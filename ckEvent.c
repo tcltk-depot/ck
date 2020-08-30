@@ -560,17 +560,21 @@ CkHandleInput(clientData, mask)
 	if (code >= 0x100 && code != ERR)
 	    ungetch(code);
 	ucbuf[ucp] = '\0';
-#if TCL_UTF_MAX == 4
-	{
-	    int n;
-
-	    n = Tcl_UtfToUniChar(ucbuf, &uch);
-	    ch = uch;
-	    if (n == 0) {
-		Tcl_UtfToUniChar(ucbuf, &uch);
-		ch = (((ch&0x3ff)<<10) | (uch&0x3ff)) + 0x10000;
+#if TCL_UTF_MAX == 3
+	if ((ucp > 3) && ((ucbuf[0] & 0xff) < 0xf8)) {
+	    if (((ucbuf[1] & 0xc0) == 0x80) &&
+		((ucbuf[2] & 0xc0) == 0x80) &&
+		((ucbuf[3] & 0xc0) == 0x80)) {
+		ch = ((ucbuf[0] & 0x0f) << 18) |
+		     ((ucbuf[1] & 0x3f) << 12) |
+		     ((ucbuf[2] & 0x3f) << 6) |
+		     (ucbuf[3] & 0x3f);
+		goto decDone;
 	    }
 	}
+	Tcl_UtfToUniChar(ucbuf, &uch);
+	ch = uch;
+decDone:
 #else
 	Tcl_UtfToUniChar(ucbuf, &uch);
 	ch = uch;

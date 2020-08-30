@@ -1396,8 +1396,22 @@ ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
 		    }
 #if CK_USE_UTF
 		    if (eventPtr->key.is_uch) {
+#if TCL_UTF_MAX == 3
+			int uch = eventPtr->key.uch;
+
+			numChars = 0;
+			if (uch >= 0x10000) {
+			    uch -= 0x10000;
+			    numChars += Tcl_UniCharToUtf((uch>>10) | 0xd800,
+							 numStorage);
+			    uch = (uch&0x3ff) | 0xdc00;
+			}
+			numChars += Tcl_UniCharToUtf(uch,
+						     numStorage + numChars);
+#else
 			numChars = Tcl_UniCharToUtf(eventPtr->key.uch,
 						    numStorage);
+#endif
 		    }
 #endif
 		    numStorage[numChars] = '\0';
