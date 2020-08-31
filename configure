@@ -651,6 +651,7 @@ CK_MAJOR_VERSION
 CK_LIB_SPEC
 CK_LIB_FILE
 CK_LD_SEARCH_FLAGS
+TCL_EXTRA_CFLAGS
 TCL_INCLUDE_SPEC
 TCL_BUILD_STUB_LIB_SPEC
 TCL_BUILD_LIB_SPEC
@@ -6278,8 +6279,10 @@ if test "$ok" = "yes" -a "${SHLIB_SUFFIX}" != ""; then
     CK_SHLIB_CFLAGS="${CK_SHLIB_CFLAGS} ${SHLIB_CFLAGS}"
     eval "CK_LIB_FILE=libck${TCL_SHARED_LIB_SUFFIX}"
     eval "suffix=${TCL_SHARED_LIB_SUFFIX}"
+    version=`echo ${VERSION} | tr -d .`
     case "$suffix" in
       ${VERSION}*) ;;
+      ${version}*) ;;
       *) eval "CK_LIB_FILE=libck${VERSION}${TCL_SHARED_LIB_SUFFIX}" ;;
     esac
     MAKE_LIB="\${SHLIB_LD} -o ${CK_LIB_FILE} \${OBJS} ${SHLIB_LD_LIBS}"
@@ -6323,6 +6326,7 @@ if test "$TCL_SUPPORTS_STUBS" = 1; then
 else
     CWSH_LIB_SPEC="$TCL_BUILD_LIB_SPEC"
 fi
+
 
 
 

@@ -722,6 +722,13 @@ init";
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
         return TCL_ERROR;
 
+    /* Interlock: when Tk is loaded, refuse to continue. */
+    if ((Tcl_FindCommand(interp, "::tk", NULL, 0) != NULL) &&
+	(Tcl_FindCommand(interp, "::bind", NULL, 0) != NULL)) {
+	Tcl_SetResult(interp, "can't load Ck", TCL_STATIC);
+	return TCL_ERROR;
+    }
+
     p = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
     if (p == NULL || *p == '\0')
         p = "Ck";

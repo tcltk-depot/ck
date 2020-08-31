@@ -100,7 +100,7 @@ LIBS = @LIBS@ $(CURSES_LIB_SWITCHES) @DL_LIBS@ @MATH_LIBS@ -lc
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS = -O -g
+CFLAGS = -O
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
@@ -225,7 +225,7 @@ all: cwsh
 	$(RANLIB) @CK_LIB_FILE@
 
 cwsh: ckAppInit.o $(CK_LIB_FILE)
-	$(CC) $(LD_FLAGS) ckAppInit.o @CK_BUILD_LIB_SPEC@ @CWSH_LIB_SPEC@ $(LIBS) -o cwsh
+	$(CC) @TCL_EXTRA_CFLAGS@ $(LD_FLAGS) ckAppInit.o @CK_BUILD_LIB_SPEC@ @CWSH_LIB_SPEC@ $(LIBS) -o cwsh
 
 configInfo: Makefile
 	@rm -f configInfo

@@ -1,2 +1,2 @@
 package ifneeded Ck @CK_VERSION@ \
-    [list load [file join $dir libck@CK_VERSION@[info sharedlibextension]] Ck]
+    [list load [file join $dir @CK_LIB_FILE@] Ck]

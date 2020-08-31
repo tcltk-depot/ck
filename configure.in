@@ -442,8 +442,10 @@ if test "$ok" = "yes" -a "${SHLIB_SUFFIX}" != ""; then
     CK_SHLIB_CFLAGS="${CK_SHLIB_CFLAGS} ${SHLIB_CFLAGS}"
     eval "CK_LIB_FILE=libck${TCL_SHARED_LIB_SUFFIX}"
     eval "suffix=${TCL_SHARED_LIB_SUFFIX}"
+    version=`echo ${VERSION} | tr -d .`
     case "$suffix" in
       ${VERSION}*) ;;
+      ${version}*) ;;
       *) eval "CK_LIB_FILE=libck${VERSION}${TCL_SHARED_LIB_SUFFIX}" ;;
     esac
     MAKE_LIB="\${SHLIB_LD} -o ${CK_LIB_FILE} \${OBJS} ${SHLIB_LD_LIBS}"
@@ -505,6 +507,7 @@ AC_SUBST(TCL_VERSION)
 AC_SUBST(TCL_BUILD_LIB_SPEC)
 AC_SUBST(TCL_BUILD_STUB_LIB_SPEC)
 AC_SUBST(TCL_INCLUDE_SPEC)
+AC_SUBST(TCL_EXTRA_CFLAGS)
 AC_SUBST(CK_LD_SEARCH_FLAGS)
 AC_SUBST(CK_LIB_FILE)
 AC_SUBST(CK_LIB_SPEC)
