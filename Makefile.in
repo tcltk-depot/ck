@@ -100,7 +100,7 @@ LIBS = @LIBS@ $(CURSES_LIB_SWITCHES) @DL_LIBS@ @MATH_LIBS@ -lc
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS = -O -g
+CFLAGS = -O
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
