@@ -225,7 +225,7 @@ all: cwsh
 	$(RANLIB) @CK_LIB_FILE@
 
 cwsh: ckAppInit.o $(CK_LIB_FILE)
-	$(CC) $(LD_FLAGS) ckAppInit.o @CK_BUILD_LIB_SPEC@ @CWSH_LIB_SPEC@ $(LIBS) -o cwsh
+	$(CC) @TCL_EXTRA_CFLAGS@ $(LD_FLAGS) ckAppInit.o @CK_BUILD_LIB_SPEC@ @CWSH_LIB_SPEC@ $(LIBS) -o cwsh
 
 configInfo: Makefile
 	@rm -f configInfo
