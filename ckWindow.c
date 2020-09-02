@@ -364,6 +364,27 @@ Ck_MainWindow(interp)
     return ckMainInfo->winPtr;
 }
 
+#ifdef USE_NCURSES
+/*
+ *----------------------------------------------------------------------
+ *
+ * HandleWinch --
+ *
+ *	Signal handler for SIGWINCH which writes a single byte
+ *	to a trigger pipe, which should wake up CkHandleInput().
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+HandleWinch(int sig)
+{
+    if (ckMainInfo != NULL && ckMainInfo->winchFd[1] >= 0) {
+	write(ckMainInfo->winchFd[1], "R", 1);
+    }
+}
+#endif 
+
 /*
  *----------------------------------------------------------------------
  *
@@ -510,6 +531,26 @@ Ck_CreateMainWindow(interp, className)
      * in non-blocking mode
      */
     fcntl(0, F_SETFL, fcntl(0, F_GETFL) & (~O_NDELAY));
+#ifdef USE_NCURSES
+    if (pipe(mainPtr->winchFd) != -1) {
+	fcntl(mainPtr->winchFd[0], F_SETFL, O_NDELAY);
+	fcntl(mainPtr->winchFd[1], F_SETFL, O_NDELAY);
+	fcntl(mainPtr->winchFd[0], F_SETFD, FD_CLOEXEC);
+	fcntl(mainPtr->winchFd[1], F_SETFD, FD_CLOEXEC);
+#ifdef HAVE_SIGACTION
+	newsig.sa_handler = HandleWinch;
+	sigfillset(&newsig.sa_mask);
+	newsig.sa_flags = 0;
+	sigaction(SIGWINCH, &newsig, &oldsig);
+#else
+	signal(SIGWINCH, HandleWinch);
+#endif
+	Tcl_CreateFileHandler(mainPtr->winchFd[0], 
+	    TCL_READABLE, CkHandleInput, (ClientData) mainPtr);
+    } else {
+	mainPtr->winchFd[0] = mainPtr->winchFd[1] = -1;
+    }
+#endif
 #endif
 
     if (initscr() == (WINDOW *) ERR) {
@@ -538,8 +579,8 @@ Ck_CreateMainWindow(interp, className)
     winPtr->height = mainPtr->maxHeight;
     winPtr->window = newwin(winPtr->height, winPtr->width, 0, 0);
     if (has_colors()) {
-    	start_color();
-    	mainPtr->flags |= CK_HAS_COLOR;
+	start_color();
+	mainPtr->flags |= CK_HAS_COLOR;
     }
 #ifdef NCURSES_MOUSE_VERSION
     mouseinterval(1);
@@ -1147,15 +1188,15 @@ Ck_MakeWindowExist(winPtr)
 	parentPtr = winPtr->parentPtr;
 	if (x < 0)
 	    x = winPtr->x = 0;
-	else if (x >= parentPtr->width)
+	else if (x >= parentPtr->width - 1)
 	    x = winPtr->x = parentPtr->width - 1;
 	if (y < 0)
 	    y = winPtr->y = 0;
-	else if (y >= parentPtr->height)
+	else if (y >= parentPtr->height - 1)
 	    y = winPtr->y = parentPtr->height - 1;
-	if (x + winPtr->width >= parentPtr->width)
+	if (x + winPtr->width > parentPtr->width)
 	    winPtr->width = parentPtr->width - x;
-	if (y + winPtr->height >= parentPtr->height)
+	if (y + winPtr->height > parentPtr->height)
 	    winPtr->height = parentPtr->height - y;
 	parentPtr = winPtr;
 	while ((parentPtr = parentPtr->parentPtr) != NULL) {
@@ -1291,7 +1332,7 @@ Ck_ResizeWindow(winPtr, width, height)
     WINDOW *new;
     int x, y, evMap = 0, doResize = 0;
 
-    if (winPtr == NULL || winPtr == mainWin)
+    if (winPtr == NULL)
 	return;
 
     /*
@@ -1307,11 +1348,11 @@ Ck_ResizeWindow(winPtr, width, height)
     }
 
     if (!(winPtr->flags & CK_TOPLEVEL)) {
-	if (winPtr->x + winPtr->width >= parentPtr->width) {
+	if (winPtr->x + winPtr->width > parentPtr->width) {
 	    winPtr->width = parentPtr->width - winPtr->x;
 	    doResize++;
 	}
-	if (winPtr->y + winPtr->height >= parentPtr->height) {
+	if (winPtr->y + winPtr->height > parentPtr->height) {
 	    winPtr->height = parentPtr->height - winPtr->y;
 	    doResize++;
 	}
@@ -1346,7 +1387,11 @@ Ck_ResizeWindow(winPtr, width, height)
     if (y + winPtr->height > winPtr->mainPtr->maxHeight)
 	winPtr->height = winPtr->mainPtr->maxHeight - y;
 
-    new = newwin(winPtr->height, winPtr->width, y, x);
+    if (winPtr->width > 0 && winPtr->height > 0)
+	new = newwin(winPtr->height, winPtr->width, y, x);
+    else
+	new = NULL;
+
     if (winPtr->window == NULL) {
 	winPtr->flags |= CK_MAPPED;
 	evMap++;
@@ -1354,11 +1399,13 @@ Ck_ResizeWindow(winPtr, width, height)
         delwin(winPtr->window);
     }
     winPtr->window = new;
-    idlok(winPtr->window, TRUE);
-    scrollok(winPtr->window, FALSE);
-    keypad(winPtr->window, TRUE);
-    nodelay(winPtr->window, TRUE);
-    meta(winPtr->window, TRUE);
+    if (winPtr->window != NULL) {
+	idlok(winPtr->window, TRUE);
+	scrollok(winPtr->window, FALSE);
+	keypad(winPtr->window, TRUE);
+	nodelay(winPtr->window, TRUE);
+	meta(winPtr->window, TRUE);
+    }
     Ck_SetWindowAttr(winPtr, winPtr->fg, winPtr->bg, winPtr->attr);
     Ck_ClearToBot(winPtr, 0, 0);
 

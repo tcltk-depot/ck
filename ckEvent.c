@@ -20,6 +20,11 @@
 #include "gpm.h"
 #endif
 
+#ifdef USE_NCURSES
+#include <sys/ioctl.h>
+#include <termios.h>
+#endif
+
 typedef struct {
     Tcl_Event header;		/* Standard event header. */
     CkEvent event;		/* Ck event data. */
@@ -27,6 +32,9 @@ typedef struct {
 } CkQEvt;
 
 static int	Ck_HandleQEvent _ANSI_ARGS_((Tcl_Event *evPtr, int flags));
+#ifdef USE_NCURSES
+static void	TerminalResized _ANSI_ARGS_((CkWindow *parentPtr));
+#endif
 
 /*
  * There's a potential problem if a handler is deleted while it's
@@ -483,6 +491,76 @@ CkEventDeadWindow(winPtr)
     }
 }
 
+#ifdef USE_NCURSES
+/*
+ *--------------------------------------------------------------
+ *
+ * TerminalResized --
+ *
+ *	Terminal, e.g. xterm, was resized. Recursively constrain
+ *	all toplevel (child) windows to the new situation.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+TerminalResized(parentPtr)
+    CkWindow *parentPtr;         /* Pointer to window. */
+{
+    CkMainInfo *mainPtr = parentPtr->mainPtr;
+    CkWindow *winPtr;
+
+    if (parentPtr->flags & CK_TOPLEVEL) {
+	if (parentPtr == mainPtr->winPtr) {
+	    Ck_ResizeWindow(parentPtr, mainPtr->maxWidth, mainPtr->maxHeight);
+	    Ck_EventuallyRefresh(parentPtr);
+	} else {
+	    int x, y, w, h;
+	    int move = 0, resize = 0;
+
+	    x = parentPtr->x;
+	    y = parentPtr->y;
+	    w = parentPtr->width;
+	    h = parentPtr->height;
+	    if (x + w > mainPtr->maxWidth) {
+		if (w > mainPtr->maxWidth) {
+		    w = mainPtr->maxWidth;
+		    x = 0;
+		    move++;
+		    resize++;
+		} else {
+		    x -= mainPtr->maxWidth - w;
+		    move++;
+		}
+	    }
+	    if (y + h > mainPtr->maxHeight) {
+		if (h > mainPtr->maxHeight) {
+		    h = mainPtr->maxHeight;
+		    y = 0;
+		    move++;
+		    resize++;
+		} else {
+		   y -= mainPtr->maxHeight - h;
+		   move++;
+		}
+	    }
+	    if (move)
+		Ck_MoveWindow(parentPtr, x, y);
+	    if (resize)
+		Ck_ResizeWindow(parentPtr, w, h);
+	    if (move || resize)
+		Ck_EventuallyRefresh(parentPtr);
+	}
+    }
+    winPtr = parentPtr->childList;
+    while (winPtr != NULL) {
+	if (winPtr->flags & CK_TOPLEVEL)
+	    TerminalResized(winPtr);
+	winPtr = winPtr->nextPtr;
+    }
+}
+#endif
+
 /*
  *--------------------------------------------------------------
  *
@@ -521,10 +599,39 @@ CkHandleInput(clientData, mask)
     Tcl_UniChar uch = 0;
 #endif
 
+#ifdef USE_NCURSES
+    if (mainPtr->winchFd[0] >= 0) {
+	code = ERR;
+	errCount = 0;
+	if (read(mainPtr->winchFd[0], ucbuf, sizeof (ucbuf)) > 0) {
+#ifdef TIOCGWINSZ
+	    struct winsize wsz;
+
+	    if (ioctl(1, TIOCGWINSZ, &wsz) != -1) {
+		resizeterm(wsz.ws_row, wsz.ws_col);
+	    }
+#endif
+	    goto doResize;
+	}
+    }
+#endif
+
     if (!(mask & TCL_READABLE))
 	return;
 
     code = getch();
+
+#ifdef USE_NCURSES
+    if (code == KEY_RESIZE) {
+doResize:
+	/* Terminal resized, must resize all toplevels, too. */
+	clear();
+	mainPtr->maxWidth = COLS;
+	mainPtr->maxHeight = LINES;
+	TerminalResized(mainPtr->winPtr);
+    }
+#endif
+
     if (code == ERR) {
 	if (++errCount > 100) {
 	    Tcl_Eval(mainPtr->interp, "exit 99");
