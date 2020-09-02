@@ -493,6 +493,12 @@ ArrangePacking(clientData)
     if (height > maxHeight) {
 	maxHeight = height;
     }
+    if (maxWidth < 0) {
+	maxWidth = 0;
+    }
+    if (maxHeight < 0) {
+	maxHeight = 0;
+    }
 
     /*
      * If the total amount of space needed in the parent window has
@@ -652,8 +658,10 @@ ArrangePacking(clientData)
 	    if (width != slavePtr->winPtr->width ||
 		height != slavePtr->winPtr->height)
 		    Ck_ResizeWindow(slavePtr->winPtr, width, height);
+#if 0
 	    if (abort)
 		goto done;
+#endif
 	    Ck_MapWindow(slavePtr->winPtr);
 	}
 

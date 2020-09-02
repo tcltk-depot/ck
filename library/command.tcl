@@ -14,7 +14,7 @@
 proc ckCommand {{w .ckCommand}} {
     global ckPriv
     if {[winfo exists $w]} {
-	raise $w
+        raise $w
         return
     }
     toplevel $w -class CommandDialog \
@@ -26,27 +26,29 @@ proc ckCommand {{w .ckCommand}} {
 
     entry $w.entry
     frame $w.sep0 -border hline -height 1
-    scrollbar $w.scroll -command "$w.output yview" -takefocus 0
-    text $w.output -yscrollcommand "$w.scroll set"
+    frame $w.t -border {}
+    scrollbar $w.t.scroll -command [list $w.t.output yview] -takefocus 0
+    text $w.t.output -yscrollcommand [list $w.t.scroll set]
     frame $w.sep1 -border hline -height 1
     button $w.close -command "lower $w" -text Dismiss
 
-    pack $w.entry -side top -fill x
-    pack $w.sep0 -side top -fill x
     pack $w.close -side bottom -ipadx 1
     pack $w.sep1 -side bottom -fill x
-    pack $w.scroll -side right -fill y
-    pack $w.output -side left -fill both -expand 1
+    pack $w.entry -side top -fill x
+    pack $w.sep0 -side top -fill x
+    pack $w.t -side top -fill both -expand 1
+    pack $w.t.scroll -side right -fill y
+    pack $w.t.output -side left -fill both -expand 1
 
-    bind $w.entry <Return> "ckCommandRun $w"
-    bind $w.entry <Linefeed> "ckCommandRun $w"
-    bind $w.entry <Up> "ckCmdHist $w 1"
-    bind $w.entry <Down> "ckCmdHist $w -1"
-    bind $w.output <Tab> {focus [ck_focusNext %W] ; break}
-    bind $w.output <Control-X> "ckCommandRun $w \[$w.output get 1.0 end\]"
-    bind $w <Escape> "lower $w ; break"
-    bind $w <Control-U> "ckCmdToggleSize $w"    
-    bind $w <Control-L> {update screen}
+    bind $w.entry <Return> [list ckCommandRun $w]
+    bind $w.entry <Linefeed> [list ckCommandRun $w]
+    bind $w.entry <Up> [list ckCmdHist $w 1]
+    bind $w.entry <Down> [list ckCmdHist $w -1]
+    bind $w.t.output <Tab> {focus [ck_focusNext %W] ; break}
+    bind $w.t.output <Control-X> [list ckCommandRunT $w]
+    bind $w <Escape> [subst {lower $w ; break}]
+    bind $w <Control-U> [subst {ckCmdToggleSize $w ; break}]
+    bind $w <Control-L> {update screen ; break}
 
     focus $w.entry
 
@@ -82,25 +84,35 @@ proc ckCmdHist {w dir} {
     $w.entry insert end $cmd
 }
 
-proc ckCommandRun {w {cmd {}}} {
+proc ckCommandRunInt {w cmd} {
     global errorInfo ckPriv
-    if {$cmd eq ""} {
-        set cmd [string trim [$w.entry get]]
-        if {$cmd eq ""} {
-            return
-        }
-    }
     set code [catch {uplevel #0 $cmd} result]
     if {$code == 0} {
         set ckPriv(cmdHistory) [lrange [concat [list $cmd] \
             $ckPriv(cmdHistory)] 0 $ckPriv(cmdHistMax)]
         set ckPriv(cmdHistCnt) -1
     }
-    $w.output delete 1.0 end
-    $w.output insert 1.0 $result
-    if {$code} { $w.output insert end "\n----\n$errorInfo" }
-    $w.output mark set insert 1.0
+    $w.t.output delete 1.0 end
+    $w.t.output insert 1.0 $result
+    if {$code} { $w.t.output insert end "\n----\n$errorInfo" }
+    $w.t.output mark set insert 1.0
     if {$code == 0} {
         $w.entry delete 0 end
     }
+}
+
+proc ckCommandRun {w} {
+    set cmd [string trim [$w.entry get]]
+    if {$cmd eq ""} {
+        return
+    }
+    ckCommandRunInt $w $cmd
+}
+
+proc ckCommandRunT {w} {
+    set cmd [string trim [$w.t.output get 1.0 end]]
+    if {$cmd eq ""} {
+        return
+    }
+    ckCommandRunInt $w $cmd
 }

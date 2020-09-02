@@ -247,6 +247,9 @@ typedef struct CkMainInfo {
     ClientData mouseData;       /* Value used by mouse handling code. */
     ClientData barcodeData;	/* Value used by bar code handling code. */
     int flags;			/* See definitions below. */
+#ifdef USE_NCURSES
+    int winchFd[2];		/* Pipe for SIGWINCH handling. */
+#endif
 #if CK_USE_UTF
     Tcl_Encoding isoEncoding;
 #endif
