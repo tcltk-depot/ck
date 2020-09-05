@@ -487,6 +487,103 @@ Ck_GetEncoding(interp)
 /*
  *--------------------------------------------------------------
  *
+ * NumUtfChars, UtfToUniChar, UtfAtIndex --
+ *
+ *	Wrappers for Tcl_NumUtfChars(), Tcl_UtfToUniChar(), and
+ *	Tcl_UtAtIndex() counting/producing 32 bit codepoints.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+NumUtfChars(buf, len)
+    char *buf;
+    int len;
+{
+    Tcl_UniChar ch;
+    char *end;
+    int n, i = 0;
+
+    if (len < 0) {
+	len = strlen(buf);
+    }
+    end = buf + len;
+    while (buf < end) {
+	n = Tcl_UtfToUniChar(buf, &ch);
+#if TCL_UTF_MAX == 3
+	if ((ch & 0xfc00) == 0xd800) {
+	    int n2;
+	    Tcl_UniChar ch2;
+
+	    n2 = Tcl_UtfToUniChar(buf + n, &ch2);
+	    if ((ch2 & 0xfc00) == 0xdc00)
+		buf += n2;
+	}
+#endif
+	buf += n;
+	i++;
+    }
+    return i;
+}
+
+static int
+UtfToUniChar(buf, chPtr)
+    char *buf;
+    int *chPtr;
+{
+    int len;
+    Tcl_UniChar ch;
+
+    len = Tcl_UtfToUniChar(buf, &ch);
+#if TCL_UTF_MAX == 3
+    if ((ch & 0xfc00) == 0xd800) {
+	int len2;
+	Tcl_UniChar ch2;
+
+	len2 = Tcl_UtfToUniChar(buf + len, &ch2);
+	if ((ch2 & 0xfc00) == 0xdc00) {
+	    *chPtr = (((ch & 0x3ff) << 10) | (ch2 & 0x3ff)) + 0x10000;
+	    len += len2;
+	    return len;
+	}
+    }
+#endif
+    *chPtr = ch;
+    return len;
+}
+
+static CONST char *
+UtfAtIndex(src, index)
+    CONST char *src;
+    int index;
+{
+    int len;
+    Tcl_UniChar ch = 0;
+
+    while (index-- > 0) {
+	len = Tcl_UtfToUniChar(src, &ch);
+#if TCL_UTF_MAX == 3
+	if ((ch & 0xfc00) == 0xd800) {
+	    int len2;
+	    Tcl_UniChar ch2;
+
+	    len2 = Tcl_UtfToUniChar(src + len, &ch2);
+	    if ((ch2 & 0xfc00) == 0xdc00) {
+		len += len2;
+		index++;
+	    }
+	}
+#endif
+	src += len;
+    }
+    return src;
+}
+#endif
+
+#if CK_USE_UTF
+/*
+ *--------------------------------------------------------------
+ *
  * MakeUCRepl --
  *
  *	Make replacement for unprintable chars.
@@ -496,13 +593,12 @@ Ck_GetEncoding(interp)
 
 static int
 MakeUCRepl(uch, buf)
-    Tcl_UniChar uch;
+    unsigned int uch;
     char *buf;
 {
     unsigned int i, need;
 
-    if ((unsigned int) uch < sizeof (mapChars) &&
-	mapChars[(unsigned int) uch]) {
+    if (uch < sizeof (mapChars) && mapChars[uch]) {
 	if (buf) {
 	    *buf++ = '\\';
 	    *buf++ = mapChars[(unsigned int) uch];
@@ -511,7 +607,7 @@ MakeUCRepl(uch, buf)
 	return 2;
     }
     for (i = 0x100, need = 2; i; i++, need++) {
-	if ((unsigned int) uch < i) {
+	if (uch < i) {
 	    break;
 	}
 	i = i << 4;
@@ -520,7 +616,16 @@ MakeUCRepl(uch, buf)
 	char *p;
 
 	*buf++ = '\\';
-	*buf++ = (need < 3) ? 'x' : 'u';
+	if (need < 3) {
+	    *buf++ = 'x';
+	} else if (need < 5) {
+	    *buf++ = 'u';
+	} else {
+	    *buf++ = 'U';
+	}
+	if (need & 1) {
+	    ++need;
+	}
 	p = buf + need;
 	*p = '\0';
 	for (i = 0; i < need; i++) {
@@ -599,8 +704,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     int rem;
     int nChars = 0;
 #if CK_USE_UTF
-    int n, m, srcRead, dstWrote, dstChars;
-    Tcl_UniChar uch;
+    int uch, n, m, srcRead, dstWrote, dstChars;
     char buf[TCL_UTF_MAX*2], buf2[TCL_UTF_MAX*2];
 
     /*
@@ -614,7 +718,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     for (p = source; *p != '\0' && maxChars > 0;) {
         char *p2;
 
-	n = Tcl_UtfToUniChar(p, &uch);
+	n = UtfToUniChar(p, &uch);
 	p2 = p + n;
 	++nChars;
 	maxChars -= n;
@@ -673,7 +777,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 	}
 	p = p2;
 	if (maxChars > 1) {
-	    n = Tcl_UtfToUniChar(p, &uch);
+	    n = UtfToUniChar(p, &uch);
 	    p2 = p + n;
 	    m = Tcl_UniCharToUtf(uch, buf);
 	    if (mainPtr->isoEncoding) {
@@ -707,7 +811,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     if ((flags & CK_PARTIAL_OK) && (curX < maxX)) {
 	curX = newX;
 	if (*p) {
-	    n = Tcl_UtfToUniChar(p, &uch);
+	    n = UtfToUniChar(p, &uch);
 	    p += n;
 	    ++nChars;
 	}
@@ -717,7 +821,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 	term = p;
 	termX = curX;
 	if (term == source) {
-	    n = Tcl_UtfToUniChar(term, &uch);
+	    n = UtfToUniChar(term, &uch);
 	    term += n;
 	    ++nChars;
 	}
@@ -852,9 +956,9 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
 
     getmaxyx(window, dummy, maxX);
 #if CK_USE_UTF
-    nc = Tcl_NumUtfChars(string, numChars);
+    nc = NumUtfChars(string, numChars);
     if (nc > maxX)
-	numChars = Tcl_UtfAtIndex(string, maxX) - string;
+	numChars = UtfAtIndex(string, maxX) - string;
     else
 	numChars = nc;
 #endif
@@ -864,7 +968,7 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
     if (x < 0) {
 	x = -x;
 #if CK_USE_UTF
-	x = Tcl_UtfAtIndex(p, x) - p;
+	x = UtfAtIndex(p, x) - p;
 #endif
 	p += x;
 	numChars -= x;
@@ -874,12 +978,11 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
     startX = curX = x;
     for (; numChars > 0; numChars--, p += nc) {
 #if CK_USE_UTF
-	Tcl_UniChar uch;
-	int len;
+	int uch, len;
 
 	if (*p == '\0')
 	    break;
-	nc = Tcl_UtfToUniChar(p, &uch);
+	nc = UtfToUniChar(p, &uch);
 	if (mainPtr->isoEncoding) {
 	    int srcRead, dstWrote, dstChars;
 	    char buf[TCL_UTF_MAX*2];
@@ -1106,18 +1209,11 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     startX = curX = x;
     for (; numChars > 0 && count <= last; numChars -= nc, count++, p += nc) {
 #if CK_USE_UTF
-	Tcl_UniChar uch;
-	int len;
+	int uch, len;
 
 	if (*p == '\0')
 	    break;
-	if (mainPtr->isoEncoding == NULL) {
-	    nc = Tcl_UtfToUniChar(p, &uch);
-	} else {
-	    Tcl_UtfToUniChar(p, &uch);
-	    nc = 1;
-	}
-	nc = Tcl_UtfToUniChar(p, &uch);
+	nc = UtfToUniChar(p, &uch);
 	if (mainPtr->isoEncoding) {
 	    int srcRead, dstWrote, dstChars;
 	    char buf[TCL_UTF_MAX*2];

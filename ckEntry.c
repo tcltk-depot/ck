@@ -1054,6 +1054,9 @@ InsertChars(entryPtr, index, string)
     char *new;
 #if CK_USE_UTF
     int inspos;
+#if TCL_UTF_MAX == 3
+	Tcl_UniChar ch;
+#endif
 #endif
 
     length = strlen(string);
@@ -1064,6 +1067,21 @@ InsertChars(entryPtr, index, string)
     clength = Tcl_NumUtfChars(string, -1);
     new = (char *) ckalloc((unsigned) (entryPtr->numBytes + length + 1));
     inspos = Tcl_UtfAtIndex(entryPtr->string, index) - entryPtr->string;
+#if TCL_UTF_MAX == 3
+    if (length) {
+	char *prevPtr;
+
+	Tcl_UtfToUniChar(string + length, &ch);
+	if ((ch & 0xfc00) == 0xdc00) {
+	    prevPtr = Tcl_UtfPrev(string + length, string);
+	    Tcl_UtfToUniChar(prevPtr, &ch);
+	    if ((ch & 0xfc00) == 0xd800) {
+		length = prevPtr - string;
+		index -= 1;
+	    }
+	}
+    }
+#endif
     strncpy(new, entryPtr->string, (size_t) inspos);
     strcpy(new+inspos, string);
     strcpy(new+inspos+length, entryPtr->string+inspos);
@@ -1080,6 +1098,27 @@ InsertChars(entryPtr, index, string)
     ckfree(entryPtr->string);
     entryPtr->string = new;
     entryPtr->numChars += length;
+#endif
+
+#if TCL_UTF_MAX == 3
+    /*
+     * Account for high surrogate at end of inserted string.
+     */
+    if (length > 1) {
+	char *lastPtr = Tcl_UtfPrev(new+inspos+length, new);
+
+	Tcl_UtfToUniChar(lastPtr, &ch);
+	if ((ch & 0xfc00) == 0xd800) {
+	    /*
+	     * A high surrogate. If followed by low surrogate,
+	     * adjust index after it.
+	     */
+	    lastPtr = Tcl_UtfNext(lastPtr);
+	    Tcl_UtfToUniChar(lastPtr, &ch);
+	    if ((ch & 0xfc00) == 0xdc00)
+		index++;
+	}
+    }
 #endif
 
     /*
@@ -1151,9 +1190,61 @@ DeleteChars(entryPtr, index, count)
     }
 
 #if CK_USE_UTF
+
+#if TCL_UTF_MAX == 3
     delpos = Tcl_UtfAtIndex(entryPtr->string, index) - entryPtr->string;
+
+    /*
+     * Delete complete surrogate pairs.
+     */
+    if (delpos >= 0) {
+	Tcl_UniChar ch;
+	char *prevPtr, *nextPtr;
+
+	Tcl_UtfToUniChar(entryPtr->string + delpos, &ch);
+	if ((ch & 0xfc00) == 0xdc00) {
+	    prevPtr = Tcl_UtfPrev(entryPtr->string + delpos, entryPtr->string);
+	    Tcl_UtfToUniChar(prevPtr, &ch);
+	    if ((ch & 0xfc00) == 0xd800) {
+		delpos = prevPtr - entryPtr->string;
+		count++;
+		index--;
+	    }
+	} else if ((count == 1) && ((ch & 0xfc00) == 0xd800)) {
+	    nextPtr = Tcl_UtfNext(entryPtr->string + delpos);
+	    Tcl_UtfToUniChar(nextPtr, &ch);
+	    if ((ch & 0xfc00) == 0xdc00) {
+		count++;
+	    }
+	}
+	if ((index + count) > entryPtr->numChars) {
+	    count = entryPtr->numChars - index;
+	}
+    }
+#endif
+
     delcount = Tcl_UtfAtIndex(entryPtr->string + delpos, count) -
 	   	   (entryPtr->string + delpos);
+
+#if TCL_UTF_MAX == 3
+    if (delcount) {
+	int len;
+	Tcl_UniChar ch;
+	char *prevPtr;
+
+	len = Tcl_UtfToUniChar(entryPtr->string + delpos + delcount, &ch);
+	if ((ch & 0xfc00) == 0xdc00) {
+	    prevPtr = Tcl_UtfPrev(entryPtr->string + delpos + delcount,
+			    entryPtr->string);
+	    Tcl_UtfToUniChar(prevPtr, &ch);
+	    if ((ch & 0xfc00) == 0xd800) {
+		delcount += len;
+		count++;
+	    }
+	}
+    }
+#endif
+
     new = (char *) ckalloc((unsigned) (entryPtr->numBytes + 1 - delcount));
     strncpy(new, entryPtr->string, (size_t) delpos);
     strcpy(new+delpos, entryPtr->string+delpos+delcount);
@@ -1349,6 +1440,10 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
     size_t length;
     int dummy;
     CkWindow *winPtr = entryPtr->winPtr;
+    int roundUp = 0;
+#if TCL_UTF_MAX == 3
+    int oldInsertPos = entryPtr->insertPos;
+#endif
 
     length = strlen(string);
 
@@ -1396,7 +1491,7 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
 	    goto badIndex;
 	}
     } else if (string[0] == '@') {
-        int x, roundUp;
+        int x;
 
         if (Tcl_GetInt(interp, string+1, &x) != TCL_OK) {
             goto badIndex;
@@ -1404,7 +1499,6 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
         if (x < 0) {
             x = 0;
         }
-        roundUp = 0;
         if (x >= entryPtr->winPtr->width) {
             x = entryPtr->winPtr->width - 1;
             roundUp = 1;
@@ -1433,7 +1527,35 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
 	} else if (*indexPtr > entryPtr->numChars) {
 	    *indexPtr = entryPtr->numChars;
 	}
+#if TCL_UTF_MAX == 3
+	roundUp = (indexPtr == &entryPtr->insertPos) &&
+		(*indexPtr == (oldInsertPos + 1));
+#endif
     }
+
+#if TCL_UTF_MAX == 3
+    /*
+     * Enforce index on start or end of surrogate pair.
+     */
+    if (*indexPtr) {
+	Tcl_UniChar ch;
+
+	string = Tcl_UtfAtIndex(entryPtr->string, *indexPtr);
+	Tcl_UtfToUniChar(string, &ch);
+	if ((ch & 0xfc00) == 0xdc00) {
+	    if (roundUp) {
+		*indexPtr += 1;
+	    } else {
+		string = Tcl_UtfPrev(string, entryPtr->string);
+		Tcl_UtfToUniChar(string, &ch);
+		if ((ch & 0xfc00) == 0xd800) {
+		    *indexPtr -= 1;
+		}
+	    }
+	}
+    }
+#endif
+
     return TCL_OK;
 }
 
@@ -1471,6 +1593,26 @@ EntrySelectTo(entryPtr, index)
 	entryPtr->selectAnchor = entryPtr->numChars;
     }
     if (entryPtr->selectAnchor <= index) {
+#if TCL_UTF_MAX == 3
+	/*
+	 * Correct ending point for surrogate pair.
+	 */
+	Tcl_UniChar ch;
+	char *string;
+
+	string = Tcl_UtfAtIndex(entryPtr->string, index);
+	string += Tcl_UtfToUniChar(string, &ch);
+	if (((ch & 0xfc00) == 0xdc00) && (index + 1 < entryPtr->numChars)) {
+	    index += 1;
+	} else if (((ch & 0xfc00) == 0xd800) &&
+		   (index + 1 < entryPtr->numChars) &&
+		   (index == entryPtr->insertPos)) {
+	    Tcl_UtfToUniChar(string, &ch);
+	    if ((ch & 0xfc00) == 0xdc00) {
+		index += 2;
+	    }
+	}
+#endif
 	newFirst = entryPtr->selectAnchor;
 	newLast = index;
     } else {

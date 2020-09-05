@@ -868,6 +868,18 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
 		start = segPtr->body.chars + byteOffset;
 		end = segPtr->body.chars + segPtr->size;
 		for (p = start; p < end; p += Tcl_UtfToUniChar(p, &ch)) {
+#if TCL_UTF_MAX == 3
+		    if (((ch & 0xfc00) == 0xd800) && (p < end)) {
+			char *pp = p;
+
+			pp += Tcl_UtfToUniChar(pp, &ch);
+			if ((ch & 0xfc00) == 0xdc00) {
+			    p = pp;
+			    if (count > 0)
+				count--;
+			}
+		    }
+#endif
 		    if (count == 0) {
 			dstPtr->charIndex += (p - start);
 			return;
@@ -1060,6 +1072,23 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
 	    start = segPtr->body.chars;
 	    end = segPtr->body.chars + segSize;
 	    for (p = end; ; p = Tcl_UtfPrev(p, start)) {
+#if TCL_UTF_MAX == 3
+		Tcl_UniChar ch;
+
+		Tcl_UtfToUniChar(p, &ch);
+		if (((ch & 0xfc00) == 0xdc00) && (p > start)) {
+		    char *pp = Tcl_UtfPrev(p, start);
+
+		    if (pp != NULL) {
+			Tcl_UtfToUniChar(pp, &ch);
+			if ((ch & 0xfc00) == 0xd800) {
+			    p = pp;
+			    if (count > 0)
+				count--;
+			}
+		    }
+		}
+#endif
 		if (count == 0) {
 		    dstPtr->charIndex -= (end - p);
 		    return;

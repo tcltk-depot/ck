@@ -763,6 +763,12 @@ init";
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
         return TCL_ERROR;
 
+    /* Interlock: only one interp allowed. */
+    if (ckMainInfo != NULL && ckMainInfo->interp != interp) {
+	Tcl_SetResult(interp, "can't load Ck", TCL_STATIC);
+	return TCL_ERROR;
+    }
+
     /* Interlock: when Tk is loaded, refuse to continue. */
     if ((Tcl_FindCommand(interp, "::tk", NULL, 0) != NULL) &&
 	(Tcl_FindCommand(interp, "::bind", NULL, 0) != NULL)) {
@@ -1077,6 +1083,9 @@ Ck_DestroyWindow(winPtr)
 		Tcl_FreeEncoding(mainPtr->isoEncoding);
 	    }
 #endif
+	    Tcl_SetVar2(mainPtr->interp, "ckPriv", "forever", "0",
+			TCL_GLOBAL_ONLY);
+	    mainPtr->interp = NULL;
 	    ckfree((char *) mainPtr);
 	    ckMainInfo = NULL;
 	    goto done;
@@ -1188,11 +1197,11 @@ Ck_MakeWindowExist(winPtr)
 	parentPtr = winPtr->parentPtr;
 	if (x < 0)
 	    x = winPtr->x = 0;
-	else if (x >= parentPtr->width - 1)
+	else if (x > parentPtr->width - 1)
 	    x = winPtr->x = parentPtr->width - 1;
 	if (y < 0)
 	    y = winPtr->y = 0;
-	else if (y >= parentPtr->height - 1)
+	else if (y > parentPtr->height - 1)
 	    y = winPtr->y = parentPtr->height - 1;
 	if (x + winPtr->width > parentPtr->width)
 	    winPtr->width = parentPtr->width - x;
