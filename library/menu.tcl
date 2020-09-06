@@ -252,7 +252,7 @@ proc ckMenuLeftRight {menu direction} {
     set buttons [winfo children [winfo parent $w]]
     set length [llength $buttons]
     set i [expr {[lsearch -exact $buttons $w] + $count}]
-    while 1 {
+    while {1} {
 	while {$i < 0} {
 	    incr i $length
 	}
@@ -297,7 +297,7 @@ proc ckMenuNextEntry {menu count} {
     } else {
 	set i [expr {$active + $count}]
     }
-    while 1 {
+    while {1} {
 	while {$i < 0} {
 	    incr i $length
 	}

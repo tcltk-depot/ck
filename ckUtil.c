@@ -496,13 +496,12 @@ Ck_GetEncoding(interp)
 
 static int
 MakeUCRepl(uch, buf)
-    Tcl_UniChar uch;
+    unsigned int uch;
     char *buf;
 {
     unsigned int i, need;
 
-    if ((unsigned int) uch < sizeof (mapChars) &&
-	mapChars[(unsigned int) uch]) {
+    if (uch < sizeof (mapChars) && mapChars[uch]) {
 	if (buf) {
 	    *buf++ = '\\';
 	    *buf++ = mapChars[(unsigned int) uch];
@@ -511,7 +510,7 @@ MakeUCRepl(uch, buf)
 	return 2;
     }
     for (i = 0x100, need = 2; i; i++, need++) {
-	if ((unsigned int) uch < i) {
+	if (uch < i) {
 	    break;
 	}
 	i = i << 4;
@@ -520,7 +519,16 @@ MakeUCRepl(uch, buf)
 	char *p;
 
 	*buf++ = '\\';
-	*buf++ = (need < 3) ? 'x' : 'u';
+	if (need < 3) {
+	    *buf++ = 'x';
+	} else if (need < 5) {
+	    *buf++ = 'u';
+	} else {
+	    *buf++ = 'U';
+	}
+	if (need & 1) {
+	    ++need;
+	}
 	p = buf + need;
 	*p = '\0';
 	for (i = 0; i < need; i++) {
@@ -1111,12 +1119,6 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
 
 	if (*p == '\0')
 	    break;
-	if (mainPtr->isoEncoding == NULL) {
-	    nc = Tcl_UtfToUniChar(p, &uch);
-	} else {
-	    Tcl_UtfToUniChar(p, &uch);
-	    nc = 1;
-	}
 	nc = Tcl_UtfToUniChar(p, &uch);
 	if (mainPtr->isoEncoding) {
 	    int srcRead, dstWrote, dstChars;

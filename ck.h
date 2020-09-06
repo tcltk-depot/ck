@@ -57,6 +57,12 @@
 #define CK_USE_UTF 0
 #endif
 
+#ifdef TCL_UTF_MAX
+#if TCL_UTF_MAX == 4
+#error TCL_UTF_MAX=4 is unsupported
+#endif
+#endif
+
 #ifndef RESOURCE_INCLUDED
 
 #ifdef __STDC__
@@ -586,6 +592,9 @@ EXTERN void	CkDisplayChars _ANSI_ARGS_((CkMainInfo *mainPtr,
 		    WINDOW *window, char *string,
 		    int numChars, int x, int y, int tabOrigin, int flags));
 EXTERN void	CkEventDeadWindow _ANSI_ARGS_((CkWindow *winPtr));
+#ifdef USE_NCURSES
+EXTERN void	CkFocusRestore _ANSI_ARGS_((ClientData clientData));
+#endif
 EXTERN void	CkFreeBindingTags _ANSI_ARGS_((CkWindow *winPtr));
 EXTERN char *	CkGetBarcodeData _ANSI_ARGS_((CkMainInfo *mainPtr));
 EXTERN void	CkHandleInput _ANSI_ARGS_((ClientData clientData, int mask));

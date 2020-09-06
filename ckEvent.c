@@ -33,7 +33,7 @@ typedef struct {
 
 static int	Ck_HandleQEvent _ANSI_ARGS_((Tcl_Event *evPtr, int flags));
 #ifdef USE_NCURSES
-static void	TerminalResized _ANSI_ARGS_((CkWindow *parentPtr));
+static void	TerminalResized _ANSI_ARGS_((CkWindow *parentPtr, int flag));
 #endif
 
 /*
@@ -504,13 +504,15 @@ CkEventDeadWindow(winPtr)
  */
 
 static void
-TerminalResized(parentPtr)
-    CkWindow *parentPtr;         /* Pointer to window. */
+TerminalResized(parentPtr, flag)
+    CkWindow *parentPtr;        /* Pointer to window. */
+    int flag;                   /* When true, deal with toplevels. */
 {
     CkMainInfo *mainPtr = parentPtr->mainPtr;
     CkWindow *winPtr;
+    CkWindowEvent event;
 
-    if (parentPtr->flags & CK_TOPLEVEL) {
+    if (flag && (parentPtr->flags & CK_TOPLEVEL)) {
 	if (parentPtr == mainPtr->winPtr) {
 	    Ck_ResizeWindow(parentPtr, mainPtr->maxWidth, mainPtr->maxHeight);
 	    Ck_EventuallyRefresh(parentPtr);
@@ -551,13 +553,39 @@ TerminalResized(parentPtr)
 	    if (move || resize)
 		Ck_EventuallyRefresh(parentPtr);
 	}
+    } else if (!flag) {
+	CkEvent ev;
+
+	ev.win.type = CK_EV_EXPOSE;
+	ev.win.winPtr = parentPtr;
+	Ck_HandleEvent(mainPtr, &ev);
     }
     winPtr = parentPtr->childList;
     while (winPtr != NULL) {
-	if (winPtr->flags & CK_TOPLEVEL)
-	    TerminalResized(winPtr);
+	TerminalResized(winPtr, flag);
 	winPtr = winPtr->nextPtr;
     }
+}
+#endif
+
+#ifdef USE_NCURSES
+/*
+ *--------------------------------------------------------------
+ *
+ * CkFocusRestore --
+ *
+ *	Try to restore focus after terminal resize.
+ *
+ *--------------------------------------------------------------
+ */
+
+void
+CkFocusRestore(clientData)
+    ClientData clientData;
+{
+    CkWindow *winPtr = (CkWindow *) clientData;
+
+    Ck_SetFocus(winPtr);
 }
 #endif
 
@@ -607,9 +635,8 @@ CkHandleInput(clientData, mask)
 #ifdef TIOCGWINSZ
 	    struct winsize wsz;
 
-	    if (ioctl(1, TIOCGWINSZ, &wsz) != -1) {
+	    if (ioctl(1, TIOCGWINSZ, &wsz) != -1)
 		resizeterm(wsz.ws_row, wsz.ws_col);
-	    }
 #endif
 	    goto doResize;
 	}
@@ -625,10 +652,20 @@ CkHandleInput(clientData, mask)
     if (code == KEY_RESIZE) {
 doResize:
 	/* Terminal resized, must resize all toplevels, too. */
-	clear();
-	mainPtr->maxWidth = COLS;
-	mainPtr->maxHeight = LINES;
-	TerminalResized(mainPtr->winPtr);
+	if (mainPtr->maxWidth != COLS || mainPtr->maxHeight != LINES) {
+	    mainPtr->maxWidth = COLS;
+	    mainPtr->maxHeight = LINES;
+	    TerminalResized(mainPtr->winPtr, 1);
+	    TerminalResized(mainPtr->winPtr, 0);
+	    wrefresh(curscr);
+	    if (mainPtr->focusPtr != NULL) {
+		Tcl_CancelIdleCall(CkFocusRestore,
+				   (ClientData) mainPtr->focusPtr);
+		Tcl_DoWhenIdle(CkFocusRestore,
+			       (ClientData) mainPtr->focusPtr);
+	    }
+	}
+	return;
     }
 #endif
 
@@ -912,6 +949,7 @@ keyEvent:
 mkEvent:
     qev = (CkQEvt *) ckalloc(sizeof (CkQEvt));
     qev->header.proc = Ck_HandleQEvent;
+    qev->header.nextPtr = NULL;
     qev->event = event;
     qev->mainPtr = mainPtr;
     Tcl_QueueEvent(&qev->header, TCL_QUEUE_TAIL);
@@ -995,6 +1033,7 @@ CkHandleGPMInput(clientData, mask)
 	    &event.mouse.y, 1);
 	qev = (CkQEvt *) ckalloc(sizeof (CkQEvt));
 	qev->header.proc = Ck_HandleQEvent;
+	qev->header.nextPtr = NULL;
 	qev->event = event;
 	qev->mainPtr = mainPtr;
 	Tcl_QueueEvent(&qev->header, TCL_QUEUE_TAIL);

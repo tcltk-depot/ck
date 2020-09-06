@@ -763,6 +763,12 @@ init";
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
         return TCL_ERROR;
 
+    /* Interlock: only one interp allowed. */
+    if (ckMainInfo != NULL && ckMainInfo->interp != interp) {
+	Tcl_SetResult(interp, "can't load Ck", TCL_STATIC);
+	return TCL_ERROR;
+    }
+
     /* Interlock: when Tk is loaded, refuse to continue. */
     if ((Tcl_FindCommand(interp, "::tk", NULL, 0) != NULL) &&
 	(Tcl_FindCommand(interp, "::bind", NULL, 0) != NULL)) {
@@ -988,6 +994,7 @@ Ck_DestroyWindow(winPtr)
     MEVENT mEvent;
 #endif
 
+    Tcl_CancelIdleCall(CkFocusRestore, (ClientData) winPtr);
     if (winPtr->flags & CK_ALREADY_DEAD)
 	return;
     winPtr->flags |= CK_ALREADY_DEAD;
@@ -1077,6 +1084,9 @@ Ck_DestroyWindow(winPtr)
 		Tcl_FreeEncoding(mainPtr->isoEncoding);
 	    }
 #endif
+	    Tcl_SetVar2(mainPtr->interp, "ckPriv", "forever", "0",
+			TCL_GLOBAL_ONLY);
+	    mainPtr->interp = NULL;
 	    ckfree((char *) mainPtr);
 	    ckMainInfo = NULL;
 	    goto done;
@@ -1188,11 +1198,11 @@ Ck_MakeWindowExist(winPtr)
 	parentPtr = winPtr->parentPtr;
 	if (x < 0)
 	    x = winPtr->x = 0;
-	else if (x >= parentPtr->width - 1)
+	else if (x > parentPtr->width - 1)
 	    x = winPtr->x = parentPtr->width - 1;
 	if (y < 0)
 	    y = winPtr->y = 0;
-	else if (y >= parentPtr->height - 1)
+	else if (y > parentPtr->height - 1)
 	    y = winPtr->y = parentPtr->height - 1;
 	if (x + winPtr->width > parentPtr->width)
 	    winPtr->width = parentPtr->width - x;
@@ -1258,18 +1268,15 @@ Ck_MoveWindow(winPtr, x, y)
 				 * parent). */
 {
     CkWindow *childPtr, *parentPtr;
-    int newx, newy;
+    CkWindow *mainWin = winPtr->mainPtr->winPtr;
+    CkWindowEvent event;
+    int newx, newy, evMap = 0;
 
     if (winPtr == NULL)
 	return;
 
-    winPtr->x = x;
-    winPtr->y = y;
-    if (winPtr->window == NULL)
-    	return;
-
-    newx = x;
-    newy = y;
+    winPtr->x = newx = x;
+    winPtr->y = newy = y;
     if (!(winPtr->flags & CK_TOPLEVEL)) {
 	parentPtr = winPtr;
 	while ((parentPtr = parentPtr->parentPtr) != NULL) {
@@ -1296,13 +1303,30 @@ Ck_MoveWindow(winPtr, x, y)
 	newy = 0;
     }
 
-    mvwin(winPtr->window, newy, newx);
+    if (winPtr->window != NULL)
+	mvwin(winPtr->window, newy, newx);
+    else if (winPtr->width > 0 && winPtr->height > 0) {
+	winPtr->window = newwin(winPtr->height, winPtr->width, newy, newx);
+	winPtr->flags |= CK_MAPPED;
+	evMap++;
+    } else
+	return;
 
     for (childPtr = winPtr->childList;
          childPtr != NULL; childPtr = childPtr->nextPtr)
 	if (!(childPtr->flags & CK_TOPLEVEL))
 	    Ck_MoveWindow(childPtr, childPtr->x, childPtr->y);
     Ck_EventuallyRefresh(winPtr);
+
+    if (!evMap)
+	return;
+
+    event.type = CK_EV_MAP;
+    event.winPtr = winPtr;
+    Ck_HandleEvent(mainWin->mainPtr, (CkEvent *) &event);
+    event.type = CK_EV_EXPOSE;
+    event.winPtr = winPtr;
+    Ck_HandleEvent(mainWin->mainPtr, (CkEvent *) &event);
 }
 
 /*
@@ -1330,7 +1354,7 @@ Ck_ResizeWindow(winPtr, width, height)
     CkWindow *mainWin = winPtr->mainPtr->winPtr;
     CkWindowEvent event;
     WINDOW *new;
-    int x, y, evMap = 0, doResize = 0;
+    int x, y, doResize = 0;
 
     if (winPtr == NULL)
 	return;
@@ -1358,9 +1382,6 @@ Ck_ResizeWindow(winPtr, width, height)
 	}
 
 	if (!doResize)
-	    return;
-
-	if (winPtr->window == NULL)
 	    return;
 
 	parentPtr = winPtr;
@@ -1394,7 +1415,6 @@ Ck_ResizeWindow(winPtr, width, height)
 
     if (winPtr->window == NULL) {
 	winPtr->flags |= CK_MAPPED;
-	evMap++;
     } else {
         delwin(winPtr->window);
     }
@@ -2202,15 +2222,20 @@ Ck_SetHWCursor(winPtr, newState)
     CkWindow *winPtr;
     int newState;
 {
-    int oldState = winPtr->flags & CK_SHOW_CURSOR;
+    int oldState = (winPtr->flags & CK_SHOW_CURSOR) != 0;
 
-    if (newState == oldState)
+    if (newState < 0)
+	goto refresh;
+
+    if ((newState && oldState) || (!newState && !oldState))
 	return;
 
     if (newState)
 	winPtr->flags |= CK_SHOW_CURSOR;
     else
 	winPtr->flags &= ~CK_SHOW_CURSOR;
+
+refresh:
     if (winPtr == winPtr->mainPtr->focusPtr)
 	UpdateHWCursor(winPtr->mainPtr);
 }
