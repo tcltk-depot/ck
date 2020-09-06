@@ -25,7 +25,7 @@ set ckPriv(restrictWindow) {}
 proc ck_focusNext w {
     global ckPriv
     set cur $w
-    while 1 {
+    while {1} {
 
 	# Descend to just before the first child of the current widget.
 
@@ -35,7 +35,7 @@ proc ck_focusNext w {
 
 	# Look for the next sibling that isn't a top-level.
 
-	while 1 {
+	while {1} {
 	    incr i
 	    if {$i < [llength $children]} {
 		set cur [lindex $children $i]
@@ -79,7 +79,7 @@ proc ck_focusNext w {
 proc ck_focusPrev w {
     global ckPriv
     set cur $w
-    while 1 {
+    while {1} {
 
 	# Collect information about the current window's position
 	# among its siblings.

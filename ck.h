@@ -586,6 +586,9 @@ EXTERN void	CkDisplayChars _ANSI_ARGS_((CkMainInfo *mainPtr,
 		    WINDOW *window, char *string,
 		    int numChars, int x, int y, int tabOrigin, int flags));
 EXTERN void	CkEventDeadWindow _ANSI_ARGS_((CkWindow *winPtr));
+#ifdef USE_NCURSES
+EXTERN void	CkFocusRestore _ANSI_ARGS_((ClientData clientData));
+#endif
 EXTERN void	CkFreeBindingTags _ANSI_ARGS_((CkWindow *winPtr));
 EXTERN char *	CkGetBarcodeData _ANSI_ARGS_((CkMainInfo *mainPtr));
 EXTERN void	CkHandleInput _ANSI_ARGS_((ClientData clientData, int mask));
