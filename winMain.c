@@ -1,4 +1,4 @@
-/* 
+/*
  * winMain.c --
  *
  *	Main entry point for cwsh.
@@ -36,7 +36,7 @@ static void		CwshPanic _ANSI_ARGS_(TCL_VARARGS(char *,format));
  *
  * Results:
  *	Returns false if initialization fails, otherwise it never
- *	returns. 
+ *	returns.
  *
  * Side effects:
  *	Just about anything, since from here we call arbitrary Tcl code.
@@ -163,7 +163,7 @@ CwshPanic TCL_VARARGS_DEF(char *,arg1)
     va_list argList;
     char buf[1024];
     char *format;
-    
+
     format = TCL_VARARGS_START(char *,arg1,argList);
     vsprintf(buf, format, argList);
 
@@ -181,7 +181,7 @@ CwshPanic TCL_VARARGS_DEF(char *,arg1)
  * setargv --
  *
  *	Parse the Windows command line string into argc/argv.  Done here
- *	because we don't trust the builtin argument parser in crt0.  
+ *	because we don't trust the builtin argument parser in crt0.
  *	Windows applications are responsible for breaking their command
  *	line into arguments.
  *
@@ -210,7 +210,7 @@ setargv(argcPtr, argvPtr)
     char *cmdLine, *p, *arg, *argSpace;
     char **argv;
     int argc, size, inquote, copy, slashes;
-    
+
     cmdLine = GetCommandLine();
 
     /*
@@ -230,7 +230,7 @@ setargv(argcPtr, argvPtr)
 	    }
 	}
     }
-    argSpace = (char *) ckalloc((unsigned) (size * sizeof(char *) 
+    argSpace = (char *) ckalloc((unsigned) (size * sizeof(char *)
 	    + strlen(cmdLine) + 1));
     argv = (char **) argSpace;
     argSpace += size * sizeof(char *);

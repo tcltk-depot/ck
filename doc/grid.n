@@ -4,8 +4,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
-'\" 
+'\"
 .so man.macros
 .TH grid n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -37,7 +36,7 @@ from the master window (x then y) of the top-left corner of the grid
 cell, and the second two are the width and height of the cell.
 .TP
 \fBgrid columnconfigure \fImaster index \fR?\fI\-option value...\fR?
-Query or set the column properties of the \fIindex\fP column of the 
+Query or set the column properties of the \fIindex\fP column of the
 geometry master, \fImaster\fP.
 The valid options are \fB\-minsize\fP and \fB\-weight\fP.
 The \fB\-minsize\fP option sets the minimum column size,
@@ -50,7 +49,7 @@ columns.  If no value is specified, the current value is returned.
 The arguments consist of the names of one or more slave windows
 followed by pairs of arguments that specify how
 to manage the slaves.
-The characters \fB\-\fP,  \fBx\fP and \fB^\fP, 
+The characters \fB\-\fP,  \fBx\fP and \fB^\fP,
 can be specified instead of a window name to alter the default
 location of a \fIslave\fP, as described in the ``RELATIVE PLACEMENT''
 section, below.
@@ -151,7 +150,7 @@ for \fImaster\fR.
 Propagation is enabled by default.
 .TP
 \fBgrid \fRrowconfigure \fImaster index \fR?\fI\-option value...\fR?
-Query or set the row properties of the \fIindex\fP row of the 
+Query or set the row properties of the \fIindex\fP row of the
 geometry master, \fImaster\fP.
 The valid options are \fB\-minsize\fP and \fB\-weight\fP.
 \fBMinsize\fP sets the minimum row size, in screen units, and \fBweight\fP
@@ -172,11 +171,11 @@ to be returned.
 .SH "RELATIVE PLACEMENT"
 .PP
 The \fBgrid\fP command contains a limited set of capabilities that
-permit layouts to be created without specifying the row and column 
-information for each slave.  This permits slaves to be rearranged, 
+permit layouts to be created without specifying the row and column
+information for each slave.  This permits slaves to be rearranged,
 added, or removed without the need to explicitly specify row and
 column information.
-When no column or row information is specified for a \fIslave\fP, 
+When no column or row information is specified for a \fIslave\fP,
 default values are chosen for
 \fBcolumn\fP, \fBrow\fP, \fPcolumnspan\fP and \fProwspan\fP
 at the time the \fIslave\fP is managed. The values are chosen

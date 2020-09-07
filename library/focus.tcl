@@ -87,7 +87,7 @@ proc ck_focusPrev w {
 	# Collect information about the current window's position
 	# among its siblings.  Also, if the window is a top-level,
 	# then reposition to just after the last child of the window.
-    
+
 	if {[winfo toplevel $cur] eq $cur || \
 	    $cur eq $ckPriv(restrictWindow)}  {
 	    set parent $cur
@@ -98,7 +98,7 @@ proc ck_focusPrev w {
 	    set children [winfo children $parent]
 	    set i [lsearch -exact $children $cur]
 	}
-    
+
 	# Go to the previous sibling, then descend to its last descendant
 	# (highest in stacking order.  While doing this, ignore top-levels
 	# and their descendants.  When we run out of descendants, go up

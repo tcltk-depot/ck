@@ -5,7 +5,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
+'\"
 .so man.macros
 .TH menu n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -147,7 +147,7 @@ radiobutton entry.  If the entry is selected then the indicator's
 center is displayed in the color given by the \fB\-selectcolor\fR option
 for the entry;
 otherwise the indicator's center is displayed in the background color for
-the menu or menu entry. 
+the menu or menu entry.
 If a \fB\-command\fR option is specified for a radiobutton
 entry, then its value is evaluated as a Tcl command each time the entry
 is invoked;  this happens after selecting the entry.
@@ -355,7 +355,7 @@ In active state the entry is displayed using the
 options for the entry or for the menu.
 Disabled state means that the entry should be insensitive:
 the default bindings will refuse to activate or invoke the entry.
-In this state the entry is displayed according to the 
+In this state the entry is displayed according to the
 \fBdisabledAttributes\fR, \fBdisabledForeground\fR, and
 \fBdisabledBackground\fR options for the menu.
 This option is not available for separator entries.

@@ -1,4 +1,4 @@
-/* 
+/*
  * ckTextBTree.c --
  *
  *	This file contains code that manages the B-tree representation
@@ -273,7 +273,7 @@ CkBTreeCreate()
 
 void
 CkBTreeDestroy(tree)
-    CkTextBTree tree;			/* Pointer to tree to delete. */ 
+    CkTextBTree tree;			/* Pointer to tree to delete. */
 {
     BTree *treePtr = (BTree *) tree;
 
@@ -393,7 +393,7 @@ CkBTreeInsertChars(indexPtr, string)
 					 * new segment (NULL means new segment
 					 * is at beginning of line). */
     CkTextSegment *curPtr;		/* Current segment;  new characters
-					 * are inserted just after this one. 
+					 * are inserted just after this one.
 					 * NULL means insert at beginning of
 					 * line. */
     CkTextLine *linePtr;		/* Current line (new segments are
@@ -1219,7 +1219,7 @@ ChangeNodeToggleCount(nodePtr, tagPtr, delta)
 	 * See if there's already an entry for this tag for this node.  If so,
 	 * perhaps all we have to do is adjust its count.
 	 */
-    
+
 	for (prevPtr = NULL, summaryPtr = nodePtr->summaryPtr;
 		summaryPtr != NULL;
 		prevPtr = summaryPtr, summaryPtr = summaryPtr->nextPtr) {
@@ -1233,11 +1233,11 @@ ChangeNodeToggleCount(nodePtr, tagPtr, delta)
 	    if (summaryPtr->toggleCount < 0) {
 		panic("ChangeNodeToggleCount: negative toggle count");
 	    }
-    
+
 	    /*
 	     * Zero count;  must remove this tag from the list.
 	     */
-    
+
 	    if (prevPtr == NULL) {
 		nodePtr->summaryPtr = summaryPtr->nextPtr;
 	    } else {
@@ -1246,11 +1246,11 @@ ChangeNodeToggleCount(nodePtr, tagPtr, delta)
 	    ckfree((char *) summaryPtr);
 	    goto nextAncestor;
 	}
-    
+
 	/*
 	 * This tag isn't in the list.  Add a new entry to the list.
 	 */
-    
+
 	if (delta < 0) {
 	    panic("ChangeNodeToggleCount: negative delta, no tag entry");
 	}
@@ -1388,7 +1388,7 @@ CkBTreeNextTag(searchPtr)
 	    }
 	    searchPtr->curIndex.charIndex += segPtr->size;
 	}
-    
+
 	/*
 	 * See if there are more lines associated with the current parent
 	 * node.  If so, go back to the top of the loop to search the next
@@ -1406,14 +1406,14 @@ CkBTreeNextTag(searchPtr)
 	    searchPtr->curIndex.charIndex = 0;
 	    continue;
 	}
-    
+
 	/*
 	 * Search across and up through the B-tree's node hierarchy looking
 	 * for the next node that has a relevant tag transition somewhere in
 	 * its subtree.  Be sure to update linesLeft as we skip over large
 	 * chunks of lines.
 	 */
-    
+
 	while (1) {
 	    while (nodePtr->nextPtr == NULL) {
 		if (nodePtr->parentPtr == NULL) {
@@ -1431,13 +1431,13 @@ CkBTreeNextTag(searchPtr)
 	    }
 	    searchPtr->linesLeft -= nodePtr->numLines;
 	}
-    
+
 	/*
 	 * At this point we've found a subtree that has a relevant tag
 	 * transition.  Now search down (and across) through that subtree
 	 * to find the first level-0 node that has a relevant tag transition.
 	 */
-    
+
 	gotNodeWithTag:
 	while (nodePtr->level > 0) {
 	    for (nodePtr = nodePtr->children.nodePtr; ;
@@ -1457,7 +1457,7 @@ CkBTreeNextTag(searchPtr)
 	    nextChild:
 	    continue;
 	}
-    
+
 	/*
 	 * Now we're down to a level-0 node that contains a line that contains
 	 * a relevant tag transition.  Set up line information and go back to
@@ -1508,7 +1508,7 @@ CkBTreeCharTagged(indexPtr, tagPtr)
     CkTextSegment *toggleSegPtr;
     int toggles, index;
 
-    /* 
+    /*
      * Check for toggles for the tag in indexPtr's line but before
      * indexPtr.  If there is one, its type indicates whether or
      * not the character is tagged.
@@ -1563,7 +1563,7 @@ CkBTreeCharTagged(indexPtr, tagPtr)
 	register Node *siblingPtr;
 	register Summary *summaryPtr;
 
-	for (siblingPtr = nodePtr->parentPtr->children.nodePtr; 
+	for (siblingPtr = nodePtr->parentPtr->children.nodePtr;
 		siblingPtr != nodePtr; siblingPtr = siblingPtr->nextPtr) {
 	    for (summaryPtr = siblingPtr->summaryPtr; summaryPtr != NULL;
 		    summaryPtr = summaryPtr->nextPtr) {
@@ -1668,7 +1668,7 @@ CkBTreeGetTags(indexPtr, numTagsPtr)
 	register Node *siblingPtr;
 	register Summary *summaryPtr;
 
-	for (siblingPtr = nodePtr->parentPtr->children.nodePtr; 
+	for (siblingPtr = nodePtr->parentPtr->children.nodePtr;
 		siblingPtr != nodePtr; siblingPtr = siblingPtr->nextPtr) {
 	    for (summaryPtr = siblingPtr->summaryPtr; summaryPtr != NULL;
 		    summaryPtr = summaryPtr->nextPtr) {
@@ -2064,7 +2064,7 @@ Rebalance(treePtr, nodePtr)
 		 * If the node being split is the root node, then make a
 		 * new root node above it first.
 		 */
-    
+
 		if (nodePtr->parentPtr == NULL) {
 		    newPtr = (Node *) ckalloc(sizeof(Node));
 		    newPtr->parentPtr = NULL;

@@ -1,4 +1,4 @@
-/* 
+/*
  * ckPlace.c --
  *
  *	This file contains code to implement a simple geometry manager

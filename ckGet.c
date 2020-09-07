@@ -1,4 +1,4 @@
-/* 
+/*
  * ckGet.c --
  *
  *	This file contains a number of "Ck_GetXXX" procedures, which

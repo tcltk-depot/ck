@@ -1,4 +1,4 @@
-/* 
+/*
  * ckTextIndex.c --
  *
  *	This module provides procedures that manipulate indices for
@@ -86,7 +86,7 @@ CkTextMakeByteIndex(tree, lineIndex, byteIndex, indexPtr)
 
     /*
      * Verify that the index is within the range of the line and points
-     * to a valid character boundary.  
+     * to a valid character boundary.
      */
 
     index = 0;
@@ -97,7 +97,7 @@ CkTextMakeByteIndex(tree, lineIndex, byteIndex, indexPtr)
 	     * the last character on the line is guaranteed to be a '\n',
 	     * we can back up a constant sizeof(char) bytes.
 	     */
-	     
+
 	    indexPtr->charIndex = index - sizeof(char);
 	    break;
 	}
@@ -428,7 +428,7 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
 	}
 	CkTextPixelIndex(textPtr, x, y, indexPtr);
 	endOfBase = end;
-	goto gotBase; 
+	goto gotBase;
     }
 
     if (isdigit((unsigned char) string[0]) || (string[0] == '-')) {
@@ -525,7 +525,7 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
 	if (*p == 0) {
 	    break;
 	}
-    
+
 	if ((*p == '+') || (*p == '-')) {
 	    p = ForwBack(p, indexPtr);
 	} else {
@@ -548,7 +548,7 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
  *
  * CkTextPrintIndex --
  *
- *	
+ *
  *	This procedure generates a string description of an index,
  *	suitable for reading in again later.
  *
@@ -666,7 +666,7 @@ CkTextIndexCmp(index1Ptr, index2Ptr)
 static char *
 ForwBack(string, indexPtr)
     char *string;		/* String to parse for additional info
-				 * about modifier (count and units). 
+				 * about modifier (count and units).
 				 * Points to "+" or "-" that starts
 				 * modifier. */
     CkTextIndex *indexPtr;	/* Index to update as specified in string. */
@@ -699,7 +699,7 @@ ForwBack(string, indexPtr)
      * accordingly.
      */
 
-    units = p; 
+    units = p;
     while ((*p != 0) && !isspace((unsigned char) *p)
            && (*p != '+') && (*p != '-')) {
 	p++;
@@ -732,7 +732,7 @@ ForwBack(string, indexPtr)
 #if CK_USE_UTF
 	CkTextMakeByteIndex(indexPtr->tree, lineIndex, indexPtr->charIndex,
 		indexPtr);
-#else 
+#else
 	CkTextMakeIndex(indexPtr->tree, lineIndex, indexPtr->charIndex,
 		indexPtr);
 #endif
@@ -902,7 +902,7 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
 	 * back up one byte (for the terminal '\n' character) and return
 	 * that index.
 	 */
-	 
+
 	linePtr = CkBTreeNextLine(dstPtr->linePtr);
 	if (linePtr == NULL) {
 	    dstPtr->charIndex -= sizeof(char);
@@ -1059,7 +1059,7 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
      */
 
     lineIndex = -1;
-    
+
     segSize = dstPtr->charIndex;
     for (segPtr = dstPtr->linePtr->segPtr; ; segPtr = segPtr->nextPtr) {
 	if (segSize <= segPtr->size) {
@@ -1201,7 +1201,7 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
 static char *
 StartEnd(string, indexPtr)
     char *string;		/* String to parse for additional info
-				 * about modifier (count and units). 
+				 * about modifier (count and units).
 				 * Points to first character of modifer
 				 * word. */
     CkTextIndex *indexPtr;	/* Index to mdoify based on string. */

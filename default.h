@@ -1,4 +1,4 @@
-/* 
+/*
  * default.h --
  *
  *	This file defines the defaults for all options for all widgets.

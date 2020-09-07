@@ -5,7 +5,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
+'\"
 .so man.macros
 .TH text n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -1014,7 +1014,7 @@ front of the insertion cursor without moving the insertion cursor.
 Control-x moves the input focus to the next widget in focus order.
 .IP [14]
 Control-t reverses the order of the two characters to the right of
-the insertion cursor. 
+the insertion cursor.
 .PP
 If the widget is disabled using the \fB\-state\fR option, then its
 view can still be adjusted and text can still be selected,

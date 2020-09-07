@@ -1,4 +1,4 @@
-/* 
+/*
  * ckGeometry.c --
  *
  *	This file contains generic code for geometry management

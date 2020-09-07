@@ -1,4 +1,4 @@
-/* 
+/*
  * ckWindow.c --
  *
  *	This file provides basic window-manipulation procedures.
@@ -383,7 +383,7 @@ HandleWinch(int sig)
 	write(ckMainInfo->winchFd[1], "R", 1);
     }
 }
-#endif 
+#endif
 
 /*
  *----------------------------------------------------------------------
@@ -439,7 +439,7 @@ Ck_CreateMainWindow(interp, className)
      */
 
     winPtr = NewWindow(NULL);
-    
+
     /*
      * Create the CkMainInfo structure for this application, and set
      * up name-related information for the new window.
@@ -545,7 +545,7 @@ Ck_CreateMainWindow(interp, className)
 #else
 	signal(SIGWINCH, HandleWinch);
 #endif
-	Tcl_CreateFileHandler(mainPtr->winchFd[0], 
+	Tcl_CreateFileHandler(mainPtr->winchFd[0],
 	    TCL_READABLE, CkHandleInput, (ClientData) mainPtr);
     } else {
 	mainPtr->winchFd[0] = mainPtr->winchFd[1] = -1;
@@ -658,7 +658,7 @@ Ck_CreateMainWindow(interp, className)
 		   ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
     InputSetup(&inputInfo);
 #else
-    Tcl_CreateFileHandler(0, 
+    Tcl_CreateFileHandler(0,
 	TCL_READABLE, CkHandleInput, (ClientData) mainPtr);
 #endif
 
@@ -1077,7 +1077,7 @@ Ck_DestroyWindow(winPtr)
 	    } else {
 		wclear(stdscr);
 		wrefresh(stdscr);
-	    } 
+	    }
 	    endwin();
 #if CK_USE_UTF
 	    if (mainPtr->isoEncoding != NULL) {

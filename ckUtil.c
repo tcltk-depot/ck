@@ -1,4 +1,4 @@
-/* 
+/*
  * ckUtil.c --
  *
  *	Miscellaneous utility functions.
@@ -118,7 +118,7 @@ static struct charEncoding EncodingTable[] = {
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
-    
+
 	{ REPLACE, 4 },	/* 0x7f */
 
 	/* 0x80 .. 0x8f */
@@ -241,7 +241,7 @@ static struct charEncoding EncodingTable[] = {
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
 	{ NORMAL, 1 }, { NORMAL, 1 }, { NORMAL, 1 },
-    
+
 	{ REPLACE, 4 },	/* 0x7f */
 
 	/* 0x80 .. 0x8f */
@@ -599,7 +599,7 @@ MakeUCRepl(uch, buf)
     unsigned int i, need;
 
     if (uch < sizeof (mapChars) && mapChars[uch]) {
-	if (buf) {
+	if (buf != NULL) {
 	    *buf++ = '\\';
 	    *buf++ = mapChars[(unsigned int) uch];
 	    *buf++ = '\0';
@@ -612,7 +612,10 @@ MakeUCRepl(uch, buf)
 	}
 	i = i << 4;
     }
-    if (buf) {
+    if (need & 1) {
+	++need;
+    }
+    if (buf != NULL) {
 	char *p;
 
 	*buf++ = '\\';
@@ -622,9 +625,6 @@ MakeUCRepl(uch, buf)
 	    *buf++ = 'u';
 	} else {
 	    *buf++ = 'U';
-	}
-	if (need & 1) {
-	    ++need;
 	}
 	p = buf + need;
 	*p = '\0';
@@ -654,7 +654,6 @@ MakeUCRepl(uch, buf)
  *	is filled in with the x-coordinate at which the first
  *	character that didn't fit would be drawn, if it were to
  *	be drawn.
- *	
  *
  * Side effects:
  *	None.
@@ -681,7 +680,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 				 * (just before a space character) if
 				 * possible.  CK_AT_LEAST_ONE means always
 				 * return a value of at least one, even
-				 * if the character doesn't fit. 
+				 * if the character doesn't fit.
 				 * CK_PARTIAL_OK means it's OK to display only
 				 * a part of the last character in the line.
 				 * CK_NEWLINES_NOT_SPECIAL means that newlines
@@ -755,7 +754,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 	    }
 	} else if (mainPtr->isoEncoding) {
 	    if (c == 0 || (c == '?' && uch != '?')) {
-		newX += MakeUCRepl(uch, 0);
+		newX += MakeUCRepl(uch, NULL);
 	    } else {
 		if (CHARTYPE(c).type == REPLACE) {
 		    newX += CHARTYPE(c).width;
@@ -767,7 +766,7 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 	    int len = wcwidth((wint_t) uch);
 
 	    if (len < 0) {
-		newX += MakeUCRepl(uch, 0);
+		newX += MakeUCRepl(uch, NULL);
 	    } else {
 		newX += len;
 	    }
