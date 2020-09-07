@@ -579,6 +579,25 @@ EntryWidgetCmd(clientData, interp, argc, argv)
 		    index += count;
 		    break;
 	    }
+#if CK_USE_UTF
+#if TCL_UTF_MAX == 3
+	    /*
+	     * Adjust to begin of surrogate pair.
+	     */
+	    if (index > 0) {
+		char *cPtr = Tcl_UtfAtIndex(entryPtr->string, index);
+		Tcl_UniChar ch;
+
+		Tcl_UtfToUniChar(cPtr, &ch);
+		if ((ch & 0xfc00) == 0xdc00) {
+		    cPtr = Tcl_UtfPrev(cPtr, entryPtr->string);
+		    Tcl_UtfToUniChar(cPtr, &ch);
+		    if ((ch & 0xfc00) == 0xd800)
+			index--;
+		}
+	    }
+#endif
+#endif
 	}
 	if (index >= entryPtr->numChars) {
 	    index = entryPtr->numChars-1;
@@ -936,12 +955,12 @@ EntryComputeGeometry(entryPtr)
     }
     if (entryPtr->showChar != NULL) {
 #if CK_USE_UTF
-	int ulen;
+	int nc, ulen;
 
-	entryPtr->displayString = (char *) ckalloc(entryPtr->numChars * 3 + 1);
+	nc = entryPtr->numChars;
 	ulen = Tcl_UtfNext(entryPtr->showChar) - entryPtr->showChar;
-	for (p = entryPtr->displayString, i = entryPtr->numChars; i > 0;
-		i--) {
+	entryPtr->displayString = (char *) ckalloc(nc * ulen + 1);
+	for (p = entryPtr->displayString, i = nc; i > 0; i--) {
 	    memcpy(p, entryPtr->showChar, ulen);
 	    p += ulen;
 	}
@@ -1004,6 +1023,25 @@ EntryComputeGeometry(entryPtr)
 #if CK_USE_UTF
 	leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
 	    displayString;
+#if TCL_UTF_MAX == 3
+	/*
+	 * Adjust to begin of surrogate pair.
+	 */
+	if (entryPtr->leftIndex > 0) {
+	    char *cPtr = displayString + leftIndex;
+	    Tcl_UniChar ch;
+
+	    Tcl_UtfToUniChar(cPtr, &ch);
+	    if ((ch & 0xfc00) == 0xdc00) {
+		cPtr = Tcl_UtfPrev(cPtr, displayString);
+		Tcl_UtfToUniChar(cPtr, &ch);
+		if ((ch & 0xfc00) == 0xd800) {
+		    entryPtr->leftIndex--;
+		    leftIndex = cPtr - displayString;
+		}
+	    }
+	}
+#endif
 #else
 	leftIndex = entryPtr->leftIndex;
 #endif
@@ -1055,7 +1093,7 @@ InsertChars(entryPtr, index, string)
 #if CK_USE_UTF
     int inspos;
 #if TCL_UTF_MAX == 3
-	Tcl_UniChar ch;
+    Tcl_UniChar ch;
 #endif
 #endif
 
@@ -1516,6 +1554,8 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
             *indexPtr = entryPtr->leftX + entryPtr->leftIndex + x;
 #endif
         }
+	if (roundUp && *indexPtr < entryPtr->numChars)
+	    *indexPtr += 1;
         if (*indexPtr >= entryPtr->numChars)
             *indexPtr = entryPtr->numChars;
     } else {

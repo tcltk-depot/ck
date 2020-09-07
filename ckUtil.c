@@ -1185,9 +1185,9 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     getmaxyx(window, dummy, maxX);
     maxX -= x;
 #if CK_USE_UTF
-    nc = Tcl_NumUtfChars(string, numChars);
+    nc = NumUtfChars(string, numChars);
     if (nc > maxX)
-	numChars = Tcl_UtfAtIndex(string, maxX) - string;
+	numChars = UtfAtIndex(string, maxX) - string;
     else
 	numChars = nc;
 #endif
@@ -1197,7 +1197,7 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     if (x < 0) {
 	x = -x;
 #if CK_USE_UTF
-	x = Tcl_UtfAtIndex(p, x) - p;
+	x = UtfAtIndex(p, x) - p;
 #endif
 	p += x;
 	numChars -= x;
