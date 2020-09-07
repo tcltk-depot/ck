@@ -95,7 +95,7 @@ Ck_GetGChar(interp, name, gchar)
 
 	initialized = 1;
     }
-    
+
     hPtr = Tcl_FindHashEntry(&gCharTable, name);
     if (hPtr == NULL) {
 	if (interp != NULL)
@@ -128,7 +128,7 @@ Ck_SetGChar(interp, name, gchar)
 
     if (!initialized)
 	Ck_GetGChar(interp, "ulcorner", NULL);
-    hPtr = Tcl_FindHashEntry(&gCharTable, name);    
+    hPtr = Tcl_FindHashEntry(&gCharTable, name);
     if (hPtr == NULL) {
 	Tcl_AppendResult(interp, "bad gchar \"", name, "\"", (char *) NULL);
 	return TCL_ERROR;
@@ -193,7 +193,7 @@ Ck_GetBorder(interp, string)
     for (i = 0; i < 8; i++)
 	borderPtr->gchar[i] = bchar[i];
     borderPtr->name = ckalloc(strlen(string) + 1);
-    strcpy(borderPtr->name, string);	
+    strcpy(borderPtr->name, string);
     return borderPtr;
 }
 

@@ -459,7 +459,7 @@ proc ckFDialogResolveFile {context text defaultext} {
 }
 
 # Gets called when the entry box gets keyboard focus. We clear the selection
-# from the icon list . This way the user can be certain that the input in the 
+# from the icon list . This way the user can be certain that the input in the
 # entry box is the selection.
 
 proc ckFDialog_EntFocusIn {w} {
@@ -674,7 +674,7 @@ proc ckFDialog_Done {w {selectFilePath ""}} {
 		$data(selectFile)]
 	set ckPriv(selectFile) $data(selectFile)
 	set ckPriv(selectPath) $data(selectPath)
-	if {[file exists $selectFilePath] && 
+	if {[file exists $selectFilePath] &&
 	    $data(type) eq "save"} {
 		set reply [ck_messageBox -icon warning -type yesno\
 			-parent $data(-parent) -message "File\

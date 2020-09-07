@@ -5,7 +5,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
+'\"
 .so man.macros
 .TH options n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -253,7 +253,7 @@ check whether the window is viewable (it and all its ancestors are mapped);
 if not, the window is skipped.
 Next, the scripts consult the value of the \fBtakeFocus\fR option.
 A value of \fB0\fR means that this window should be skipped entirely
-during keyboard traversal. 
+during keyboard traversal.
 \fB1\fR means that the this window should always receive the input
 focus.
 An empty value means that the traversal scripts make the decision

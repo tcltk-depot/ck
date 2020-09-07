@@ -1,4 +1,4 @@
-/* 
+/*
  * ks_names.h --
  *
  *	Key symbols, associated values and terminfo names.

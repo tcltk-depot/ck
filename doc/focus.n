@@ -5,7 +5,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
+'\"
 .so man.macros
 .TH focus n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -27,7 +27,7 @@ The Tcl procedures \fBck_focusNext\fR and \fBck_focusPrev\fR
 implement a focus order among the windows of a top-level;  they
 are used in the default bindings for Tab and Shift-Tab, among other
 things. Switching the focus among different top-levels is up
-to the user. 
+to the user.
 .PP
 The \fBfocus\fR command can take any of the following forms:
 .TP

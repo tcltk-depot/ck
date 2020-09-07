@@ -1,4 +1,4 @@
-/* 
+/*
  * ckMain.c --
  *
  *	This file contains a generic main program for Ck-based applications.
@@ -143,7 +143,7 @@ Ck_Main(argc, argv, appInitProc, interp)
     /*
      * Invoke the script specified on the command line, if any.
      */
- 
+
     if (fileName != NULL) {
 	code = Tcl_VarEval(interp, "source ", fileName, (char *) NULL);
 	if (code != TCL_OK)

@@ -109,7 +109,7 @@ proc entryx {w args} {
         }
         set args [lreplace $args $index [expr {$index + 1}]]
     }
- 
+
     if {[catch {eval entry $w $args} ret]} {
         return -code error -errorinfo $errorInfo
     }

@@ -21,7 +21,7 @@ apply {{tv cv} {
 	}
 	if {$d != $b} {
 	    error "wrong version of Ck loaded ($c.$d): need 8.$b"
-	} 
+	}
     } else {
 	error "wrong version of Tcl loaded ($a.b): need 8.x"
     }

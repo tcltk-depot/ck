@@ -27,7 +27,7 @@ proc showglob args {
 	} else {
 	    catch {lappend result [list set $i $var]}
 	}
-    }	
+    }
     return [join $result "\n"]
 }
 

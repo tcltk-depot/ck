@@ -3,7 +3,7 @@
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-'\" 
+'\"
 .so man.macros
 .TH curses n 8.0 Ck "Ck Built-In Commands"
 .BS
@@ -120,7 +120,7 @@ dump file to ASCII in order to print it on paper.
 .TP
 \fBcurses suspend\fR
 Takes appropriate actions for job control, such as saving \fBcurses(3)\fR
-terminal state, sending the stop signal to the process and restoring 
+terminal state, sending the stop signal to the process and restoring
 the terminal state when the process is continued.
 
 .SH "SEE ALSO"

@@ -7,7 +7,7 @@ build-stamp:
 	dh_testdir
 	./configure --prefix=/usr --includedir=/usr/include/tcl$(v) \
 	    --with-tcl=/usr/lib/tcl$(v) \
-	    --enable-shared --disable-threads 
+	    --enable-shared --disable-threads
 	$(MAKE) CFLAGS="-g -O2 -D_REENTRANT"
 	touch build-stamp
 

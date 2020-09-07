@@ -54,7 +54,7 @@ proc keylpr {keylname {prefix {}}} {
     foreach k $keys {
         if ![catch {format $fmt $k [keylget keylist $k]} l] {
             append r $q $l
-            set q "\n" 
+            set q "\n"
         }
     }
     return $r

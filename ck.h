@@ -109,7 +109,7 @@ typedef struct {
 
 typedef struct {
     long type;
-    struct CkWindow *winPtr;    
+    struct CkWindow *winPtr;
 } CkWindowEvent;
 
 typedef union {
@@ -152,7 +152,7 @@ typedef char *Ck_BindingTable;
  *
  *--------------------------------------------------------------
  */
-      
+
 typedef void (Ck_EventProc) _ANSI_ARGS_((ClientData clientData,
 				CkEvent *eventPtr));
 typedef int  (Ck_GenericProc) _ANSI_ARGS_((ClientData clientData,
@@ -207,7 +207,7 @@ typedef struct Ck_GeomMgr {
  * created by calling Ck_CreateEventHandler.  This information
  * is used by ckEvent.c only.
  */
-    
+
 typedef struct CkEventHandler {
     long mask;				/* Events for which to invoke proc. */
     Ck_EventProc *proc;			/* Procedure to invoke when an event
@@ -217,7 +217,7 @@ typedef struct CkEventHandler {
 					 * associated with window (NULL means
 					 * end of list). */
 } CkEventHandler;
- 
+
 /*
  * Ck keeps the following data structure for the main
  * window (created by a call to Ck_CreateMainWindow). It stores
@@ -312,7 +312,7 @@ typedef struct CkWindow {
     /*
      * Information kept by the event manager (ckEvent.c):
      */
-              
+
     CkEventHandler *handlerList;/* First in list of event handlers
 				 * declared for this window, or
 				 * NULL if none. */
@@ -412,17 +412,17 @@ typedef struct {
 /*
  * Enumerated type for describing a point by which to anchor something:
  */
-  
+
 typedef enum {
     CK_ANCHOR_N, CK_ANCHOR_NE, CK_ANCHOR_E, CK_ANCHOR_SE,
     CK_ANCHOR_S, CK_ANCHOR_SW, CK_ANCHOR_W, CK_ANCHOR_NW,
     CK_ANCHOR_CENTER
 } Ck_Anchor;
-  
+
 /*
  * Enumerated type for describing a style of justification:
  */
-  
+
 typedef enum {
     CK_JUSTIFY_LEFT, CK_JUSTIFY_RIGHT,
     CK_JUSTIFY_CENTER, CK_JUSTIFY_FILL

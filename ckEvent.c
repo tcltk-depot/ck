@@ -1,4 +1,4 @@
-/* 
+/*
  * ckEvent.c --
  *
  *	This file provides basic event-managing facilities,
@@ -291,9 +291,9 @@ Ck_CreateGenericHandler(proc, clientData)
      ClientData clientData;	/* One-word value to pass to proc. */
 {
     GenericHandler *handlerPtr;
-    
+
     handlerPtr = (GenericHandler *) ckalloc (sizeof (GenericHandler));
-    
+
     handlerPtr->proc = proc;
     handlerPtr->clientData = clientData;
     handlerPtr->deleteFlag = 0;
@@ -331,7 +331,7 @@ Ck_DeleteGenericHandler(proc, clientData)
      ClientData clientData;
 {
     GenericHandler * handler;
-    
+
     for (handler = genericList; handler; handler = handler->nextPtr) {
 	if ((handler->proc == proc) && (handler->clientData == clientData)) {
 	    handler->deleteFlag = 1;
@@ -367,7 +367,7 @@ Ck_HandleEvent(mainPtr, eventPtr)
     CkWindow *winPtr;
     InProgress ip;
 
-    /* 
+    /*
      * Invoke all the generic event handlers (those that are
      * invoked for all events).  If a generic event handler reports that
      * an event is fully processed, go no further.
