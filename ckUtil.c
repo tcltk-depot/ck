@@ -14,6 +14,11 @@
 
 #if CK_USE_UTF
 #include <wchar.h>
+#ifdef __APPLE__
+#ifdef USE_NCURSES
+#define USE_NCURSESW
+#endif
+#endif
 #endif
 
 #define REPLACE 1
