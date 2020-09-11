@@ -12,12 +12,10 @@
 #include "ckPort.h"
 #include "ck.h"
 
-#if CK_USE_UTF
 #include <wchar.h>
 #ifdef __APPLE__
 #ifdef USE_NCURSES
 #define USE_NCURSESW
-#endif
 #endif
 #endif
 
@@ -488,7 +486,6 @@ Ck_GetEncoding(interp)
     return TCL_OK;
 }
 
-#if CK_USE_UTF
 /*
  *--------------------------------------------------------------
  *
@@ -583,9 +580,7 @@ UtfAtIndex(src, index)
     }
     return src;
 }
-#endif
 
-#if CK_USE_UTF
 /*
  *--------------------------------------------------------------
  *
@@ -641,7 +636,6 @@ MakeUCRepl(uch, buf)
     }
     return need + 2;
 }
-#endif
 
 /*
  *--------------------------------------------------------------
@@ -707,7 +701,6 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     int newX;			/* X-position corresponding to p+1. */
     int rem;
     int nChars = 0;
-#if CK_USE_UTF
     int uch, n, m, srcRead, dstWrote, dstChars;
     char buf[TCL_UTF_MAX*2], buf2[TCL_UTF_MAX*2];
 
@@ -836,79 +829,6 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     *nextXPtr = termX;
     *nextCPtr = term - source;
     return nChars;
-#else
-    /*
-     * Scan the input string one character at a time, until a character
-     * is found that crosses maxX.
-     */
-
-    newX = curX = startX;
-    termX = 0;
-    term = source;
-    for (p = source, c = *p & 0xff; c != '\0' && maxChars > 0;
-	p++, maxChars--) {
-	++nChars;
-	if ((CHARTYPE(c).type == NORMAL) || (CHARTYPE(c).type == REPLACE) ||
-	    (CHARTYPE(c).type == GCHAR)) {
-	    newX += CHARTYPE(c).width;
-	} else if (CHARTYPE(c).type == TAB) {
-	    if (!(flags & CK_IGNORE_TABS)) {
-		newX += 8;
-		rem = (newX - tabOrigin) % 8;
-		if (rem < 0) {
-		    rem += 8;
-		}
-		newX -= rem;
-	    }
-	} else if (CHARTYPE(c).type == NEWLINE) {
-	    if (flags & CK_NEWLINES_NOT_SPECIAL) {
-		newX += CHARTYPE(c).width;
-	    } else {
-		break;
-	    }
-	}
-	if (newX > maxX) {
-	    break;
-	}
-	if (maxChars > 1) {
-	    c = p[1] & 0xff;
-	} else {
-	    c = 0;
-	}
-	if (isspace(c) || (c == 0)) {
-	    term = p+1;
-	    termX = newX;
-	}
-	curX = newX;
-    }
-
-    /*
-     * P points to the first character that doesn't fit in the desired
-     * span. Use the flags to figure out what to return.
-     */
-
-    if ((flags & CK_PARTIAL_OK) && (curX < maxX)) {
-	curX = newX;
-	p++;
-	++nChars;
-    }
-    if ((flags & CK_AT_LEAST_ONE) && (term == source) && (maxChars > 0)
-	     && !isspace((unsigned char) *term)) {
-	term = p;
-	termX = curX;
-	if (term == source && *source) {
-	    term++;
-	    termX = newX;
-	    ++nChars;
-	}
-    } else if ((maxChars == 0) || !(flags & CK_WHOLE_WORDS)) {
-	term = p;
-	termX = curX;
-    }
-    *nextXPtr = termX;
-    *nextCPtr = term - source;
-    return nChars;
-#endif
 }
 
 /*
@@ -959,21 +879,17 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
      */
 
     getmaxyx(window, dummy, maxX);
-#if CK_USE_UTF
     nc = NumUtfChars(string, numChars);
     if (nc > maxX)
 	numChars = UtfAtIndex(string, maxX) - string;
     else
 	numChars = nc;
-#endif
     if (numChars > maxX)
         numChars = maxX;
     p = string;
     if (x < 0) {
 	x = -x;
-#if CK_USE_UTF
 	x = UtfAtIndex(p, x) - p;
-#endif
 	p += x;
 	numChars -= x;
 	x = 0;
@@ -981,7 +897,6 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
     wmove(window, y, x);
     startX = curX = x;
     for (; numChars > 0; numChars--, p += nc) {
-#if CK_USE_UTF
 	int uch, len;
 
 	if (*p == '\0')
@@ -1070,62 +985,6 @@ replaceChar:
 	    }
 	    curX += len;
 	}
-#else
-	nc = 1;
-	c = *p & 0xff;
-	if (c == '\0')
-	    break;
-	if (CHARTYPE(c).type == NORMAL) {
-	    waddch(window, c);
-	    curX++;
-	}
-	if (CHARTYPE(c).type == TAB) {
-	    if (!(flags & CK_IGNORE_TABS)) {
-		curX += 8;
-		rem = (curX - tabOrigin) % 8;
-		if (rem < 0) {
-		    rem += 8;
-		}
-		curX -= rem;
-	    }
-	    while (startX < curX) {
-	    	waddch(window, ' ');
-	    	startX++;
-	    }
-	    continue;
-	} else if (CHARTYPE(c).type == GCHAR) {
-	    long gchar;
-
-	    if (Ck_GetGChar(NULL, gcharTab[c - 0x81], &gchar) != TCL_OK)
-		goto replaceChar;
-	    waddch(window, gchar);
-	    startX++;
-	    curX = startX;
-	    continue;
-	} else if (CHARTYPE(c).type == REPLACE || (CHARTYPE(c).type == NEWLINE
-	    && (flags & CK_NEWLINES_NOT_SPECIAL))) {
-replaceChar:
-	    if ((c < sizeof(mapChars)) && (mapChars[c] != 0)) {
-		replace[0] = '\\';
-	        replace[1] = mapChars[c];
-	        replace[2] = '\0';
-		waddstr(window, replace);
-	        curX += 2;
-	    } else {
-		replace[0] = '\\';
-	        replace[1] = 'x';
-	        replace[2] = hexChars[(c >> 4) & 0xf];
-	        replace[3] = hexChars[c & 0xf];
-	        replace[4] = '\0';
-	        waddstr(window, replace);
-	        curX += 4;
-  	    }
-	} else if (CHARTYPE(c).type == NEWLINE) {
-	    y++;
-	    wmove(window, y, x);
-	    curX = x;
-	}
-#endif
 	startX = curX;
     }
     if (flags & CK_FILL_UNTIL_EOL) {
@@ -1189,21 +1048,17 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     count = 0;
     getmaxyx(window, dummy, maxX);
     maxX -= x;
-#if CK_USE_UTF
     nc = NumUtfChars(string, numChars);
     if (nc > maxX)
 	numChars = UtfAtIndex(string, maxX) - string;
     else
 	numChars = nc;
-#endif
     if (numChars > maxX)
         numChars = maxX;
     p = string;
     if (x < 0) {
 	x = -x;
-#if CK_USE_UTF
 	x = UtfAtIndex(p, x) - p;
-#endif
 	p += x;
 	numChars -= x;
 	count -= x;
@@ -1212,7 +1067,6 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     wmove(window, y, x);
     startX = curX = x;
     for (; numChars > 0 && count <= last; numChars -= nc, count++, p += nc) {
-#if CK_USE_UTF
 	int uch, len;
 
 	if (*p == '\0')
@@ -1316,73 +1170,6 @@ replaceChar:
 	    if (count < first)
 		wmove(window, y, curX);
 	}
-#else
-	nc = 1;
-	c = *p & 0xff;
-	if (CHARTYPE(c).type == NORMAL) {
-	    curX++;
-	    if (count >= first) {
-		waddch(window, c);
-	    } else
-		wmove(window, y, startX);
-	}
-	if (CHARTYPE(c).type == TAB) {
-	    if (!(flags & CK_IGNORE_TABS)) {
-		curX += 8;
-		rem = (curX - tabOrigin) % 8;
-		if (rem < 0) {
-		    rem += 8;
-		}
-		curX -= rem;
-	    }
-	    while (startX < curX) {
-		startX++;
-		if (count >= first)
-		    waddch(window, ' ');
-		else
-		    wmove(window, y, startX);
-	    }
-	    continue;
-	} else if (CHARTYPE(c).type == GCHAR) {
-	    long gchar;
-
-	    if (Ck_GetGChar(NULL, gcharTab[c - 0x81], &gchar) != TCL_OK)
-		goto replaceChar;
-	    curX++;
-	    if (count >= first)
-		waddch(window, gchar);
-	    else
-		wmove(window, y, curX);
-	} else if (CHARTYPE(c).type == REPLACE || (CHARTYPE(c).type == NEWLINE
-	    && (flags & CK_NEWLINES_NOT_SPECIAL))) {
-replaceChar:
-	    if ((c < sizeof(mapChars)) && (mapChars[c] != 0)) {
-		replace[0] = '\\';
-	        replace[1] = mapChars[c];
-	        replace[2] = '\0';
-	        curX += 2;
-		if (count >= first)
-		    waddstr(window, replace);
-		else
-		    wmove(window, y, curX);
-	    } else {
-		replace[0] = '\\';
-	        replace[1] = 'x';
-	        replace[2] = hexChars[(c >> 4) & 0xf];
-	        replace[3] = hexChars[c & 0xf];
-	        replace[4] = '\0';
-	        curX += 4;
-		if (count >= first)
-		    waddstr(window, replace);
-		else
-		    wmove(window, y, curX);
-  	    }
-	} else if (CHARTYPE(c).type == NEWLINE) {
-	    y++;
-	    wmove(window, y, x);
-	    curX = x;
-	}
-#endif
 	startX = curX;
     }
 }

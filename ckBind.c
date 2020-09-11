@@ -1375,7 +1375,6 @@ ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
 
 		    if ((eventPtr->key.keycode & ~0xff) == 0 &&
 		        eventPtr->key.keycode != 0) {
-#if CK_USE_UTF
 			char c = eventPtr->key.keycode;
 			int numc = 0;
 
@@ -1390,11 +1389,7 @@ ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
 			} else {
 		    	    numStorage[numChars++] = eventPtr->key.keycode;
 			}
-#else
-		    	numStorage[numChars++] = eventPtr->key.keycode;
-#endif
 		    }
-#if CK_USE_UTF
 		    if (eventPtr->key.is_uch) {
 #if TCL_UTF_MAX == 3
 			int uch = eventPtr->key.uch;
@@ -1413,7 +1408,6 @@ ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
 						    numStorage);
 #endif
 		    }
-#endif
 		    numStorage[numChars] = '\0';
 		    string = numStorage;
 		} else if (eventPtr->type == CK_EV_BARCODE) {

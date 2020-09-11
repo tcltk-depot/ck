@@ -29,9 +29,7 @@ typedef struct {
 				 * cleaned up.*/
     Tcl_Interp *interp;		/* Interpreter associated with entry. */
     Tcl_Command widgetCmd;      /* Token for entry's widget command. */
-#if CK_USE_UTF
     int numBytes;		/* Number of bytes in string. */
-#endif
     int numChars;		/* Number of non-NULL characters in
 				 * string (may be 0). */
     char *string;		/* Pointer to storage for string;
@@ -264,9 +262,7 @@ Ck_EntryCmd(clientData, interp, argc, argv)
     entryPtr->widgetCmd = Tcl_CreateCommand(interp,
         entryPtr->winPtr->pathName, EntryWidgetCmd,
 	    (ClientData) entryPtr, EntryCmdDeletedProc);
-#if CK_USE_UTF
     entryPtr->numBytes = 0;
-#endif
     entryPtr->numChars = 0;
     entryPtr->string = (char *) ckalloc(1);
     entryPtr->string[0] = '\0';
@@ -579,7 +575,6 @@ EntryWidgetCmd(clientData, interp, argc, argv)
 		    index += count;
 		    break;
 	    }
-#if CK_USE_UTF
 #if TCL_UTF_MAX == 3
 	    /*
 	     * Adjust to begin of surrogate pair.
@@ -596,7 +591,6 @@ EntryWidgetCmd(clientData, interp, argc, argv)
 			index--;
 		}
 	    }
-#endif
 #endif
 	}
 	if (index >= entryPtr->numChars) {
@@ -850,7 +844,6 @@ DisplayEntry(clientData)
         entryPtr->normalAttr);
     Ck_ClearToBot(winPtr, 0, 0);
 
-#if CK_USE_UTF
     leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
 	displayString;
     selectFirst = Tcl_UtfAtIndex(displayString, entryPtr->selectFirst) -
@@ -859,12 +852,6 @@ DisplayEntry(clientData)
 	displayString;
     insertPos = Tcl_UtfAtIndex(displayString, entryPtr->insertPos) -
 	displayString;
-#else
-    leftIndex = entryPtr->leftIndex;
-    selectFirst = entryPtr->selectFirst;
-    selectLast = entryPtr->selectLast;
-    insertPos = entryPtr->insertPos;
-#endif
 
     CkDisplayChars(winPtr->mainPtr, winPtr->window,
 	displayString + leftIndex,
@@ -954,7 +941,6 @@ EntryComputeGeometry(entryPtr)
 	entryPtr->displayString = NULL;
     }
     if (entryPtr->showChar != NULL) {
-#if CK_USE_UTF
 	int nc, ulen;
 
 	nc = entryPtr->numChars;
@@ -964,13 +950,6 @@ EntryComputeGeometry(entryPtr)
 	    memcpy(p, entryPtr->showChar, ulen);
 	    p += ulen;
 	}
-#else
-	entryPtr->displayString = (char *) ckalloc(entryPtr->numChars + 1);
-	for (p = entryPtr->displayString, i = entryPtr->numChars; i > 0;
-		i--, p++) {
-	    *p = entryPtr->showChar[0];
-	}
-#endif
 	*p = 0;
 	displayString = entryPtr->displayString;
     } else {
@@ -1020,7 +999,6 @@ EntryComputeGeometry(entryPtr)
 	if (entryPtr->leftIndex > maxOffScreen) {
 	    entryPtr->leftIndex = maxOffScreen;
 	}
-#if CK_USE_UTF
 	leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
 	    displayString;
 #if TCL_UTF_MAX == 3
@@ -1041,9 +1019,6 @@ EntryComputeGeometry(entryPtr)
 		}
 	    }
 	}
-#endif
-#else
-	leftIndex = entryPtr->leftIndex;
 #endif
 	CkMeasureChars(winPtr->mainPtr, displayString, leftIndex,
 	    0, INT_MAX, 0,
@@ -1090,18 +1065,15 @@ InsertChars(entryPtr, index, string)
 {
     int length, clength;
     char *new;
-#if CK_USE_UTF
     int inspos;
 #if TCL_UTF_MAX == 3
     Tcl_UniChar ch;
-#endif
 #endif
 
     length = strlen(string);
     if (length == 0) {
 	return;
     }
-#if CK_USE_UTF
     clength = Tcl_NumUtfChars(string, -1);
     new = (char *) ckalloc((unsigned) (entryPtr->numBytes + length + 1));
     inspos = Tcl_UtfAtIndex(entryPtr->string, index) - entryPtr->string;
@@ -1127,16 +1099,6 @@ InsertChars(entryPtr, index, string)
     entryPtr->string = new;
     entryPtr->numChars += clength;
     entryPtr->numBytes += length;
-#else
-    clength = length;
-    new = (char *) ckalloc((unsigned) (entryPtr->numChars + length + 1));
-    strncpy(new, entryPtr->string, (size_t) index);
-    strcpy(new+index, string);
-    strcpy(new+index+length, entryPtr->string+index);
-    ckfree(entryPtr->string);
-    entryPtr->string = new;
-    entryPtr->numChars += length;
-#endif
 
 #if TCL_UTF_MAX == 3
     /*
@@ -1216,9 +1178,7 @@ DeleteChars(entryPtr, index, count)
     int count;			/* How many characters to delete. */
 {
     char *new;
-#if CK_USE_UTF
     int delpos, delcount;
-#endif
 
     if ((index + count) > entryPtr->numChars) {
 	count = entryPtr->numChars - index;
@@ -1226,8 +1186,6 @@ DeleteChars(entryPtr, index, count)
     if (count <= 0) {
 	return;
     }
-
-#if CK_USE_UTF
 
 #if TCL_UTF_MAX == 3
     delpos = Tcl_UtfAtIndex(entryPtr->string, index) - entryPtr->string;
@@ -1288,12 +1246,6 @@ DeleteChars(entryPtr, index, count)
     strcpy(new+delpos, entryPtr->string+delpos+delcount);
     entryPtr->numChars = Tcl_NumUtfChars(new, -1);
     entryPtr->numBytes = strlen(new);
-#else
-    new = (char *) ckalloc((unsigned) (entryPtr->numChars + 1 - count));
-    strncpy(new, entryPtr->string, (size_t) index);
-    strcpy(new+index, entryPtr->string+index+count);
-    entryPtr->numChars -= count;
-#endif
     ckfree(entryPtr->string);
     entryPtr->string = new;
 
@@ -1380,14 +1332,9 @@ EntrySetValue(entryPtr, value)
     char *value;			/* New text to display in entry. */
 {
     ckfree(entryPtr->string);
-#if CK_USE_UTF
     entryPtr->numBytes = strlen(value);
     entryPtr->numChars = Tcl_NumUtfChars(value, -1);
     entryPtr->string = (char *) ckalloc((unsigned) (entryPtr->numBytes + 1));
-#else
-    entryPtr->numChars = strlen(value);
-    entryPtr->string = (char *) ckalloc((unsigned) (entryPtr->numChars + 1));
-#endif
     strcpy(entryPtr->string, value);
     entryPtr->selectFirst = entryPtr->selectLast = -1;
     entryPtr->leftIndex = 0;
@@ -1752,14 +1699,9 @@ EntryVisibleRange(entryPtr, firstPtr, lastPtr)
     } else {
 	int leftIndex, total;
 
-#if CK_USE_UTF
 	leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
 	    displayString;
 	total = entryPtr->numBytes - leftIndex;
-#else
-	leftIndex = entryPtr->leftIndex;
-	total = entryPtr->numChars - leftIndex;
-#endif
 	charsInWindow = CkMeasureChars(winPtr->mainPtr,
 	    displayString + leftIndex, total, 0,
 	    entryPtr->winPtr->width, 0,

@@ -112,11 +112,7 @@ typedef struct barcodeData {
     int endChar;	/* End of barcode packet character. */
     int delivered;	/* BarCode event has been delivered. */
     int index;		/* Current index into buffer. */
-#if CK_USE_UTF
     char buffer[256];	/* Here the barcode packet is assembled. */
-#else
-    char buffer[128];	/* Here the barcode packet is assembled. */
-#endif
 } BarcodeData;
 
 /*
@@ -621,11 +617,9 @@ CkHandleInput(clientData, mask)
     int code;
     static int buttonpressed = 0;
     static int errCount = 0;
-#if CK_USE_UTF
     int ch, ucp = 0;
     char ucbuf[16];
     Tcl_UniChar uch = 0;
-#endif
 
 #ifdef USE_NCURSES
     if (mainPtr->winchFd[0] >= 0) {
@@ -677,7 +671,6 @@ doResize:
 	return;
     }
     errCount = 0;
-#if CK_USE_UTF
     if (mainPtr->isoEncoding == NULL && code >= 0xc0 && code < 0x100) {
 	int need = 2;
 
@@ -725,7 +718,6 @@ decDone:
 #endif
 	code = 0;
     }
-#endif
 
     /*
      * Barcode reader handling.
@@ -772,7 +764,6 @@ decDone:
 	    } else {
 		/* Leave space for one NUL byte. */
 		if (bd->index < sizeof (bd->buffer) - 1) {
-#if CK_USE_UTF
 		    char c, utfb[8];
 		    int numc, i;
 
@@ -794,9 +785,6 @@ decDone:
 			    bd->buffer[bd->index] = ch;
 			}
 		    }
-#else
-		    bd->buffer[bd->index] = code;
-#endif
 		}
 		bd->index++;
 	    }
@@ -937,7 +925,6 @@ keyEvent:
     event.key.keycode = code;
     if (event.key.keycode < 0)
 	event.key.keycode &= 0xff;
-#if CK_USE_UTF
     event.key.is_uch = 0;
     if (ucp > 0) {
 	event.key.is_uch = 1;
@@ -948,7 +935,6 @@ keyEvent:
     if (mainPtr->isoEncoding == NULL &&
 	(code >= 0x20 && code < 0x100))
 	event.key.is_uch = 1;
-#endif
 
 mkEvent:
     qev = (CkQEvt *) ckalloc(sizeof (CkQEvt));

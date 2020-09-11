@@ -195,11 +195,7 @@ Ck_TextCmd(clientData, interp, argc, argv)
     textPtr->prevWidth = new->width;
     textPtr->prevHeight = new->height;
     CkTextCreateDInfo(textPtr);
-#if CK_USE_UTF
     CkTextMakeByteIndex(textPtr->tree, 0, 0, &startIndex);
-#else
-    CkTextMakeIndex(textPtr->tree, 0, 0, &startIndex);
-#endif
     CkTextSetYView(textPtr, &startIndex, 0);
     textPtr->selTagPtr = NULL;
     textPtr->selBg = 0;
@@ -888,11 +884,7 @@ InsertChars(textPtr, indexPtr, string)
     lineIndex = CkBTreeLineIndex(indexPtr->linePtr);
     if (lineIndex == CkBTreeNumLines(textPtr->tree)) {
 	lineIndex--;
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, lineIndex, 1000000, indexPtr);
-#else
-	CkTextMakeIndex(textPtr->tree, lineIndex, 1000000, indexPtr);
-#endif
     }
 
     /*
@@ -1051,11 +1043,7 @@ DeleteChars(textPtr, index1String, index2String)
     }
     CkBTreeDeleteChars(&index1, &index2);
     if (resetView) {
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, line, charIndex, &index1);
-#else
-	CkTextMakeIndex(textPtr->tree, line, charIndex, &index1);
-#endif
 	CkTextSetYView(textPtr, &index1, 0);
     }
 
@@ -1171,15 +1159,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	Tcl_DStringInit(&patDString);
 	Tcl_DStringAppend(&patDString, pattern, -1);
 	pattern = Tcl_DStringValue(&patDString);
-#if CK_USE_UTF
 	Tcl_UtfToLower(pattern);
-#else
-	for (p = pattern; *p != 0; p++) {
-	    if (isupper((unsigned char) *p)) {
-		*p = tolower((unsigned char) *p);
-	    }
-	}
-#endif
     }
 
     if (CkTextGetIndex(interp, textPtr, argv[i+1], &index) != TCL_OK) {
@@ -1263,16 +1243,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	 */
 
 	if (noCase) {
-#if CK_USE_UTF
 	    Tcl_DStringSetLength(&line,
 		Tcl_UtfToLower(Tcl_DStringValue(&line)));
-#else
-	    for (p = Tcl_DStringValue(&line); *p != 0; p++) {
-		if (isupper((unsigned char) *p)) {
-		    *p = tolower((unsigned char) *p);
-		}
-	    }
-#endif
 	}
 
 	/*
@@ -1326,9 +1298,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	}
 	do {
 	    int thisLength;
-#if CK_USE_UTF
 	    Tcl_UniChar ch;
-#endif
 
 	    if (exact) {
 		p = strstr(startOfLine + firstChar, pattern);
@@ -1359,11 +1329,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	    }
 	    matchChar = i;
 	    matchLength = thisLength;
-#if CK_USE_UTF
 	    firstChar = i + Tcl_UtfToUniChar(startOfLine + matchChar, &ch);
-#else
-	    firstChar = matchChar+1;
-#endif
 	} while (backwards);
 
 	/*
@@ -1373,12 +1339,10 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	 */
 
 	if (matchChar >= 0) {
-#if CK_USE_UTF
 	    int numChars;
 
 	    numChars = Tcl_NumUtfChars(startOfLine + matchChar,
 		matchLength);
-#endif
 
 	    /*
 	     * The index information returned by the regular expression
@@ -1399,20 +1363,12 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	    for (leftToScan += matchLength; leftToScan > 0;
 		    segPtr = segPtr->nextPtr) {
 		if (segPtr->typePtr != &ckTextCharType) {
-#if CK_USE_UTF
 		    numChars += segPtr->size;
-#else
-		    matchLength += segPtr->size;
-#endif
 		    continue;
 		}
 		leftToScan -= segPtr->size;
 	    }
-#if CK_USE_UTF
 	    CkTextMakeByteIndex(textPtr->tree, lineNum, matchChar, &index);
-#else
-	    CkTextMakeIndex(textPtr->tree, lineNum, matchChar, &index);
-#endif
 	    if (!searchWholeText) {
 		if (!backwards && (CkTextIndexCmp(&index, &stopIndex) >= 0)) {
 		    goto done;
@@ -1422,11 +1378,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		}
 	    }
 	    if (varName != NULL) {
-#if CK_USE_UTF
 		sprintf(buffer, "%d", numChars);
-#else
-		sprintf(buffer, "%d", matchLength);
-#endif
 		if (Tcl_SetVar(interp, varName, buffer, TCL_LEAVE_ERR_MSG)
 			== NULL) {
 		    code = TCL_ERROR;
@@ -1505,9 +1457,7 @@ CkTextGetTabs(interp, winPtr, string)
     char **argv;
     CkTextTabArray *tabArrayPtr;
     CkTextTab *tabPtr;
-#if CK_USE_UTF
     Tcl_UniChar ch;
-#endif
 
     if (Tcl_SplitList(interp, string, &argc, &argv) != TCL_OK) {
 	return NULL;
@@ -1550,17 +1500,10 @@ CkTextGetTabs(interp, winPtr, string)
 	if ((i+1) == argc) {
 	    continue;
 	}
-#if CK_USE_UTF
 	Tcl_UtfToUniChar(argv[i+1], &ch);
 	if (!Tcl_UniCharIsAlpha(ch)) {
 	    continue;
 	}
-#else
-	c = (unsigned char) argv[i+1][0];
-	if (!isalpha(c)) {
-	    continue;
-	}
-#endif
 	i += 1;
 	if ((c == 'l') && (strncmp(argv[i], "left",
 		strlen(argv[i])) == 0)) {

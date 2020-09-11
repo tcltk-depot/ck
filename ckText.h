@@ -631,18 +631,14 @@ extern int		CkTextGetIndex _ANSI_ARGS_((Tcl_Interp *interp,
 			    CkTextIndex *indexPtr));
 extern CkTextTabArray *	CkTextGetTabs _ANSI_ARGS_((Tcl_Interp *interp,
 			    CkWindow *winPtr, char *string));
-#if CK_USE_UTF
 extern void		CkTextIndexBackBytes _ANSI_ARGS_((CkTextIndex *srcPtr,
 			    int count, CkTextIndex *dstPtr));
-#endif
 extern void		CkTextIndexBackChars _ANSI_ARGS_((CkTextIndex *srcPtr,
 			    int count, CkTextIndex *dstPtr));
 extern int		CkTextIndexCmp _ANSI_ARGS_((CkTextIndex *index1Ptr,
 			    CkTextIndex *index2Ptr));
-#if CK_USE_UTF
 extern void		CkTextIndexForwBytes _ANSI_ARGS_((CkTextIndex *srcPtr,
 			    int count, CkTextIndex *dstPtr));
-#endif
 extern void		CkTextIndexForwChars _ANSI_ARGS_((CkTextIndex *srcPtr,
 			    int count, CkTextIndex *dstPtr));
 extern CkTextSegment *	CkTextIndexToSeg _ANSI_ARGS_((CkTextIndex *indexPtr,
@@ -652,11 +648,9 @@ extern void		CkTextInsertDisplayProc _ANSI_ARGS_((
 			    int baseline, WINDOW *window, int screenY));
 extern void		CkTextLostSelection _ANSI_ARGS_((
 			    ClientData clientData));
-#if CK_USE_UTF
 extern CkTextIndex *	CkTextMakeByteIndex _ANSI_ARGS_((CkTextBTree tree,
 			    int lineIndex, int byteIndex,
 			    CkTextIndex *indexPtr));
-#endif
 extern CkTextIndex *	CkTextMakeIndex _ANSI_ARGS_((CkTextBTree tree,
 			    int lineIndex, int charIndex,
 			    CkTextIndex *indexPtr));

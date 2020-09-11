@@ -1007,11 +1007,7 @@ UpdateDisplayInfo(textPtr)
 	lineOK:
 	dlPtr->y = y;
 	y += dlPtr->height;
-#if CK_USE_UTF
 	CkTextIndexForwBytes(&index, dlPtr->count, &index);
-#else
-	CkTextIndexForwChars(&index, dlPtr->count, &index);
-#endif
 	prevPtr = dlPtr;
 	dlPtr = dlPtr->nextPtr;
 
@@ -1088,15 +1084,11 @@ UpdateDisplayInfo(textPtr)
 		dlPtr = LayoutDLine(textPtr, &index);
 		dlPtr->nextPtr = lowestPtr;
 		lowestPtr = dlPtr;
-#if CK_USE_UTF
 		if (dlPtr->length == 0 && dlPtr->height == 0) {
 		    charsToCount--;
 		    break;
 		}
 		CkTextIndexForwBytes(&index, dlPtr->count, &index);
-#else
-		CkTextIndexForwChars(&index, dlPtr->count, &index);
-#endif
 		charsToCount -= dlPtr->count;
 	    } while ((charsToCount > 0)
 		    && (index.linePtr == lowestPtr->index.linePtr));
@@ -1775,13 +1767,8 @@ CkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tagPtr, withTag)
      */
 
     if (index2Ptr == NULL) {
-#if CK_USE_UTF
 	index2Ptr = CkTextMakeByteIndex(textPtr->tree,
 		CkBTreeNumLines(textPtr->tree), 0, &endOfText);
-#else
-	index2Ptr = CkTextMakeIndex(textPtr->tree,
-		CkBTreeNumLines(textPtr->tree), 0, &endOfText);
-#endif
     }
 
     /*
@@ -2139,11 +2126,7 @@ MeasureUp(textPtr, srcPtr, distance, dstPtr)
 	    dlPtr = LayoutDLine(textPtr, &index);
 	    dlPtr->nextPtr = lowestPtr;
 	    lowestPtr = dlPtr;
-#if CK_USE_UTF
 	    CkTextIndexForwBytes(&index, dlPtr->count, &index);
-#else
-	    CkTextIndexForwChars(&index, dlPtr->count, &index);
-#endif
 	    charsToCount -= dlPtr->count;
 	} while ((charsToCount > 0) && (index.linePtr == dlPtr->index.linePtr));
 
@@ -2179,11 +2162,7 @@ MeasureUp(textPtr, srcPtr, distance, dstPtr)
      * Ran off the beginning of the text.  Return the first character
      * in the text.
      */
-#if CK_USE_UTF
     CkTextMakeByteIndex(textPtr->tree, 0, 0, dstPtr);
-#else
-    CkTextMakeIndex(textPtr->tree, 0, 0, dstPtr);
-#endif
 }
 
 /*
@@ -2424,11 +2403,7 @@ ScrollByLines(textPtr, offset)
 		dlPtr = LayoutDLine(textPtr, &index);
 		dlPtr->nextPtr = lowestPtr;
 		lowestPtr = dlPtr;
-#if CK_USE_UTF
 		CkTextIndexForwBytes(&index, dlPtr->count, &index);
-#else
-		CkTextIndexForwChars(&index, dlPtr->count, &index);
-#endif
 		charsToCount -= dlPtr->count;
 	    } while ((charsToCount > 0)
 		    && (index.linePtr == dlPtr->index.linePtr));
@@ -2457,11 +2432,7 @@ ScrollByLines(textPtr, offset)
 	 * Ran off the beginning of the text.  Return the first character
 	 * in the text.
 	 */
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, 0, 0, &textPtr->topIndex);
-#else
-	CkTextMakeIndex(textPtr->tree, 0, 0, &textPtr->topIndex);
-#endif
     } else {
 	/*
 	 * Scrolling down, to show later information in the text.
@@ -2473,14 +2444,10 @@ ScrollByLines(textPtr, offset)
 	for (i = 0; i < offset; i++) {
 	    dlPtr = LayoutDLine(textPtr, &textPtr->topIndex);
 	    dlPtr->nextPtr = NULL;
-#if CK_USE_UTF
 	    if (dlPtr->length == 0 && dlPtr->height == 0) {
 		offset++;
 	    }
 	    CkTextIndexForwBytes(&textPtr->topIndex, dlPtr->count, &new);
-#else
-	    CkTextIndexForwChars(&textPtr->topIndex, dlPtr->count, &new);
-#endif
 	    FreeDLines(textPtr, dlPtr, (DLine *) NULL, 0);
 	    if (new.linePtr == lastLinePtr) {
 		break;
@@ -2531,9 +2498,7 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
     CkTextIndex index, new;
     CkTextLine *lastLinePtr;
     DLine *dlPtr;
-#if CK_USE_UTF
     int bytesInLine;
-#endif
 
     if (dInfoPtr->flags & DINFO_OUT_OF_DATE) {
 	UpdateDisplayInfo(textPtr);
@@ -2564,11 +2529,7 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
     }
     if ((argc == 3) || pickPlace) {
 	if (Tcl_GetInt(interp, argv[2+pickPlace], &lineNum) == TCL_OK) {
-#if CK_USE_UTF
 	    CkTextMakeByteIndex(textPtr->tree, lineNum, 0, &index);
-#else
-	    CkTextMakeIndex(textPtr->tree, lineNum, 0, &index);
-#endif
 	    CkTextSetYView(textPtr, &index, 0);
 	    return TCL_OK;
 	}
@@ -2595,7 +2556,6 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
 	case CK_SCROLL_ERROR:
 	    return TCL_ERROR;
 	case CK_SCROLL_MOVETO:
-#if CK_USE_UTF
 	    if (fraction > 1.0) {
 		fraction = 1.0;
 	    }
@@ -2610,13 +2570,6 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
 	    if (index.charIndex >= bytesInLine) {
 		CkTextMakeByteIndex(textPtr->tree, lineNum + 1, 0, &index);
 	    }
-#else
-	    fraction *= CkBTreeNumLines(textPtr->tree);
-	    lineNum = (int) fraction;
-	    CkTextMakeIndex(textPtr->tree, lineNum+1, 0, &index);
-	    CkTextIndexBackChars(&index, 1, &index);
-	    index.charIndex = (int) ((index.charIndex+1)*(fraction-lineNum));
-#endif
 	    CkTextSetYView(textPtr, &index, 0);
 	    break;
 	case CK_SCROLL_PAGES:
@@ -2653,13 +2606,8 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
 		do {
 		    dlPtr = LayoutDLine(textPtr, &textPtr->topIndex);
 		    dlPtr->nextPtr = NULL;
-#if CK_USE_UTF
 		    CkTextIndexForwBytes(&textPtr->topIndex, dlPtr->count,
 			    &new);
-#else
-		    CkTextIndexForwChars(&textPtr->topIndex, dlPtr->count,
-			    &new);
-#endif
 		    pixels -= dlPtr->height;
 		    FreeDLines(textPtr, dlPtr, (DLine *) NULL, 0);
 		    if (new.linePtr == lastLinePtr) {
@@ -2996,12 +2944,8 @@ CkTextPixelIndex(textPtr, x, y, indexPtr)
 	    indexPtr->charIndex += chunkPtr->numChars,
 	    chunkPtr = chunkPtr->nextPtr) {
 	if (chunkPtr->nextPtr == NULL) {
-#if CK_USE_UTF
 	    indexPtr->charIndex += chunkPtr->numChars;
 	    CkTextIndexBackChars(indexPtr, 1, indexPtr);
-#else
-	    indexPtr->charIndex += chunkPtr->numChars - 1;
-#endif
 	    return;
 	}
     }

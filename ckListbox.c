@@ -938,7 +938,6 @@ DisplayListbox(clientData)
 	    Ck_SetWindowAttr(winPtr, listPtr->normalFg, listPtr->normalBg,
         	listPtr->normalAttr);
         }
-#if CK_USE_UTF
 	if (listPtr->xOffset < elPtr->textWidth) {
 	    char *p = Tcl_UtfAtIndex(elPtr->text, listPtr->xOffset);
 
@@ -946,12 +945,6 @@ DisplayListbox(clientData)
 		strlen(p), 0, y, 0,
 		CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS | CK_FILL_UNTIL_EOL);
 	}
-#else
-	CkDisplayChars(winPtr->mainPtr,
-	    winPtr->window, &elPtr->text[listPtr->xOffset],
-	    elPtr->textLength - listPtr->xOffset, 0, y, 0,
-	    CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS | CK_FILL_UNTIL_EOL);
-#endif
 	y++;
     }
     wmove(winPtr->window, cursorY, 0);
@@ -1062,11 +1055,7 @@ InsertEls(listPtr, index, argc, argv)
 	newPtr = (Element *) ckalloc(ElementSize(length));
 	newPtr->textLength = length;
 	strcpy(newPtr->text, *argv);
-#if CK_USE_UTF
 	newPtr->textWidth = Tcl_NumUtfChars(*argv, length);
-#else
-	newPtr->textWidth = newPtr->textLength;
-#endif
 	if (newPtr->textWidth > listPtr->maxWidth) {
 	    listPtr->maxWidth = newPtr->textWidth;
 	}
