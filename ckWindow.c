@@ -474,7 +474,6 @@ Ck_CreateMainWindow(interp, className)
     ckDisabledUid = Ck_GetUid("disabled");
     ckActiveUid = Ck_GetUid("active");
 
-#if CK_USE_UTF
 #ifdef __WIN32__
     {
 	char enc[32], *envcp = getenv("CK_USE_ENCODING");
@@ -509,7 +508,6 @@ Ck_CreateMainWindow(interp, className)
 	Tcl_FreeEncoding(mainPtr->isoEncoding);
 	mainPtr->isoEncoding = NULL;
     }
-#endif
 
     /* Curses related initialization */
 
@@ -1079,11 +1077,9 @@ Ck_DestroyWindow(winPtr)
 		wrefresh(stdscr);
 	    }
 	    endwin();
-#if CK_USE_UTF
 	    if (mainPtr->isoEncoding != NULL) {
 		Tcl_FreeEncoding(mainPtr->isoEncoding);
 	    }
-#endif
 	    Tcl_SetVar2(mainPtr->interp, "ckPriv", "forever", "0",
 			TCL_GLOBAL_ONLY);
 	    mainPtr->interp = NULL;

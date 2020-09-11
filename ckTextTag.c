@@ -325,17 +325,10 @@ CkTextTagCmd(textPtr, interp, argc, argv)
 		CkTextRedrawTag(textPtr, (CkTextIndex *) NULL,
 			(CkTextIndex *) NULL, tagPtr, 1);
 	    }
-#if CK_USE_UTF
 	    CkBTreeTag(CkTextMakeByteIndex(textPtr->tree, 0, 0, &first),
 		    CkTextMakeByteIndex(textPtr->tree,
 			    CkBTreeNumLines(textPtr->tree), 0, &last),
 		    tagPtr, 0);
-#else
-	    CkBTreeTag(CkTextMakeIndex(textPtr->tree, 0, 0, &first),
-		    CkTextMakeIndex(textPtr->tree,
-			    CkBTreeNumLines(textPtr->tree), 0, &last),
-		    tagPtr, 0);
-#endif
 	    Tcl_DeleteHashEntry(hPtr);
 	    if (textPtr->bindingTable != NULL) {
 		Ck_DeleteAllBindings(textPtr->bindingTable,
@@ -436,13 +429,8 @@ CkTextTagCmd(textPtr, interp, argc, argv)
 	if (CkTextGetIndex(interp, textPtr, argv[4], &index1) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
 		0, &last);
-#else
-	CkTextMakeIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
-		0, &last);
-#endif
 	if (argc == 5) {
 	    index2 = last;
 	} else if (CkTextGetIndex(interp, textPtr, argv[5], &index2)
@@ -545,15 +533,9 @@ CkTextTagCmd(textPtr, interp, argc, argv)
 	if (tagPtr == NULL) {
 	    return TCL_OK;
 	}
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
 	CkTextMakeByteIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
 		0, &last);
-#else
-	CkTextMakeIndex(textPtr->tree, 0, 0, &first);
-	CkTextMakeIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
-		0, &last);
-#endif
 	CkBTreeStartSearch(&first, &last, tagPtr, &tSearch);
 	if (CkBTreeCharTagged(&first, tagPtr)) {
 	    CkTextPrintIndex(&first, position);

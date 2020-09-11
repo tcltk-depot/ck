@@ -2779,7 +2779,6 @@ CkBTreeCharsInLine(linePtr)
     CkTextSegment *segPtr;
     int count = 0;
 
-#if CK_USE_UTF
     for (segPtr = linePtr->segPtr; segPtr != NULL; segPtr = segPtr->nextPtr) {
 	if (segPtr->typePtr == &ckTextCharType) {
 	    count += Tcl_NumUtfChars(segPtr->body.chars, segPtr->size);
@@ -2787,10 +2786,5 @@ CkBTreeCharsInLine(linePtr)
 	    count += segPtr->size;
 	}
     }
-#else
-    for (segPtr = linePtr->segPtr; segPtr != NULL; segPtr = segPtr->nextPtr) {
-	count += segPtr->size;
-    }
-#endif
     return count;
 }

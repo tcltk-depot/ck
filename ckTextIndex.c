@@ -31,7 +31,6 @@ static char *		ForwBack _ANSI_ARGS_((char *string,
 static char *		StartEnd _ANSI_ARGS_(( char *string,
 			    CkTextIndex *indexPtr));
 
-#if CK_USE_UTF
 /*
  *---------------------------------------------------------------------------
  *
@@ -122,7 +121,6 @@ CkTextMakeByteIndex(tree, lineIndex, byteIndex, indexPtr)
     }
     return indexPtr;
 }
-#endif
 
 /*
  *--------------------------------------------------------------
@@ -155,11 +153,9 @@ CkTextMakeIndex(tree, lineIndex, charIndex, indexPtr)
 {
     register CkTextSegment *segPtr;
     int index;
-#if CK_USE_UTF
     char *p, *start, *end;
     int offset;
     Tcl_UniChar ch;
-#endif
 
     indexPtr->tree = tree;
     if (lineIndex < 0) {
@@ -186,7 +182,6 @@ CkTextMakeIndex(tree, lineIndex, charIndex, indexPtr)
 	    indexPtr->charIndex = index-1;
 	    break;
 	}
-#if CK_USE_UTF
 	if (segPtr->typePtr == &ckTextCharType) {
 	    /*
 	     * Turn character offset into a byte offset.
@@ -211,13 +206,6 @@ CkTextMakeIndex(tree, lineIndex, charIndex, indexPtr)
 	    charIndex -= segPtr->size;
 	    index += segPtr->size;
 	}
-#else
-	index += segPtr->size;
-	if (index > charIndex) {
-	    indexPtr->charIndex = charIndex;
-	    break;
-	}
-#endif
     }
     return indexPtr;
 }
@@ -382,15 +370,9 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
 	    goto tryxy;
 	}
 	tagPtr = (CkTextTag *) Tcl_GetHashValue(hPtr);
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
 	CkTextMakeByteIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree), 0,
 		&last);
-#else
-	CkTextMakeIndex(textPtr->tree, 0, 0, &first);
-	CkTextMakeIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree), 0,
-		&last);
-#endif
 	CkBTreeStartSearch(&first, &last, tagPtr, &search);
 	if (!CkBTreeCharTagged(&first, tagPtr) && !CkBTreeNextTag(&search)) {
 	    Tcl_AppendResult(interp,
@@ -484,13 +466,8 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
 	 * Base position is end of text.
 	 */
 
-#if CK_USE_UTF
 	CkTextMakeByteIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
 		0, indexPtr);
-#else
-	CkTextMakeIndex(textPtr->tree, CkBTreeNumLines(textPtr->tree),
-		0, indexPtr);
-#endif
 	goto gotBase;
     } else {
 	/*
@@ -567,7 +544,6 @@ CkTextPrintIndex(indexPtr, string)
     char *string;		/* Place to store the position.  Must have
 				 * at least TK_POS_CHARS characters. */
 {
-#if CK_USE_UTF
     CkTextSegment *segPtr;
     int numBytes, charIndex;
 
@@ -591,10 +567,6 @@ CkTextPrintIndex(indexPtr, string)
     }
     sprintf(string, "%d.%d", CkBTreeLineIndex(indexPtr->linePtr) + 1,
 	    charIndex);
-#else
-    sprintf(string, "%d.%d", CkBTreeLineIndex(indexPtr->linePtr) + 1,
-	    indexPtr->charIndex);
-#endif
 }
 
 /*
@@ -729,20 +701,14 @@ ForwBack(string, indexPtr)
 		lineIndex = 0;
 	    }
 	}
-#if CK_USE_UTF
 	CkTextMakeByteIndex(indexPtr->tree, lineIndex, indexPtr->charIndex,
 		indexPtr);
-#else
-	CkTextMakeIndex(indexPtr->tree, lineIndex, indexPtr->charIndex,
-		indexPtr);
-#endif
     } else {
 	return NULL;
     }
     return p;
 }
 
-#if CK_USE_UTF
 /*
  *---------------------------------------------------------------------------
  *
@@ -808,7 +774,6 @@ CkTextIndexForwBytes(srcPtr, byteCount, dstPtr)
 	dstPtr->linePtr = linePtr;
     }
 }
-#endif
 
 /*
  *----------------------------------------------------------------------
@@ -839,13 +804,9 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
 {
     CkTextLine *linePtr;
     CkTextSegment *segPtr;
-#if CK_USE_UTF
     int byteOffset;
     char *p, *start, *end;
     Tcl_UniChar ch;
-#else
-    int lineLength;
-#endif
 
     if (count < 0) {
 	CkTextIndexBackChars(srcPtr, -count, dstPtr);
@@ -854,7 +815,6 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
 
     *dstPtr = *srcPtr;
 
-#if CK_USE_UTF
     segPtr = CkTextIndexToSeg(dstPtr, &byteOffset);
     while (1) {
 
@@ -900,39 +860,8 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
 	dstPtr->charIndex = 0;
 	segPtr = dstPtr->linePtr->segPtr;
     }
-#else
-    dstPtr->charIndex += count;
-    while (1) {
-	/*
-	 * Compute the length of the current line.
-	 */
-
-	lineLength = 0;
-	for (segPtr = dstPtr->linePtr->segPtr; segPtr != NULL;
-		segPtr = segPtr->nextPtr) {
-	    lineLength += segPtr->size;
-	}
-
-	/*
-	 * If the new index is in the same line then we're done.
-	 * Otherwise go on to the next line.
-	 */
-
-	if (dstPtr->charIndex < lineLength) {
-	    return;
-	}
-	dstPtr->charIndex -= lineLength;
-	linePtr = CkBTreeNextLine(dstPtr->linePtr);
-	if (linePtr == NULL) {
-	    dstPtr->charIndex = lineLength - 1;
-	    return;
-	}
-	dstPtr->linePtr = linePtr;
-    }
-#endif
 }
 
-#if CK_USE_UTF
 /*
  *---------------------------------------------------------------------------
  *
@@ -996,7 +925,6 @@ CkTextIndexBackBytes(srcPtr, byteCount, dstPtr)
 	}
     }
 }
-#endif
 
 /*
  *----------------------------------------------------------------------
@@ -1027,11 +955,9 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
 {
     CkTextSegment *segPtr;
     int lineIndex;
-#if CK_USE_UTF
     CkTextSegment *oldPtr;
     int segSize;
     char *p, *start, *end;
-#endif
 
     if (count < 0) {
 	CkTextIndexForwChars(srcPtr, -count, dstPtr);
@@ -1039,7 +965,6 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
     }
 
     *dstPtr = *srcPtr;
-#if CK_USE_UTF
 
     /*
      * Find offset within seg that contains byteIndex.
@@ -1118,35 +1043,6 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
 	segPtr = oldPtr;
 	segSize = segPtr->size;
     }
-#else
-    dstPtr->charIndex -= count;
-    lineIndex = -1;
-    while (dstPtr->charIndex < 0) {
-	/*
-	 * Move back one line in the text.  If we run off the beginning
-	 * of the file then just return the first character in the text.
-	 */
-
-	if (lineIndex < 0) {
-	    lineIndex = CkBTreeLineIndex(dstPtr->linePtr);
-	}
-	if (lineIndex == 0) {
-	    dstPtr->charIndex = 0;
-	    return;
-	}
-	lineIndex--;
-	dstPtr->linePtr = CkBTreeFindLine(dstPtr->tree, lineIndex);
-
-	/*
-	 * Compute the length of the line and add that to dstPtr->charIndex.
-	 */
-
-	for (segPtr = dstPtr->linePtr->segPtr; segPtr != NULL;
-		segPtr = segPtr->nextPtr) {
-	    dstPtr->charIndex += segPtr->size;
-	}
-    }
-#endif
 }
 
 /*

@@ -26,35 +26,26 @@
 #if (TCL_MINOR_VERSION == 7)
 #define CK_VERSION "8.7"
 #define CK_MINOR_VERSION 7
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 6)
 #define CK_VERSION "8.6"
 #define CK_MINOR_VERSION 6
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 5)
 #define CK_VERSION "8.5"
 #define CK_MINOR_VERSION 5
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 4)
 #define CK_VERSION "8.4"
 #define CK_MINOR_VERSION 4
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 3)
 #define CK_VERSION "8.3"
 #define CK_MINOR_VERSION 3
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 2)
 #define CK_VERSION "8.2"
 #define CK_MINOR_VERSION 2
-#define CK_USE_UTF 1
 #elif (TCL_MINOR_VERSION == 1)
 #define CK_VERSION "8.1"
 #define CK_MINOR_VERSION 1
-#define CK_USE_UTF 1
 #else
-#define CK_VERSION "8.0"
-#define CK_MINOR_VERSION 0
-#define CK_USE_UTF 0
+#error unsupported Tcl minor version 
 #endif
 
 #ifdef TCL_UTF_MAX
@@ -95,10 +86,8 @@ typedef struct {
     long type;
     struct CkWindow *winPtr;
     int keycode;
-#if CK_USE_UTF
     int is_uch;
     int uch;
-#endif
 } CkKeyEvent;
 
 typedef struct {
@@ -256,9 +245,7 @@ typedef struct CkMainInfo {
 #ifdef USE_NCURSES
     int winchFd[2];		/* Pipe for SIGWINCH handling. */
 #endif
-#if CK_USE_UTF
     Tcl_Encoding isoEncoding;
-#endif
 } CkMainInfo;
 
 #define CK_HAS_COLOR        1
