@@ -242,7 +242,7 @@ Ck_MaintainGeometry(slave, master, x, y, width, height)
 {
     Tcl_HashEntry *hPtr;
     MaintainMaster *masterPtr;
-    register MaintainSlave *slavePtr;
+    MaintainSlave *slavePtr;
     int new, map;
     CkWindow *ancestor, *parent;
 
@@ -368,7 +368,7 @@ Ck_UnmaintainGeometry(slave, master)
 {
     Tcl_HashEntry *hPtr;
     MaintainMaster *masterPtr;
-    register MaintainSlave *slavePtr, *prevPtr;
+    MaintainSlave *slavePtr, *prevPtr;
     CkWindow *ancestor;
 
     if (!initialized) {

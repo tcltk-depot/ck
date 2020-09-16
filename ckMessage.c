@@ -164,7 +164,7 @@ Ck_MessageCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register Message *msgPtr;
+    Message *msgPtr;
     CkWindow *new;
     CkWindow *mainPtr = (CkWindow *) clientData;
 
@@ -241,7 +241,7 @@ MessageWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register Message *msgPtr = (Message *) clientData;
+    Message *msgPtr = (Message *) clientData;
     size_t length;
     int c;
 
@@ -303,7 +303,7 @@ static void
 DestroyMessage(clientData)
     ClientData clientData;	/* Info about message widget. */
 {
-    register Message *msgPtr = (Message *) clientData;
+    Message *msgPtr = (Message *) clientData;
 
     /*
      * Free up all the stuff that requires special handling, then
@@ -382,7 +382,7 @@ MessageCmdDeletedProc(clientData)
 static int
 ConfigureMessage(interp, msgPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    register Message *msgPtr;	/* Information about widget;  may or may
+    Message *msgPtr;		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
@@ -477,7 +477,7 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
 
 static void
 ComputeMessageGeometry(msgPtr)
-    register Message *msgPtr;	/* Information about window. */
+    Message *msgPtr;		/* Information about window. */
 {
     char *p;
     int width, inc, height, numLines;
@@ -584,8 +584,8 @@ static void
 DisplayMessage(clientData)
     ClientData clientData;	/* Information about window. */
 {
-    register Message *msgPtr = (Message *) clientData;
-    register CkWindow *winPtr = msgPtr->winPtr;
+    Message *msgPtr = (Message *) clientData;
+    CkWindow *winPtr = msgPtr->winPtr;
     char *p;
     int x, y, lineLength, numChars, charsLeft, byteLength;
 
@@ -743,7 +743,7 @@ MessageTextVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
-    register Message *msgPtr = (Message *) clientData;
+    Message *msgPtr = (Message *) clientData;
     char *value;
 
     /*

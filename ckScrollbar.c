@@ -211,7 +211,7 @@ Ck_ScrollbarCmd(clientData, interp, argc, argv)
     char **argv;		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
-    register Scrollbar *scrollPtr;
+    Scrollbar *scrollPtr;
     CkWindow *new;
 
     if (argc < 2) {
@@ -294,7 +294,7 @@ ScrollbarWidgetCmd(clientData, interp, argc, argv)
     int argc;				/* Number of arguments. */
     char **argv;			/* Argument strings. */
 {
-    register Scrollbar *scrollPtr = (Scrollbar *) clientData;
+    Scrollbar *scrollPtr = (Scrollbar *) clientData;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -482,7 +482,7 @@ static void
 DestroyScrollbar(clientData)
     ClientData clientData;	/* Info about scrollbar widget. */
 {
-    register Scrollbar *scrollPtr = (Scrollbar *) clientData;
+    Scrollbar *scrollPtr = (Scrollbar *) clientData;
 
     /*
      * Free up all the stuff that requires special handling, then
@@ -556,7 +556,7 @@ ScrollbarCmdDeletedProc(clientData)
 static int
 ConfigureScrollbar(interp, scrollPtr, argc, argv, flags)
     Tcl_Interp *interp;			/* Used for error reporting. */
-    register Scrollbar *scrollPtr;	/* Information about widget;  may or
+    Scrollbar *scrollPtr;		/* Information about widget;  may or
 					 * may not already have values for
 					 * some fields. */
     int argc;				/* Number of valid entries in argv. */
@@ -627,8 +627,8 @@ static void
 DisplayScrollbar(clientData)
     ClientData clientData;	/* Information about window. */
 {
-    register Scrollbar *scrollPtr = (Scrollbar *) clientData;
-    register CkWindow *winPtr = scrollPtr->winPtr;
+    Scrollbar *scrollPtr = (Scrollbar *) clientData;
+    CkWindow *winPtr = scrollPtr->winPtr;
     int width, i;
     long gchar;
 
@@ -764,7 +764,7 @@ ScrollbarEventProc(clientData, eventPtr)
 
 static void
 ComputeScrollbarGeometry(scrollPtr)
-    register Scrollbar *scrollPtr;	/* Scrollbar whose geometry may
+    Scrollbar *scrollPtr;		/* Scrollbar whose geometry may
 					 * have changed. */
 {
     int fieldLength;
@@ -835,7 +835,7 @@ ComputeScrollbarGeometry(scrollPtr)
 
 static int
 ScrollbarPosition(scrollPtr, x, y)
-    register Scrollbar *scrollPtr;	/* Scrollbar widget record. */
+    Scrollbar *scrollPtr;		/* Scrollbar widget record. */
     int x, y;				/* Coordinates within scrollPtr's
 					 * window. */
 {
@@ -885,7 +885,7 @@ ScrollbarPosition(scrollPtr, x, y)
 
 static void
 EventuallyRedraw(scrollPtr)
-    register Scrollbar *scrollPtr;	/* Information about widget. */
+    Scrollbar *scrollPtr;		/* Information about widget. */
 {
     if ((scrollPtr->winPtr == NULL) ||
 	!(scrollPtr->winPtr->flags & CK_MAPPED)) {

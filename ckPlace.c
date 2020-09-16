@@ -380,8 +380,8 @@ static void
 UnlinkSlave(slavePtr)
     Slave *slavePtr;		/* Slave structure to be unlinked. */
 {
-    register Master *masterPtr;
-    register Slave *prevPtr;
+    Master *masterPtr;
+    Slave *prevPtr;
 
     masterPtr = slavePtr->masterPtr;
     if (masterPtr == NULL) {
@@ -945,7 +945,7 @@ PlaceLostSlaveProc(clientData, winPtr)
 				 * was stolen away. */
     CkWindow *winPtr;		/* Slave window. */
 {
-    register Slave *slavePtr = (Slave *) clientData;
+    Slave *slavePtr = (Slave *) clientData;
 
     if (slavePtr->masterPtr->winPtr != slavePtr->winPtr->parentPtr) {
 	Ck_UnmaintainGeometry(slavePtr->winPtr, slavePtr->masterPtr->winPtr);

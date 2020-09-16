@@ -692,8 +692,8 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
     int *nextCPtr;		/* Return byte position of terminating
 				   character in source. */
 {
-    register char *p;		/* Current character. */
-    register int c;
+    char *p;			/* Current character. */
+    int c;
     char *term;			/* Pointer to most recent character that
 				 * may legally be a terminating character. */
     int termX;			/* X-position just after term. */
@@ -866,8 +866,8 @@ CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
 				 * now.  See CkMeasureChars for information
 				 * about it. */
 {
-    register char *p;		/* Current character being scanned. */
-    register int c;
+    char *p;			/* Current character being scanned. */
+    int c;
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[16];
@@ -1033,8 +1033,8 @@ CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
     int first, last;            /* Range: First and last characters to
 				 * display. */
 {
-    register char *p;		/* Current character being scanned. */
-    register int c, count;
+    char *p;			/* Current character being scanned. */
+    int c, count;
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[10];

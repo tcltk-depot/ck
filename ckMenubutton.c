@@ -245,7 +245,7 @@ Ck_MenubuttonCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register MenuButton *mbPtr;
+    MenuButton *mbPtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
 
@@ -337,7 +337,7 @@ MenuButtonWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register MenuButton *mbPtr = (MenuButton *) clientData;
+    MenuButton *mbPtr = (MenuButton *) clientData;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -409,7 +409,7 @@ static void
 DestroyMenuButton(clientData)
     ClientData clientData;	/* Info about button widget. */
 {
-    register MenuButton *mbPtr = (MenuButton *) clientData;
+    MenuButton *mbPtr = (MenuButton *) clientData;
 
     /*
      * Free up all the stuff that requires special handling, then
@@ -450,7 +450,7 @@ DestroyMenuButton(clientData)
 static int
 ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    register MenuButton *mbPtr;	/* Information about widget;  may or may
+    MenuButton *mbPtr;		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
@@ -747,7 +747,7 @@ MenuButtonCmdDeletedProc(clientData)
 
 static void
 ComputeMenuButtonGeometry(mbPtr)
-    register MenuButton *mbPtr;		/* Widget record for menu button. */
+    MenuButton *mbPtr;			/* Widget record for menu button. */
 {
     int width, height, dummy;
     CkWindow *winPtr = mbPtr->winPtr;
@@ -802,7 +802,7 @@ MenuButtonTextVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
-    register MenuButton *mbPtr = (MenuButton *) clientData;
+    MenuButton *mbPtr = (MenuButton *) clientData;
     char *value;
 
     /*

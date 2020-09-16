@@ -90,7 +90,7 @@ Ck_SegType ckTextLeftMarkType = {
 
 int
 CkTextMarkCmd(textPtr, interp, argc, argv)
-    register CkText *textPtr;	/* Information about text widget. */
+    CkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings.  Someone else has already
@@ -435,8 +435,7 @@ MarkLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     int noCharsYet;		/* Non-zero means no characters have been
 				 * assigned to this line yet. */
     Ck_Uid wrapMode;		/* Not used. */
-    register CkTextDispChunk *chunkPtr;
-				/* Structure to fill in with information
+    CkTextDispChunk *chunkPtr;	/* Structure to fill in with information
 				 * about this chunk.  The x field has already
 				 * been set by the caller. */
 {

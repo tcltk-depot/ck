@@ -79,7 +79,7 @@ static int		TagSortProc _ANSI_ARGS_((CONST VOID *first,
 
 int
 CkTextTagCmd(textPtr, interp, argc, argv)
-    register CkText *textPtr;	/* Information about text widget. */
+    CkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings.  Someone else has already
@@ -89,7 +89,7 @@ CkTextTagCmd(textPtr, interp, argc, argv)
     int c, i, addTag;
     size_t length;
     char *fullOption;
-    register CkTextTag *tagPtr;
+    CkTextTag *tagPtr;
     CkTextIndex first, last, index1, index2;
 
     if (argc < 3) {
@@ -583,7 +583,7 @@ CkTextCreateTag(textPtr, tagName)
     CkText *textPtr;		/* Widget in which tag is being used. */
     char *tagName;		/* Name of desired tag. */
 {
-    register CkTextTag *tagPtr;
+    CkTextTag *tagPtr;
     Tcl_HashEntry *hPtr;
     int new;
 
@@ -680,7 +680,7 @@ FindTag(interp, textPtr, tagName)
 void
 CkTextFreeTag(textPtr, tagPtr)
     CkText *textPtr;			/* Info about overall widget. */
-    register CkTextTag *tagPtr;		/* Tag being deleted. */
+    CkTextTag *tagPtr;			/* Tag being deleted. */
 {
     if (tagPtr->justifyString != NULL) {
 	ckfree(tagPtr->justifyString);
@@ -727,7 +727,7 @@ SortTags(numTags, tagArrayPtr)
     CkTextTag **tagArrayPtr;	/* Pointer to array of pointers. */
 {
     int i, j, prio;
-    register CkTextTag **tagPtrPtr;
+    CkTextTag **tagPtrPtr;
     CkTextTag **maxPtrPtr, *tmp;
 
     if (numTags < 2) {
@@ -813,7 +813,7 @@ ChangeTagPriority(textPtr, tagPtr, prio)
     int prio;				/* New priority for tag. */
 {
     int low, high, delta;
-    register CkTextTag *tagPtr2;
+    CkTextTag *tagPtr2;
     Tcl_HashEntry *hPtr;
     Tcl_HashSearch search;
 
@@ -894,7 +894,7 @@ CkTextBindProc(clientData, eventPtr)
 
 void
 CkTextPickCurrent(textPtr, eventPtr)
-    register CkText *textPtr;		/* Text widget in which to select
+    CkText *textPtr;			/* Text widget in which to select
 					 * current character. */
     CkEvent *eventPtr;			/* Event describing location of
 					 * mouse cursor.  Must be EnterWindow,
