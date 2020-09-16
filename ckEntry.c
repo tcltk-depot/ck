@@ -236,7 +236,7 @@ Ck_EntryCmd(clientData, interp, argc, argv)
     char **argv;		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
-    register Entry *entryPtr;
+    Entry *entryPtr;
     CkWindow *new;
 
     if (argc < 2) {
@@ -330,7 +330,7 @@ EntryWidgetCmd(clientData, interp, argc, argv)
     int argc;				/* Number of arguments. */
     char **argv;			/* Argument strings. */
 {
-    register Entry *entryPtr = (Entry *) clientData;
+    Entry *entryPtr = (Entry *) clientData;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -707,7 +707,7 @@ EntryCmdDeletedProc(clientData)
 static int
 ConfigureEntry(interp, entryPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    register Entry *entryPtr;	/* Information about widget;  may or may
+    Entry *entryPtr;		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
@@ -793,7 +793,7 @@ static void
 DisplayEntry(clientData)
     ClientData clientData;	/* Information about window. */
 {
-    register Entry *entryPtr = (Entry *) clientData;
+    Entry *entryPtr = (Entry *) clientData;
     CkWindow *winPtr = entryPtr->winPtr;
     int y, startX, leftIndex, selectFirst, selectLast, insertPos, dummy;
     char *displayString;
@@ -1020,7 +1020,7 @@ EntryComputeGeometry(entryPtr)
 
 static void
 InsertChars(entryPtr, index, string)
-    register Entry *entryPtr;	/* Entry that is to get the new
+    Entry *entryPtr;		/* Entry that is to get the new
 				 * elements. */
     int index;			/* Add the new elements before this
 				 * element. */
@@ -1098,7 +1098,7 @@ InsertChars(entryPtr, index, string)
 
 static void
 DeleteChars(entryPtr, index, count)
-    register Entry *entryPtr;	/* Entry widget to modify. */
+    Entry *entryPtr;		/* Entry widget to modify. */
     int index;			/* Index of first character to delete. */
     int count;			/* How many characters to delete. */
 {
@@ -1201,7 +1201,7 @@ DeleteChars(entryPtr, index, count)
 
 static void
 EntrySetValue(entryPtr, value)
-    register Entry *entryPtr;		/* Entry whose value is to be
+    Entry *entryPtr;			/* Entry whose value is to be
 					 * changed. */
     char *value;			/* New text to display in entry. */
 {
@@ -1406,7 +1406,7 @@ GetEntryIndex(interp, entryPtr, string, indexPtr)
 
 static void
 EntrySelectTo(entryPtr, index)
-    register Entry *entryPtr;		/* Information about widget. */
+    Entry *entryPtr;			/* Information about widget. */
     int index;				/* Index of element that is to
 					 * become the "other" end of the
 					 * selection. */
@@ -1633,7 +1633,7 @@ EntryTextVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Not used. */
     int flags;			/* Information about what happened. */
 {
-    register Entry *entryPtr = (Entry *) clientData;
+    Entry *entryPtr = (Entry *) clientData;
     char *value;
 
     /*

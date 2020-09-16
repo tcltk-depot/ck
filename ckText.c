@@ -142,7 +142,7 @@ Ck_TextCmd(clientData, interp, argc, argv)
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
-    register CkText *textPtr;
+    CkText *textPtr;
     CkTextIndex startIndex;
 
     if (argc < 2) {
@@ -262,7 +262,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register CkText *textPtr = (CkText *) clientData;
+    CkText *textPtr = (CkText *) clientData;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -579,7 +579,7 @@ static void
 DestroyText(clientData)
     ClientData clientData;	/* Info about text widget. */
 {
-    register CkText *textPtr = (CkText *) clientData;
+    CkText *textPtr = (CkText *) clientData;
     Tcl_HashSearch search;
     Tcl_HashEntry *hPtr;
     CkTextTag *tagPtr;
@@ -646,7 +646,7 @@ DestroyText(clientData)
 static int
 ConfigureText(interp, textPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    register CkText *textPtr;	/* Information about widget;  may or may
+    CkText *textPtr;		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
@@ -774,9 +774,9 @@ ConfigureText(interp, textPtr, argc, argv, flags)
 static void
 TextEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about window. */
-    register CkEvent *eventPtr;	/* Information about event. */
+    CkEvent *eventPtr;		/* Information about event. */
 {
-    register CkText *textPtr = (CkText *) clientData;
+    CkText *textPtr = (CkText *) clientData;
     CkWindow *winPtr = textPtr->winPtr;
     CkTextIndex index, index2;
 

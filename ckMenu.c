@@ -418,7 +418,7 @@ Ck_MenuCmd(clientData, interp, argc, argv)
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
-    register Menu *menuPtr;
+    Menu *menuPtr;
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -508,8 +508,8 @@ MenuWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register Menu *menuPtr = (Menu *) clientData;
-    register MenuEntry *mePtr;
+    Menu *menuPtr = (Menu *) clientData;
+    MenuEntry *mePtr;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -923,7 +923,7 @@ static void
 DestroyMenu(clientData)
     ClientData clientData;	/* Info about menu widget. */
 {
-    register Menu *menuPtr = (Menu *) clientData;
+    Menu *menuPtr = (Menu *) clientData;
     int i;
 
     /*
@@ -964,7 +964,7 @@ static void
 DestroyMenuEntry(clientData)
     ClientData clientData;		/* Pointer to entry to be freed. */
 {
-    register MenuEntry *mePtr = (MenuEntry *) clientData;
+    MenuEntry *mePtr = (MenuEntry *) clientData;
     Menu *menuPtr = mePtr->menuPtr;
 
     /*
@@ -1015,7 +1015,7 @@ DestroyMenuEntry(clientData)
 static int
 ConfigureMenu(interp, menuPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    register Menu *menuPtr;	/* Information about widget;  may or may
+    Menu *menuPtr;		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
@@ -1076,7 +1076,7 @@ static int
 ConfigureMenuEntry(interp, menuPtr, mePtr, index, argc, argv, flags)
     Tcl_Interp *interp;			/* Used for error reporting. */
     Menu *menuPtr;			/* Information about whole menu. */
-    register MenuEntry *mePtr;		/* Information about menu entry;  may
+    MenuEntry *mePtr;			/* Information about menu entry;  may
 					 * or may not already have values for
 					 * some fields. */
     int index;				/* Index of mePtr within menuPtr's
@@ -1222,7 +1222,7 @@ ComputeMenuGeometry(clientData)
 {
     Menu *menuPtr = (Menu *) clientData;
     CkWindow *winPtr = menuPtr->winPtr;
-    register MenuEntry *mePtr;
+    MenuEntry *mePtr;
     int maxLabelWidth, maxIndicatorWidth, maxAccelWidth;
     int width, height, indicatorSpace, dummy;
     int i, y;
@@ -1332,9 +1332,9 @@ static void
 DisplayMenu(clientData)
     ClientData clientData;	/* Information about widget. */
 {
-    register Menu *menuPtr = (Menu *) clientData;
-    register MenuEntry *mePtr;
-    register CkWindow *winPtr = menuPtr->winPtr;
+    Menu *menuPtr = (Menu *) clientData;
+    MenuEntry *mePtr;
+    CkWindow *winPtr = menuPtr->winPtr;
     int index, leftEdge, x, y, cursorX, cursorY;
     int fg, nFg, aFg, dFg;
     int bg, nBg, aBg, dBg;
@@ -1910,8 +1910,8 @@ MenuVarProc(clientData, interp, name1, name2, flags)
 
 static void
 EventuallyRedrawMenu(menuPtr, mePtr)
-    register Menu *menuPtr;	/* Information about menu to redraw. */
-    register MenuEntry *mePtr;	/* Entry to redraw.  NULL means redraw
+    Menu *menuPtr;		/* Information about menu to redraw. */
+    MenuEntry *mePtr;		/* Entry to redraw.  NULL means redraw
 				 * all the entries in the menu. */
 {
     int i;
@@ -1958,8 +1958,8 @@ static int
 PostSubmenu(interp, menuPtr, mePtr)
     Tcl_Interp *interp;		/* Used for invoking sub-commands and
 				 * reporting errors. */
-    register Menu *menuPtr;	/* Information about menu as a whole. */
-    register MenuEntry *mePtr;	/* Info about submenu that is to be
+    Menu *menuPtr;		/* Information about menu as a whole. */
+    MenuEntry *mePtr;		/* Info about submenu that is to be
 				 * posted.  NULL means make sure that
 				 * no submenu is posted. */
 {
@@ -2058,11 +2058,11 @@ PostSubmenu(interp, menuPtr, mePtr)
 
 static int
 ActivateMenuEntry(menuPtr, index)
-    register Menu *menuPtr;		/* Menu in which to activate. */
+    Menu *menuPtr;			/* Menu in which to activate. */
     int index;				/* Index of entry to activate, or
 					 * -1 to deactivate all entries. */
 {
-    register MenuEntry *mePtr;
+    MenuEntry *mePtr;
     int result = TCL_OK;
 
     if (menuPtr->active >= 0) {

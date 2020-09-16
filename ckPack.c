@@ -196,7 +196,7 @@ Ck_PackCmd(clientData, interp, argc, argv)
 	    }
 	}
     } else if ((c == 'i') && (strncmp(argv[1], "info", length) == 0)) {
-	register Packer *slavePtr;
+	Packer *slavePtr;
 	CkWindow *slave;
 	char buffer[300];
 	static char *sideNames[] = {"top", "bottom", "left", "right"};
@@ -336,7 +336,7 @@ PackReqProc(clientData, winPtr)
 				 * geometry.  */
     CkWindow *winPtr;		/* Other information about the window. */
 {
-    register Packer *packPtr = (Packer *) clientData;
+    Packer *packPtr = (Packer *) clientData;
 
     packPtr = packPtr->masterPtr;
     if (!(packPtr->flags & REQUESTED_REPACK)) {
@@ -368,7 +368,7 @@ PackLostSlaveProc(clientData, winPtr)
 				 * was stolen away. */
     CkWindow *winPtr;		/* Pointer to window. */
 {
-    register Packer *slavePtr = (Packer *) clientData;
+    Packer *slavePtr = (Packer *) clientData;
 
     if (slavePtr->masterPtr->winPtr != slavePtr->winPtr->parentPtr) {
 	Ck_UnmaintainGeometry(slavePtr->winPtr, slavePtr->masterPtr->winPtr);
@@ -403,8 +403,8 @@ ArrangePacking(clientData)
     ClientData clientData;	/* Structure describing parent whose slaves
 				 * are to be re-layed out. */
 {
-    register Packer *masterPtr = (Packer *) clientData;
-    register Packer *slavePtr;
+    Packer *masterPtr = (Packer *) clientData;
+    Packer *slavePtr;
     int cavityX, cavityY, cavityWidth, cavityHeight;
 				/* These variables keep track of the
 				 * as-yet-unallocated space remaining in
@@ -702,7 +702,7 @@ done:
 
 static int
 XExpansion(slavePtr, cavityWidth)
-    register Packer *slavePtr;		/* First in list of remaining
+    Packer *slavePtr;			/* First in list of remaining
 					 * slaves. */
     int cavityWidth;			/* Horizontal space left for all
 					 * remaining slaves. */
@@ -766,7 +766,7 @@ XExpansion(slavePtr, cavityWidth)
 
 static int
 YExpansion(slavePtr, cavityHeight)
-    register Packer *slavePtr;		/* First in list of remaining
+    Packer *slavePtr;			/* First in list of remaining
 					 * slaves. */
     int cavityHeight;			/* Vertical space left for all
 					 * remaining slaves. */
@@ -828,7 +828,7 @@ GetPacker(winPtr)
     CkWindow *winPtr;		/* Pointer to window for which
 				 * packer structure is desired. */
 {
-    register Packer *packPtr;
+    Packer *packPtr;
     Tcl_HashEntry *hPtr;
     int new;
 
@@ -882,9 +882,9 @@ GetPacker(winPtr)
 
 static void
 Unlink(packPtr)
-    register Packer *packPtr;		/* Window to unlink. */
+    Packer *packPtr;			/* Window to unlink. */
 {
-    register Packer *masterPtr, *packPtr2;
+    Packer *masterPtr, *packPtr2;
 
     masterPtr = packPtr->masterPtr;
     if (masterPtr == NULL) {
@@ -937,7 +937,8 @@ DestroyPacker(clientData)
     ClientData clientData;		/* Info about packed window that
 					 * is now dead. */
 {
-    register Packer *packPtr = (Packer *) clientData;
+    Packer *packPtr = (Packer *) clientData;
+
     ckfree((char *) packPtr);
 }
 
@@ -966,7 +967,7 @@ PackStructureProc(clientData, eventPtr)
 					 * referred to by eventPtr. */
     CkEvent *eventPtr;			/* Describes what just happened. */
 {
-    register Packer *packPtr = (Packer *) clientData;
+    Packer *packPtr = (Packer *) clientData;
 
     if (eventPtr->type == CK_EV_MAP || eventPtr->type == CK_EV_EXPOSE) {
 	if ((packPtr->slavePtr != NULL)
@@ -975,7 +976,7 @@ PackStructureProc(clientData, eventPtr)
 	    Tk_DoWhenIdle(ArrangePacking, (ClientData) packPtr);
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
-	register Packer *slavePtr, *nextPtr;
+	Packer *slavePtr, *nextPtr;
 
 	if (packPtr->masterPtr != NULL) {
 	    Unlink(packPtr);

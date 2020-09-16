@@ -402,7 +402,7 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
 					 * that triggers binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
-    register PatSeq *psPtr, *prevPtr;
+    PatSeq *psPtr, *prevPtr;
     Tcl_HashEntry *hPtr;
 
     psPtr = FindSequence(interp, bindPtr, object, eventString, 0);
@@ -529,13 +529,13 @@ Ck_GetAllBindings(interp, bindingTable, object)
 
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
-    register PatSeq *psPtr;
-    register Pattern *patPtr;
+    PatSeq *psPtr;
+    Pattern *patPtr;
     Tcl_HashEntry *hPtr;
     Tcl_DString ds;
     char c, buffer[10];
     int patsLeft;
-    register EventInfo *eiPtr;
+    EventInfo *eiPtr;
 
     hPtr = Tcl_FindHashEntry(&bindPtr->objectTable, (char *) object);
     if (hPtr == NULL) {
@@ -921,10 +921,10 @@ FindSequence(interp, bindPtr, object, eventString, create)
 {
     Pattern pats[EVENT_BUFFER_SIZE];
     int numPats, isCtrl;
-    register char *p;
-    register Pattern *patPtr;
-    register PatSeq *psPtr;
-    register Tcl_HashEntry *hPtr;
+    char *p;
+    Pattern *patPtr;
+    PatSeq *psPtr;
+    Tcl_HashEntry *hPtr;
 #define FIELD_SIZE 48
     char field[FIELD_SIZE];
     int new;
@@ -987,7 +987,7 @@ FindSequence(interp, bindPtr, object, eventString, create)
 	 */
 
 	if (isdigit((unsigned char) *p) && p[1] == '>') {
-	    register EventInfo *eiPtr;
+	    EventInfo *eiPtr;
 
 	    hPtr = Tcl_FindHashEntry(&eventTable, "ButtonPress");
 	    eiPtr = (EventInfo *) Tcl_GetHashValue(hPtr);
@@ -1012,7 +1012,7 @@ FindSequence(interp, bindPtr, object, eventString, create)
         p = GetField(p, field, FIELD_SIZE);
 	hPtr = Tcl_FindHashEntry(&eventTable, field);
 	if (hPtr != NULL) {
-	    register EventInfo *eiPtr;
+	    EventInfo *eiPtr;
 
 	    eiPtr = (EventInfo *) Tcl_GetHashValue(hPtr);
 	    patPtr->eventType = eiPtr->type;
@@ -1161,8 +1161,8 @@ done:
 
 static char *
 GetField(p, copy, size)
-    register char *p;		/* Pointer to part of pattern. */
-    register char *copy;	/* Place to copy field. */
+    char *p;			/* Pointer to part of pattern. */
+    char *copy;			/* Place to copy field. */
     int size;			/* Maximum number of characters to
 				 * copy. */
 {
@@ -1202,17 +1202,17 @@ static PatSeq *
 MatchPatterns(bindPtr, psPtr)
     BindingTable *bindPtr;	/* Information about binding table, such
 				 * as ring of recent events. */
-    register PatSeq *psPtr;	/* List of pattern sequences. */
+    PatSeq *psPtr;		/* List of pattern sequences. */
 {
-    register PatSeq *bestPtr = NULL;
+    PatSeq *bestPtr = NULL;
 
     /*
      * Iterate over all the pattern sequences.
      */
 
     for ( ; psPtr != NULL; psPtr = psPtr->nextSeqPtr) {
-	register CkEvent *eventPtr;
-	register Pattern *patPtr;
+	CkEvent *eventPtr;
+	Pattern *patPtr;
 	CkWindow *winPtr;
 	int *detailPtr;
 	int patCount, ringCount;
@@ -1271,7 +1271,7 @@ MatchPatterns(bindPtr, psPtr)
 	 */
 
 	if (bestPtr != NULL) {
-	    register Pattern *patPtr2;
+	    Pattern *patPtr2;
 	    int i;
 
 	    if (psPtr->numPats != bestPtr->numPats) {
@@ -1326,9 +1326,9 @@ static void
 ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
     CkWindow *winPtr;		/* Window where event occurred:  needed to
 				 * get input context. */
-    register char *before;	/* Command containing percent
+    char *before;		/* Command containing percent
 				 * expressions to be replaced. */
-    register CkEvent *eventPtr;	/* Event containing information
+    CkEvent *eventPtr;		/* Event containing information
 				 * to be used in % replacements. */
     KeySym keySym;		/* KeySym: only relevant for
 				 * CK_EV_KEYPRESS events). */
