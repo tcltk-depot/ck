@@ -194,20 +194,17 @@ static Element defaultMatch;
  * Forward declarations for procedures defined in this file:
  */
 
-static int		AddFromString _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkWindow *winPtr, char *string, int priority));
-static void		ClearOptionTree _ANSI_ARGS_((ElArray *arrayPtr));
-static ElArray *	ExtendArray _ANSI_ARGS_((ElArray *arrayPtr,
-			    Element *elPtr));
-static void		ExtendStacks _ANSI_ARGS_((ElArray *arrayPtr,
-			    int leaf));
-static ElArray *	NewArray _ANSI_ARGS_((int numEls));
-static void		OptionInit _ANSI_ARGS_((CkMainInfo *mainPtr));
-static int		ParsePriority _ANSI_ARGS_((Tcl_Interp *interp,
-			    char *string));
-static int		ReadOptionFile _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkWindow *winPtr, char *fileName, int priority));
-static void		SetupStacks _ANSI_ARGS_((CkWindow *winPtr, int leaf));
+static int		AddFromString(Tcl_Interp *interp,
+			    CkWindow *winPtr, char *string, int priority);
+static void		ClearOptionTree(ElArray *arrayPtr);
+static ElArray *	ExtendArray(ElArray *arrayPtr, Element *elPtr);
+static void		ExtendStacks(ElArray *arrayPtr, int leaf);
+static ElArray *	NewArray(int numEls);
+static void		OptionInit(CkMainInfo *mainPtr);
+static int		ParsePriority(Tcl_Interp *interp, char *string);
+static int		ReadOptionFile(Tcl_Interp *interp,
+			    CkWindow *winPtr, char *fileName, int priority);
+static void		SetupStacks(CkWindow *winPtr, int leaf);
 
 /*
  *--------------------------------------------------------------
@@ -275,8 +272,8 @@ Ck_AddOption(winPtr, name, value, priority)
     for (firstField = 1; ; firstField = 0) {
 
 	/*
-	 * Scan the next field from the name and convert it to a Tk_Uid.
-	 * Must copy the field before calling Tk_Uid, so that a terminating
+	 * Scan the next field from the name and convert it to a Ck_Uid.
+	 * Must copy the field before calling Ck_Uid, so that a terminating
 	 * NULL may be added without modifying the source string.
 	 */
 

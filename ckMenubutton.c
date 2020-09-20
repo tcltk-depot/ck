@@ -202,22 +202,20 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		ComputeMenuButtonGeometry _ANSI_ARGS_((
-			    MenuButton *mbPtr));
-static void		MenuButtonCmdDeletedProc _ANSI_ARGS_((
-			    ClientData clientData));
-static void		MenuButtonEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static char *		MenuButtonTextVarProc _ANSI_ARGS_((
-			    ClientData clientData, Tcl_Interp *interp,
-			    char *name1, char *name2, int flags));
-static int		MenuButtonWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		ConfigureMenuButton _ANSI_ARGS_((Tcl_Interp *interp,
+static void		ComputeMenuButtonGeometry(MenuButton *mbPtr);
+static void		MenuButtonCmdDeletedProc(ClientData clientData);
+static void		MenuButtonEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static char *		MenuButtonTextVarProc(ClientData clientData,
+			    Tcl_Interp *interp,
+			    char *name1, char *name2, int flags);
+static int		MenuButtonWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		ConfigureMenuButton(Tcl_Interp *interp,
 			    MenuButton *mbPtr, int argc, char **argv,
-			    int flags));
-static void		DestroyMenuButton _ANSI_ARGS_((ClientData clientData));
-static void		DisplayMenuButton _ANSI_ARGS_((ClientData clientData));
+			    int flags);
+static void		DestroyMenuButton(ClientData clientData);
+static void		DisplayMenuButton(ClientData clientData);
 
 /*
  *--------------------------------------------------------------
@@ -432,7 +430,7 @@ DestroyMenuButton(clientData)
  * ConfigureMenuButton --
  *
  *	This procedure is called to process an argv/argc list, plus
- *	the Tk option database, in order to configure (or
+ *	the Ck option database, in order to configure (or
  *	reconfigure) a menubutton widget.
  *
  * Results:
@@ -454,7 +452,7 @@ ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int result;
 
@@ -477,7 +475,7 @@ ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
     /*
      * A few options need special processing, such as setting the
      * background from a 3-D border, or filling in complicated
-     * defaults that couldn't be specified to Tk_ConfigureWidget.
+     * defaults that couldn't be specified to Ck_ConfigureWidget.
      */
 
     if ((mbPtr->state != ckNormalUid) && (mbPtr->state != ckActiveUid)
@@ -520,7 +518,7 @@ ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
 
     if ((mbPtr->winPtr->flags & CK_MAPPED)
         && !(mbPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
+	Tcl_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
 	mbPtr->flags |= REDRAW_PENDING;
     }
 
@@ -650,7 +648,7 @@ DisplayMenuButton(clientData)
  *
  * MenuButtonEventProc --
  *
- *	This procedure is invoked by the Tk dispatcher for various
+ *	This procedure is invoked by the Tcl dispatcher for various
  *	events on buttons.
  *
  * Results:
@@ -672,7 +670,7 @@ MenuButtonEventProc(clientData, eventPtr)
 
     if (eventPtr->type == CK_EV_EXPOSE) {
         if (mbPtr->winPtr != NULL && !(mbPtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
+	    Tcl_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
 	    mbPtr->flags |= REDRAW_PENDING;
         }
     } else if (eventPtr->type == CK_EV_DESTROY) {
@@ -682,7 +680,7 @@ MenuButtonEventProc(clientData, eventPtr)
 		    Tcl_GetCommandName(mbPtr->interp, mbPtr->widgetCmd));
 	}
 	if (mbPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayMenuButton, (ClientData) mbPtr);
+	    Tcl_CancelIdleCall(DisplayMenuButton, (ClientData) mbPtr);
 	}
 	Tcl_EventuallyFree((ClientData) mbPtr,
 	    (Ck_FreeProc *) DestroyMenuButton);
@@ -834,7 +832,7 @@ MenuButtonTextVarProc(clientData, interp, name1, name2, flags)
 
     if ((mbPtr->winPtr != NULL) && (mbPtr->winPtr->flags & CK_MAPPED)
 	    && !(mbPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
+	Tcl_DoWhenIdle(DisplayMenuButton, (ClientData) mbPtr);
 	mbPtr->flags |= REDRAW_PENDING;
     }
     return (char *) NULL;

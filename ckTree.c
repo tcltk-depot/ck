@@ -80,12 +80,12 @@ typedef struct Node {
  * Custom option for handling "-tags" options for tree nodes:
  */
 
-static int		TreeTagsParseProc _ANSI_ARGS_((ClientData clientData,
+static int		TreeTagsParseProc(ClientData clientData,
 			    Tcl_Interp *interp, CkWindow *winPtr, char *value,
-			    char *widgRec, int offset));
-static char *		TreeTagsPrintProc _ANSI_ARGS_((ClientData clientData,
+			    char *widgRec, int offset);
+static char *		TreeTagsPrintProc(ClientData clientData,
 			    CkWindow *winPtr, char *widgRec, int offset,
-			    Tcl_FreeProc **freeProcPtr));
+			    Tcl_FreeProc **freeProcPtr);
 
 Ck_CustomOption treeTagsOption = {
     TreeTagsParseProc,
@@ -304,32 +304,31 @@ static Ck_Uid activeUid = NULL;
  * Forward declarations for procedures defined later in this file:
  */
 
-static Node *		StartTagSearch _ANSI_ARGS_((Tree *treePtr,
-			    char *tag, TagSearch *searchPtr));
-static Node *		NextNode _ANSI_ARGS_((TagSearch *searchPtr));
-static void		DoNode _ANSI_ARGS_((Tcl_Interp *interp,
-			    Node *nodePtr, Ck_Uid tag));
-static void		TreeCmdDeletedProc _ANSI_ARGS_((
-			    ClientData clientData));
-static void		TreeEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static int		TreeWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		ConfigureTree _ANSI_ARGS_((Tcl_Interp *interp,
+static Node *		StartTagSearch(Tree *treePtr,
+			    char *tag, TagSearch *searchPtr);
+static Node *		NextNode(TagSearch *searchPtr);
+static void		DoNode(Tcl_Interp *interp,
+			    Node *nodePtr, Ck_Uid tag);
+static void		TreeCmdDeletedProc(ClientData clientData);
+static void		TreeEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static int		TreeWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		ConfigureTree(Tcl_Interp *interp,
 			    Tree *treePtr, int argc, char **argv,
-			    int flags));
-static void		DestroyTree _ANSI_ARGS_((ClientData clientData));
-static void		DisplayTree _ANSI_ARGS_((ClientData clientData));
-static void		TreeEventuallyRedraw _ANSI_ARGS_((Tree *treePtr));
-static int		FindNodes _ANSI_ARGS_((Tcl_Interp *interp,
+			    int flags);
+static void		DestroyTree(ClientData clientData);
+static void		DisplayTree(ClientData clientData);
+static void		TreeEventuallyRedraw(Tree *treePtr);
+static int		FindNodes(Tcl_Interp *interp,
 			    Tree *treePtr, int argc, char **argv,
-			    char *newTag, char *cmdName, char *option));
-static void		DeleteNode _ANSI_ARGS_((Tree *treePtr, Node *nodePtr));
-static void		RecomputeVisibleNodes _ANSI_ARGS_((Tree *treePtr));
-static void		ChangeTreeView _ANSI_ARGS_((Tree *treePtr, int index));
-static void		TreeUpdateVScrollbar _ANSI_ARGS_((Tree *treePtr));
-static int		GetNodeYCoord _ANSI_ARGS_((Tree *treePtr,
-			    Node *thisPtr, int *yPtr));
+			    char *newTag, char *cmdName, char *option);
+static void		DeleteNode(Tree *treePtr, Node *nodePtr);
+static void		RecomputeVisibleNodes(Tree *treePtr);
+static void		ChangeTreeView(Tree *treePtr, int index);
+static void		TreeUpdateVScrollbar(Tree *treePtr);
+static int		GetNodeYCoord(Tree *treePtr,
+			    Node *thisPtr, int *yPtr);
 
 /*
  *--------------------------------------------------------------
@@ -1010,7 +1009,7 @@ TreeEventuallyRedraw(treePtr)
 {
     if ((treePtr->winPtr->flags & CK_MAPPED)
 	&& !(treePtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayTree, (ClientData) treePtr);
+	Tcl_DoWhenIdle(DisplayTree, (ClientData) treePtr);
 	treePtr->flags |= REDRAW_PENDING;
     }
 }
@@ -1301,7 +1300,7 @@ TreeEventProc(clientData, eventPtr)
 		    Tcl_GetCommandName(treePtr->interp, treePtr->widgetCmd));
 	}
 	if (treePtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayTree, (ClientData) treePtr);
+	    Tcl_CancelIdleCall(DisplayTree, (ClientData) treePtr);
 	}
 	Tcl_EventuallyFree((ClientData) treePtr, (Ck_FreeProc *) DestroyTree);
     } else if (eventPtr->type == CK_EV_FOCUSIN) {
@@ -2174,6 +2173,6 @@ TreeUpdateVScrollbar(treePtr)
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(treePtr->interp,
 		"\n    (vertical scrolling command executed by tree)");
-	Tk_BackgroundError(treePtr->interp);
+	Tcl_BackgroundError(treePtr->interp);
     }
 }

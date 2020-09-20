@@ -29,19 +29,19 @@
  * Forward declarations for procedures defined later in this file:
  */
 
-static int		DoConfig _ANSI_ARGS_((Tcl_Interp *interp,
+static int		DoConfig(Tcl_Interp *interp,
 			    CkWindow *winPtr, Ck_ConfigSpec *specPtr,
-			    Ck_Uid value, int valueIsUid, char *widgRec));
-static Ck_ConfigSpec *	FindConfigSpec _ANSI_ARGS_ ((Tcl_Interp *interp,
+			    Ck_Uid value, int valueIsUid, char *widgRec);
+static Ck_ConfigSpec *	FindConfigSpec(Tcl_Interp *interp,
 			    Ck_ConfigSpec *specs, char *argvName,
-			    int needFlags, int hateFlags));
-static char *		FormatConfigInfo _ANSI_ARGS_ ((Tcl_Interp *interp,
+			    int needFlags, int hateFlags);
+static char *		FormatConfigInfo(Tcl_Interp *interp,
 			    CkWindow *winPtr, Ck_ConfigSpec *specPtr,
-			    char *widgRec));
-static char *           FormatConfigValue _ANSI_ARGS_((Tcl_Interp *interp,
+			    char *widgRec);
+static char *           FormatConfigValue(Tcl_Interp *interp,
                             CkWindow *tkwin, Ck_ConfigSpec *specPtr,
                             char *widgRec, char *buffer,
-                            Tcl_FreeProc **freeProcPtr));
+                            Tcl_FreeProc **freeProcPtr);
 
 /*
  *--------------------------------------------------------------
@@ -321,7 +321,7 @@ DoConfig(interp, winPtr, specPtr, value, valueIsUid, widgRec)
     CkWindow *winPtr;		/* Window containing widget. */
     Ck_ConfigSpec *specPtr;	/* Specifier to apply. */
     char *value;		/* Value to use to fill in widgRec. */
-    int valueIsUid;		/* Non-zero means value is a Tk_Uid;
+    int valueIsUid;		/* Non-zero means value is a Ck_Uid;
 				 * zero means it's an ordinary string. */
     char *widgRec;		/* Record whose fields are to be
 				 * modified.  Values must be properly

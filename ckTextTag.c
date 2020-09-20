@@ -50,14 +50,14 @@ static Ck_ConfigSpec tagConfigSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		ChangeTagPriority _ANSI_ARGS_((CkText *textPtr,
-			    CkTextTag *tagPtr, int prio));
-static CkTextTag *	FindTag _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkText *textPtr, char *tagName));
-static void		SortTags _ANSI_ARGS_((int numTags,
-			    CkTextTag **tagArrayPtr));
-static int		TagSortProc _ANSI_ARGS_((CONST VOID *first,
-			    CONST VOID *second));
+static void		ChangeTagPriority(CkText *textPtr,
+			    CkTextTag *tagPtr, int prio);
+static CkTextTag *	FindTag(Tcl_Interp *interp,
+			    CkText *textPtr, char *tagName);
+static void		SortTags(int numTags,
+			    CkTextTag **tagArrayPtr);
+static int		TagSortProc(CONST VOID *first,
+			    CONST VOID *second);
 
 /*
  *--------------------------------------------------------------

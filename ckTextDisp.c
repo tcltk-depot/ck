@@ -241,46 +241,41 @@ static int linesRedrawn;	/* Number of calls to DisplayDLine. */
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		AdjustForTab _ANSI_ARGS_((CkText *textPtr,
+static void		AdjustForTab(CkText *textPtr,
 			    CkTextTabArray *tabArrayPtr, int index,
-			    CkTextDispChunk *chunkPtr));
-static void		CharBboxProc _ANSI_ARGS_((CkTextDispChunk *chunkPtr,
+			    CkTextDispChunk *chunkPtr);
+static void		CharBboxProc(CkTextDispChunk *chunkPtr,
 			    int index, int y, int lineHeight, int baseline,
 			    int *xPtr, int *yPtr, int *widthPtr,
-			    int *heightPtr));
-static void		CharDisplayProc _ANSI_ARGS_((CkTextDispChunk *chunkPtr,
+			    int *heightPtr);
+static void		CharDisplayProc(CkTextDispChunk *chunkPtr,
 			    int x, int y, int height, int baseline,
-			    WINDOW *window, int screenY));
-static int		CharMeasureProc _ANSI_ARGS_((CkTextDispChunk *chunkPtr,
-			    int x));
-static void		CharUndisplayProc _ANSI_ARGS_((CkText *textPtr,
-			    CkTextDispChunk *chunkPtr));
-static void		DisplayDLine _ANSI_ARGS_((CkText *textPtr,
-			    DLine *dlPtr, DLine *prevPtr, WINDOW *window));
-static void		DisplayText _ANSI_ARGS_((ClientData clientData));
-static DLine *		FindDLine _ANSI_ARGS_((DLine *dlPtr,
-			    CkTextIndex *indexPtr));
-static void		FreeDLines _ANSI_ARGS_((CkText *textPtr,
-			    DLine *firstPtr, DLine *lastPtr, int unlink));
-static void		FreeStyle _ANSI_ARGS_((CkText *textPtr,
-			    Style *stylePtr));
-static Style *		GetStyle _ANSI_ARGS_((CkText *textPtr,
-			    CkTextIndex *indexPtr));
-static void		GetXView _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkText *textPtr, int report));
-static void		GetYView _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkText *textPtr, int report));
-static DLine *		LayoutDLine _ANSI_ARGS_((CkText *textPtr,
-			    CkTextIndex *indexPtr));
-static void		MeasureUp _ANSI_ARGS_((CkText *textPtr,
+			    WINDOW *window, int screenY);
+static int		CharMeasureProc(CkTextDispChunk *chunkPtr, int x);
+static void		CharUndisplayProc(CkText *textPtr,
+			    CkTextDispChunk *chunkPtr);
+static void		DisplayDLine(CkText *textPtr,
+			    DLine *dlPtr, DLine *prevPtr, WINDOW *window);
+static void		DisplayText(ClientData clientData);
+static DLine *		FindDLine(DLine *dlPtr, CkTextIndex *indexPtr);
+static void		FreeDLines(CkText *textPtr,
+			    DLine *firstPtr, DLine *lastPtr, int unlink);
+static void		FreeStyle(CkText *textPtr, Style *stylePtr);
+static Style *		GetStyle(CkText *textPtr, CkTextIndex *indexPtr);
+static void		GetXView(Tcl_Interp *interp,
+			    CkText *textPtr, int report);
+static void		GetYView(Tcl_Interp *interp,
+			    CkText *textPtr, int report);
+static DLine *		LayoutDLine(CkText *textPtr,
+			    CkTextIndex *indexPtr);
+static void		MeasureUp(CkText *textPtr,
 			    CkTextIndex *srcPtr, int distance,
-			    CkTextIndex *dstPtr));
-static void		UpdateDisplayInfo _ANSI_ARGS_((CkText *textPtr));
-static void		ScrollByLines _ANSI_ARGS_((CkText *textPtr,
-			    int offset));
-static int		SizeOfTab _ANSI_ARGS_((CkText *textPtr,
+			    CkTextIndex *dstPtr);
+static void		UpdateDisplayInfo(CkText *textPtr);
+static void		ScrollByLines(CkText *textPtr, int offset);
+static int		SizeOfTab(CkText *textPtr,
 			    CkTextTabArray *tabArrayPtr, int index, int x,
-			    int maxX));
+			    int maxX);
 
 /*
  *----------------------------------------------------------------------
@@ -355,7 +350,7 @@ CkTextFreeDInfo(textPtr)
     FreeDLines(textPtr, dInfoPtr->dLinePtr, (DLine *) NULL, 1);
     Tcl_DeleteHashTable(&dInfoPtr->styleTable);
     if (dInfoPtr->flags & REDRAW_PENDING) {
-	Tk_CancelIdleCall(DisplayText, (ClientData) textPtr);
+	Tcl_CancelIdleCall(DisplayText, (ClientData) textPtr);
     }
     ckfree((char *) dInfoPtr);
 }
@@ -1565,7 +1560,7 @@ CkTextEventuallyRepick(textPtr)
     dInfoPtr->flags |= REPICK_NEEDED;
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
 	dInfoPtr->flags |= REDRAW_PENDING;
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
 }
 
@@ -1623,7 +1618,7 @@ CkTextRedrawRegion(textPtr, x, y, width, height)
 
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
 	dInfoPtr->flags |= REDRAW_PENDING;
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
 }
 
@@ -1678,7 +1673,7 @@ CkTextChanged(textPtr, index1Ptr, index2Ptr)
      */
 
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 
@@ -1793,7 +1788,7 @@ CkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tagPtr, withTag)
      */
 
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 
@@ -1894,7 +1889,7 @@ CkTextRelayoutWindow(textPtr)
      */
 
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 
@@ -2057,7 +2052,7 @@ CkTextSetYView(textPtr, indexPtr, pickPlace)
 
     scheduleUpdate:
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 }
@@ -2278,7 +2273,7 @@ CkTextSeeCmd(textPtr, interp, argc, argv)
     dInfoPtr->flags |= DINFO_OUT_OF_DATE;
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
 	dInfoPtr->flags |= REDRAW_PENDING;
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     return TCL_OK;
 }
@@ -2347,7 +2342,7 @@ CkTextXviewCmd(textPtr, interp, argc, argv)
     dInfoPtr->flags |= DINFO_OUT_OF_DATE;
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
 	dInfoPtr->flags |= REDRAW_PENDING;
-        Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+        Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     return TCL_OK;
 }
@@ -2459,7 +2454,7 @@ ScrollByLines(textPtr, offset)
 
     scheduleUpdate:
     if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+	Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
     }
     dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 }
@@ -2618,7 +2613,7 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
 		} while (pixels > 0);
 	    }
 	    if (!(dInfoPtr->flags & REDRAW_PENDING)) {
-		Tk_DoWhenIdle(DisplayText, (ClientData) textPtr);
+		Tcl_DoWhenIdle(DisplayText, (ClientData) textPtr);
 	    }
 	    dInfoPtr->flags |= REDRAW_PENDING|DINFO_OUT_OF_DATE|REPICK_NEEDED;
 	    break;
@@ -2697,7 +2692,7 @@ GetXView(interp, textPtr, report)
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(interp,
 		"\n    (horizontal scrolling command executed by text)");
-	Tk_BackgroundError(interp);
+	Tcl_BackgroundError(interp);
     }
 }
 
@@ -2782,7 +2777,7 @@ GetYView(interp, textPtr, report)
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(interp,
 		"\n    (vertical scrolling command executed by text)");
-	Tk_BackgroundError(interp);
+	Tcl_BackgroundError(interp);
     }
 }
 

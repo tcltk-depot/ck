@@ -26,10 +26,8 @@
  * Forward declarations for procedures defined later in this file:
  */
 
-static char *		ForwBack _ANSI_ARGS_((char *string,
-			    CkTextIndex *indexPtr));
-static char *		StartEnd _ANSI_ARGS_(( char *string,
-			    CkTextIndex *indexPtr));
+static char *		ForwBack(char *string, CkTextIndex *indexPtr);
+static char *		StartEnd(char *string, CkTextIndex *indexPtr);
 
 /*
  *---------------------------------------------------------------------------

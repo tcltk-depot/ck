@@ -121,7 +121,7 @@ typedef struct PatSeq {
 				/* Next in list of all pattern
 				 * sequences for the same object
 				 * (NULL for end of list).  Needed to
-				 * implement Tk_DeleteAllBindings. */
+				 * implement Ck_DeleteAllBindings. */
     Pattern pats[1];		/* Array of "numPats" patterns.  Only
 				 * one element is declared here but
 				 * in actuality enough space will be
@@ -181,15 +181,14 @@ static Tcl_HashTable eventTable;
  * Prototypes for local procedures defined in this file:
  */
 
-static void		ExpandPercents _ANSI_ARGS_((CkWindow *winPtr,
+static void		ExpandPercents(CkWindow *winPtr,
 			    char *before, CkEvent *eventPtr, KeySym keySym,
-			    Tcl_DString *dsPtr));
-static PatSeq *		FindSequence _ANSI_ARGS_((Tcl_Interp *interp,
+			    Tcl_DString *dsPtr);
+static PatSeq *		FindSequence(Tcl_Interp *interp,
 			    BindingTable *bindPtr, ClientData object,
-			    char *eventString, int create));
-static char *		GetField _ANSI_ARGS_((char *p, char *copy, int size));
-static PatSeq *		MatchPatterns _ANSI_ARGS_((BindingTable *bindPtr,
-			    PatSeq *psPtr));
+			    char *eventString, int create);
+static char *		GetField(char *p, char *copy, int size);
+static PatSeq *		MatchPatterns(BindingTable *bindPtr, PatSeq *psPtr);
 
 /*
  *--------------------------------------------------------------
@@ -444,7 +443,7 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
     } else {
 	for ( ; ; prevPtr = prevPtr->nextSeqPtr) {
 	    if (prevPtr == NULL) {
-		panic("Tk_DeleteBinding couldn't find on hash chain");
+		panic("Ck_DeleteBinding couldn't find on hash chain");
 	    }
 	    if (prevPtr->nextSeqPtr == psPtr) {
 		prevPtr->nextSeqPtr = psPtr->nextSeqPtr;
@@ -860,7 +859,7 @@ Ck_BindEvent(bindingTable, eventPtr, winPtr, numObjects, objectPtr)
 		break;
 	    } else {
 		Tcl_AddErrorInfo(interp, "\n    (command bound to event)");
-		Tk_BackgroundError(interp);
+		Tcl_BackgroundError(interp);
 		break;
 	    }
 	}

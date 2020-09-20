@@ -21,7 +21,7 @@ typedef struct {
     CkWindow *mainPtr;
     Tcl_Interp *interp;
     int timerRunning;
-    Tk_TimerToken timer;
+    Tcl_TimerToken timer;
     Tcl_Time lastEvent;
     Tcl_Channel record;
     Tcl_Channel replay;
@@ -35,12 +35,12 @@ static Recorder *ckRecorder = NULL;
  *   Internal procedures.
  */
 
-static int	RecorderInput _ANSI_ARGS_((ClientData clientData,
-		    CkEvent *eventPtr));
-static int	DStringGets _ANSI_ARGS_((Tcl_Channel chan,
-		    Tcl_DString *dsPtr));
-static void	DeliverEvent _ANSI_ARGS_((ClientData clientData));
-static void	RecorderReplay _ANSI_ARGS_((ClientData clientData));
+static int	RecorderInput(ClientData clientData,
+		    CkEvent *eventPtr);
+static int	DStringGets(Tcl_Channel chan,
+		    Tcl_DString *dsPtr);
+static void	DeliverEvent(ClientData clientData);
+static void	RecorderReplay(ClientData clientData);
 
 /*
  *----------------------------------------------------------------------
@@ -220,7 +220,7 @@ DeliverEvent(clientData)
 {
     Recorder *recPtr = (Recorder *) clientData;
 
-    Tk_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
+    Tcl_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
     Ck_HandleEvent(recPtr->mainPtr->mainPtr, &recPtr->event);
 }
 
@@ -267,7 +267,7 @@ RecorderReplay(clientData)
 	    char **argv;
 
 	    if (Tcl_SplitList(recPtr->interp, p, &argc, &argv) != TCL_OK) {
-		Tk_BackgroundError(recPtr->interp);
+		Tcl_BackgroundError(recPtr->interp);
 		getsResult = TCL_ERROR;
 		break;
 	    }
@@ -341,16 +341,16 @@ doMouse:
 	    }
 	    ckfree((char *) argv);
 	    if (cmdError != TCL_OK) {
-		Tk_BackgroundError(recPtr->interp);
+		Tcl_BackgroundError(recPtr->interp);
 		getsResult = cmdError;
 	    } else if (deliver) {
 		doidle = delayValue = 0;
 		recPtr->event = event;
-		Tk_DoWhenIdle(DeliverEvent, (ClientData) recPtr);
+		Tcl_DoWhenIdle(DeliverEvent, (ClientData) recPtr);
 	    }
 	    break;
 	} else if (Tcl_GlobalEval(recPtr->interp, p) != TCL_OK) {
-	    Tk_BackgroundError(recPtr->interp);
+	    Tcl_BackgroundError(recPtr->interp);
 	    getsResult = TCL_ERROR;
 	    break;
 	}
@@ -361,10 +361,10 @@ doMouse:
 	recPtr->replay = NULL;
     } else if (delayValue != 0) {
 	recPtr->timerRunning = 1;
-	recPtr->timer = Tk_CreateTimerHandler(delayValue, RecorderReplay,
+	recPtr->timer = Tcl_CreateTimerHandler(delayValue, RecorderReplay,
 	    (ClientData) recPtr);
     } else if (doidle != 0) {
-	Tk_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
+	Tcl_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
     }
     Tcl_DStringFree(&input);
 }
@@ -448,13 +448,13 @@ replayError:
 
 	if (recPtr->replay != NULL) {
 	    if (recPtr->timerRunning)
-		Tk_DeleteTimerHandler(recPtr->timer);
+		Tcl_DeleteTimerHandler(recPtr->timer);
 	    Tcl_Close(NULL, recPtr->replay);
 	    recPtr->timerRunning = 0;
 	}
 	recPtr->replay = newReplay;
 	recPtr->interp = interp;
-	Tk_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
+	Tcl_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
     } else if ((c == 's') && (strncmp(argv[1], "start", length) == 0) &&
 	(length > 1)) {
 	char *fileName, *ires;
@@ -519,7 +519,7 @@ badStopArgs:
 		goto badStopArgs;
 	    if (recPtr->replay != NULL) {
 		if (recPtr->timerRunning)
-		    Tk_DeleteTimerHandler(recPtr->timer);
+		    Tcl_DeleteTimerHandler(recPtr->timer);
 		Tcl_Close(NULL, recPtr->replay);
 		recPtr->replay = NULL;
 		recPtr->timerRunning = 0;

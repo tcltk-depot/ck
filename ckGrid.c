@@ -112,7 +112,7 @@ typedef struct GridBag {
 /*
  * Flag values for GridBag structures:
  *
- * REQUESTED_RELAYOUT:		1 means a Tk_DoWhenIdle request
+ * REQUESTED_RELAYOUT:		1 means a Tcl_DoWhenIdle request
  *				has already been made to re-arrange
  *				all the slaves of this window.
  * STICK_NORTH  		1 means this window sticks to the edgth of its
@@ -152,27 +152,26 @@ static int initialized = 0;
  * Prototypes for procedures used only in this file:
  */
 
-static void		ArrangeGrid _ANSI_ARGS_((ClientData clientData));
-static int		ConfigureSlaves _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkWindow *winPtr, int argc, char *argv[]));
-static void		DestroyGridBag _ANSI_ARGS_((char *memPtr));
-static void		GetCachedLayoutInfo _ANSI_ARGS_((GridBag *masterPtr));
-static GridBag *	GetGridBag _ANSI_ARGS_((CkWindow *winPtr));
-static void		GetLayoutInfo _ANSI_ARGS_((GridBag *masterPtr,
-			    LayoutInfo *r));
-static void		GetMinSize _ANSI_ARGS_((GridBag *masterPtr,
-			    LayoutInfo *info, int *minw, int *minh));
-static void		GridBagStructureProc _ANSI_ARGS_((
-			    ClientData clientData, CkEvent *eventPtr));
-static void		GridLostSlaveProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
-static void		GridReqProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
-static void		GridBagStructureProc _ANSI_ARGS_((
-			    ClientData clientData, CkEvent *eventPtr));
-static void		StickyToString _ANSI_ARGS_((int flags, char *result));
-static int		StringToSticky _ANSI_ARGS_((char *string));
-static void		Unlink _ANSI_ARGS_((GridBag *gridPtr));
+static void		ArrangeGrid(ClientData clientData);
+static int		ConfigureSlaves(Tcl_Interp *interp,
+			    CkWindow *winPtr, int argc, char *argv[]);
+static void		DestroyGridBag(char *memPtr);
+static void		GetCachedLayoutInfo(GridBag *masterPtr);
+static GridBag *	GetGridBag(CkWindow *winPtr);
+static void		GetLayoutInfo(GridBag *masterPtr, LayoutInfo *r);
+static void		GetMinSize(GridBag *masterPtr,
+			    LayoutInfo *info, int *minw, int *minh);
+static void		GridBagStructureProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		GridLostSlaveProc(ClientData clientData,
+			    CkWindow *winPtr);
+static void		GridReqProc(ClientData clientData,
+			    CkWindow *winPtr);
+static void		GridBagStructureProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		StickyToString(int flags, char *result);
+static int		StringToSticky(char *string);
+static void		Unlink(GridBag *gridPtr);
 
 static Ck_GeomMgr gridMgrType = {
     "grid",			/* name */
@@ -253,7 +252,7 @@ Ck_GridCmd(clientData, interp, argc, argv)
 	/* make sure the grid is up to snuff */
 
 	while ((masterPtr->flags & REQUESTED_RELAYOUT)) {
-	    Tk_CancelIdleCall(ArrangeGrid, (ClientData) masterPtr);
+	    Tcl_CancelIdleCall(ArrangeGrid, (ClientData) masterPtr);
 	    ArrangeGrid((ClientData) masterPtr);
 	}
 	GetCachedLayoutInfo(masterPtr);
@@ -403,7 +402,7 @@ Ck_GridCmd(clientData, interp, argc, argv)
 	    masterPtr->valid = 0;
 	    if (!(masterPtr->flags & REQUESTED_RELAYOUT)) {
 		masterPtr->flags |= REQUESTED_RELAYOUT;
-		Tk_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
+		Tcl_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
 	    }
 	} else {
 	    masterPtr->flags |= DONT_PROPAGATE;
@@ -615,7 +614,7 @@ Ck_GridCmd(clientData, interp, argc, argv)
 	    masterPtr->valid = 0;
 	    if (!(masterPtr->flags & REQUESTED_RELAYOUT)) {
 		masterPtr->flags |= REQUESTED_RELAYOUT;
-		Tk_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
+		Tcl_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
 	    }
 	}
     } else if ((c == 'l') && (strncmp(argv[1], "location", length) == 0)) {
@@ -649,7 +648,7 @@ Ck_GridCmd(clientData, interp, argc, argv)
 	/* make sure the grid is up to snuff */
 
 	while ((masterPtr->flags & REQUESTED_RELAYOUT)) {
-	    Tk_CancelIdleCall(ArrangeGrid, (ClientData) masterPtr);
+	    Tcl_CancelIdleCall(ArrangeGrid, (ClientData) masterPtr);
 	    ArrangeGrid((ClientData) masterPtr);
 	}
 	GetCachedLayoutInfo(masterPtr);
@@ -739,7 +738,7 @@ GridReqProc(clientData, winPtr)
     gridPtr->valid = 0;
     if (!(gridPtr->flags & REQUESTED_RELAYOUT)) {
 	gridPtr->flags |= REQUESTED_RELAYOUT;
-	Tk_DoWhenIdle(ArrangeGrid, (ClientData) gridPtr);
+	Tcl_DoWhenIdle(ArrangeGrid, (ClientData) gridPtr);
     }
 }
 
@@ -1151,7 +1150,7 @@ GetMinSize(masterPtr, info, minw, minh)
  *
  * ArrangeGrid --
  *
- *	This procedure is invoked (using the Tk_DoWhenIdle
+ *	This procedure is invoked (using the Tcl_DoWhenIdle
  *	mechanism) to re-layout a set of windows managed by
  *	the gridbag.  It is invoked at idle time so that a
  *	series of gridbag requests can be merged into a single
@@ -1222,7 +1221,7 @@ ArrangeGrid(clientData)
 	Ck_GeometryRequest(masterPtr->winPtr, width, height);
 	masterPtr->flags |= REQUESTED_RELAYOUT;
 	masterPtr->valid = 0;
-	Tk_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
 	goto done;
     }
 
@@ -1495,7 +1494,7 @@ Unlink(gridPtr)
     masterPtr->valid = 0;
     if (!(masterPtr->flags & REQUESTED_RELAYOUT)) {
 	masterPtr->flags |= REQUESTED_RELAYOUT;
-	Tk_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
     }
     if (masterPtr->abortPtr != NULL) {
 	*masterPtr->abortPtr = 1;
@@ -1573,7 +1572,7 @@ GridBagStructureProc(clientData, eventPtr)
 	gridPtr->valid = 0;
 	if (!(gridPtr->flags & REQUESTED_RELAYOUT)) {
 	    gridPtr->flags |= REQUESTED_RELAYOUT;
-	    Tk_DoWhenIdle(ArrangeGrid, (ClientData) gridPtr);
+	    Tcl_DoWhenIdle(ArrangeGrid, (ClientData) gridPtr);
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
 	GridBag *gridPtr2, *nextPtr;
@@ -1591,7 +1590,7 @@ GridBagStructureProc(clientData, eventPtr)
 	Tcl_DeleteHashEntry(Tcl_FindHashEntry(&gridBagHashTable,
 		(char *) gridPtr->winPtr));
 	if (gridPtr->flags & REQUESTED_RELAYOUT) {
-	    Tk_CancelIdleCall(ArrangeGrid, (ClientData) gridPtr);
+	    Tcl_CancelIdleCall(ArrangeGrid, (ClientData) gridPtr);
 	}
 	gridPtr->winPtr = NULL;
 	Tcl_EventuallyFree((ClientData) gridPtr,
@@ -1996,7 +1995,7 @@ ConfigureSlaves(interp, winPtr, argc, argv)
 	masterPtr->valid = 0;
 	if (!(masterPtr->flags & REQUESTED_RELAYOUT)) {
 	    masterPtr->flags |= REQUESTED_RELAYOUT;
-	    Tk_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
+	    Tcl_DoWhenIdle(ArrangeGrid, (ClientData) masterPtr);
 	}
 	currentColumn += slavePtr->gridWidth;
 	numColumns = 1;

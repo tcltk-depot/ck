@@ -177,37 +177,31 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static int		ConfigureEntry _ANSI_ARGS_((Tcl_Interp *interp,
+static int		ConfigureEntry(Tcl_Interp *interp,
 			    Entry *entryPtr, int argc, char **argv,
-			    int flags));
-static void		DeleteChars _ANSI_ARGS_((Entry *entryPtr, int index,
-			    int count));
-static void		DestroyEntry _ANSI_ARGS_((ClientData clientData));
-static void		DisplayEntry _ANSI_ARGS_((ClientData clientData));
-static void		EntryComputeGeometry _ANSI_ARGS_((Entry *entryPtr));
-static void		EntryEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void		EntryFocusProc _ANSI_ARGS_ ((Entry *entryPtr,
-			    int gotFocus));
-static void		EventuallyRedraw _ANSI_ARGS_((Entry *entryPtr));
-static void             EntryCmdDeletedProc _ANSI_ARGS_((
-                            ClientData clientData));
-static void		EntrySetValue _ANSI_ARGS_((Entry *entryPtr,
-			    char *value));
-static void		EntrySelectTo _ANSI_ARGS_((
-			    Entry *entryPtr, int index));
-static char *		EntryTextVarProc _ANSI_ARGS_((ClientData clientData,
+			    int flags);
+static void		DeleteChars(Entry *entryPtr, int index, int count);
+static void		DestroyEntry(ClientData clientData);
+static void		DisplayEntry(ClientData clientData);
+static void		EntryComputeGeometry(Entry *entryPtr);
+static void		EntryEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		EntryFocusProc(Entry *entryPtr, int gotFocus);
+static void		EventuallyRedraw(Entry *entryPtr);
+static void             EntryCmdDeletedProc(ClientData clientData);
+static void		EntrySetValue(Entry *entryPtr, char *value);
+static void		EntrySelectTo(Entry *entryPtr, int index);
+static char *		EntryTextVarProc(ClientData clientData,
 			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
-static void		EntryUpdateScrollbar _ANSI_ARGS_((Entry *entryPtr));
-static void		EntryVisibleRange _ANSI_ARGS_((Entry *entryPtr,
-			    double *firstPtr, double *lastPtr));
-static int		EntryWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		GetEntryIndex _ANSI_ARGS_((Tcl_Interp *interp,
-			    Entry *entryPtr, char *string, int *indexPtr));
-static void		InsertChars _ANSI_ARGS_((Entry *entryPtr, int index,
-			    char *string));
+			    int flags);
+static void		EntryUpdateScrollbar(Entry *entryPtr);
+static void		EntryVisibleRange(Entry *entryPtr,
+			    double *firstPtr, double *lastPtr);
+static int		EntryWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		GetEntryIndex(Tcl_Interp *interp,
+			    Entry *entryPtr, char *string, int *indexPtr);
+static void		InsertChars(Entry *entryPtr, int index, char *string);
 
 /*
  *--------------------------------------------------------------
@@ -689,7 +683,7 @@ EntryCmdDeletedProc(clientData)
  * ConfigureEntry --
  *
  *	This procedure is called to process an argv/argc list, plus
- *	the Tk option database, in order to configure (or reconfigure)
+ *	the Ck option database, in order to configure (or reconfigure)
  *	an entry widget.
  *
  * Results:
@@ -711,7 +705,7 @@ ConfigureEntry(interp, entryPtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
      * Eliminate any existing trace on a variable monitored by the entry.
@@ -1257,7 +1251,7 @@ EntryEventProc(clientData, eventPtr)
                     Tcl_GetCommandName(entryPtr->interp, entryPtr->widgetCmd));
         }
 	if (entryPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayEntry, (ClientData) entryPtr);
+	    Tcl_CancelIdleCall(DisplayEntry, (ClientData) entryPtr);
 	}
 	Tcl_EventuallyFree((ClientData) entryPtr, (Ck_FreeProc *) DestroyEntry);
     } else if (eventPtr->type == CK_EV_FOCUSIN) {
@@ -1474,7 +1468,7 @@ EventuallyRedraw(entryPtr)
 
     if (!(entryPtr->flags & REDRAW_PENDING)) {
 	entryPtr->flags |= REDRAW_PENDING;
-	Tk_DoWhenIdle(DisplayEntry, (ClientData) entryPtr);
+	Tcl_DoWhenIdle(DisplayEntry, (ClientData) entryPtr);
     }
 }
 
@@ -1572,7 +1566,7 @@ EntryUpdateScrollbar(entryPtr)
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(entryPtr->interp,
 		"\n    (horizontal scrolling command executed by entry)");
-	Tk_BackgroundError(entryPtr->interp);
+	Tcl_BackgroundError(entryPtr->interp);
     }
     Tcl_SetResult(entryPtr->interp, (char *) NULL, TCL_STATIC);
 }
