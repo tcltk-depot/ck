@@ -64,7 +64,7 @@ typedef struct Packer {
 /*
  * Flag values for Packer structures:
  *
- * REQUESTED_REPACK:		1 means a Ck_DoWhenIdle request
+ * REQUESTED_REPACK:		1 means a Tcl_DoWhenIdle request
  *				has already been made to repack
  *				all the slaves of this window.
  * FILLX:			1 means if frame allocated for window
@@ -76,7 +76,7 @@ typedef struct Packer {
  *				extra space in the parent window.
  * DONT_PROPAGATE:		1 means don't set this window's requested
  *				size.  0 means if this window is a master
- *				then Tk will set its requested size to fit
+ *				then Ck will set its requested size to fit
  *				the needs of its slaves.
  */
 
@@ -104,10 +104,9 @@ static int initialized = 0;
  * packer:
  */
 
-static void		PackReqProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
-static void		PackLostSlaveProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
+static void		PackReqProc(ClientData clientData, CkWindow *winPtr);
+static void		PackLostSlaveProc(ClientData clientData,
+			    CkWindow *winPtr);
 
 static Ck_GeomMgr packerType = {
     "pack",			/* name */
@@ -119,17 +118,15 @@ static Ck_GeomMgr packerType = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		ArrangePacking _ANSI_ARGS_((ClientData clientData));
-static int		ConfigureSlaves _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkWindow *winPtr, int argc, char *argv[]));
-static Packer *		GetPacker _ANSI_ARGS_((CkWindow *winPtr));
-static void		PackStructureProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void		Unlink _ANSI_ARGS_((Packer *packPtr));
-static int		XExpansion _ANSI_ARGS_((Packer *slavePtr,
-			    int cavityWidth));
-static int		YExpansion _ANSI_ARGS_((Packer *slavePtr,
-			    int cavityHeight));
+static void		ArrangePacking(ClientData clientData);
+static int		ConfigureSlaves(Tcl_Interp *interp,
+			    CkWindow *winPtr, int argc, char *argv[]);
+static Packer *		GetPacker(CkWindow *winPtr);
+static void		PackStructureProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		Unlink(Packer *packPtr);
+static int		XExpansion(Packer *slavePtr, int cavityWidth);
+static int		YExpansion(Packer *slavePtr, int cavityHeight);
 
 /*
  *--------------------------------------------------------------
@@ -279,7 +276,7 @@ Ck_PackCmd(clientData, interp, argc, argv)
 	    }
 	    if (!(masterPtr->flags & REQUESTED_REPACK)) {
 		masterPtr->flags |= REQUESTED_REPACK;
-		Tk_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
+		Tcl_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
 	    }
 	} else {
 	    masterPtr->flags |= DONT_PROPAGATE;
@@ -341,7 +338,7 @@ PackReqProc(clientData, winPtr)
     packPtr = packPtr->masterPtr;
     if (!(packPtr->flags & REQUESTED_REPACK)) {
 	packPtr->flags |= REQUESTED_REPACK;
-	Tk_DoWhenIdle(ArrangePacking, (ClientData) packPtr);
+	Tcl_DoWhenIdle(ArrangePacking, (ClientData) packPtr);
     }
 }
 
@@ -382,7 +379,7 @@ PackLostSlaveProc(clientData, winPtr)
  *
  * ArrangePacking --
  *
- *	This procedure is invoked (using the Tk_DoWhenIdle
+ *	This procedure is invoked (using the Tcl_DoWhenIdle
  *	mechanism) to re-layout a set of windows managed by
  *	the packer.  It is invoked at idle time so that a
  *	series of packer requests can be merged into a single
@@ -513,7 +510,7 @@ ArrangePacking(clientData)
 	    && !(masterPtr->flags & DONT_PROPAGATE)) {
 	Ck_GeometryRequest(masterPtr->winPtr, maxWidth, maxHeight);
 	masterPtr->flags |= REQUESTED_REPACK;
-	Tk_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
 	goto done;
     }
 
@@ -905,7 +902,7 @@ Unlink(packPtr)
     }
     if (!(masterPtr->flags & REQUESTED_REPACK)) {
 	masterPtr->flags |= REQUESTED_REPACK;
-	Tk_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
     }
     if (masterPtr->abortPtr != NULL) {
 	*masterPtr->abortPtr = 1;
@@ -973,7 +970,7 @@ PackStructureProc(clientData, eventPtr)
 	if ((packPtr->slavePtr != NULL)
 		&& !(packPtr->flags & REQUESTED_REPACK)) {
 	    packPtr->flags |= REQUESTED_REPACK;
-	    Tk_DoWhenIdle(ArrangePacking, (ClientData) packPtr);
+	    Tcl_DoWhenIdle(ArrangePacking, (ClientData) packPtr);
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
 	Packer *slavePtr, *nextPtr;
@@ -993,7 +990,7 @@ PackStructureProc(clientData, eventPtr)
 	Tcl_DeleteHashEntry(Tcl_FindHashEntry(&packerHashTable,
 	    (char *) packPtr->winPtr));
 	if (packPtr->flags & REQUESTED_REPACK) {
-	    Tk_CancelIdleCall(ArrangePacking, (ClientData) packPtr);
+	    Tcl_CancelIdleCall(ArrangePacking, (ClientData) packPtr);
 	}
 	packPtr->winPtr = NULL;
 	Tcl_EventuallyFree((ClientData) packPtr, (Ck_FreeProc *) DestroyPacker);
@@ -1300,7 +1297,7 @@ ConfigureSlaves(interp, winPtr, argc, argv)
 	}
 	if (!(masterPtr->flags & REQUESTED_REPACK)) {
 	    masterPtr->flags |= REQUESTED_REPACK;
-	    Tk_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
+	    Tcl_DoWhenIdle(ArrangePacking, (ClientData) masterPtr);
 	}
     }
     return TCL_OK;

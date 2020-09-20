@@ -110,33 +110,33 @@ int ckBTreeDebug = 0;
  * Forward declarations for procedures defined in this file:
  */
 
-static void		ChangeNodeToggleCount _ANSI_ARGS_((Node *nodePtr,
-			    CkTextTag *tagPtr, int delta));
-static void		CharCheckProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static int		CharDeleteProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr, int treeGone));
-static CkTextSegment *	CharCleanupProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static CkTextSegment *	CharSplitProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    int index));
-static void		CheckNodeConsistency _ANSI_ARGS_((Node *nodePtr));
-static void		CleanupLine _ANSI_ARGS_((CkTextLine *linePtr));
-static void		DeleteSummaries _ANSI_ARGS_((Summary *tagPtr));
-static void		DestroyNode _ANSI_ARGS_((Node *nodePtr));
-static void		IncCount _ANSI_ARGS_((CkTextTag *tagPtr, int inc,
-			    TagInfo *tagInfoPtr));
-static void		Rebalance _ANSI_ARGS_((BTree *treePtr, Node *nodePtr));
-static void		RecomputeNodeCounts _ANSI_ARGS_((Node *nodePtr));
-static CkTextSegment *	SplitSeg _ANSI_ARGS_((CkTextIndex *indexPtr));
-static void		ToggleCheckProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static CkTextSegment *	ToggleCleanupProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static int		ToggleDeleteProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr, int treeGone));
-static void		ToggleLineChangeProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
+static void		ChangeNodeToggleCount(Node *nodePtr,
+			    CkTextTag *tagPtr, int delta);
+static void		CharCheckProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static int		CharDeleteProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr, int treeGone);
+static CkTextSegment *	CharCleanupProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static CkTextSegment *	CharSplitProc(CkTextSegment *segPtr,
+			    int index);
+static void		CheckNodeConsistency(Node *nodePtr);
+static void		CleanupLine(CkTextLine *linePtr);
+static void		DeleteSummaries(Summary *tagPtr);
+static void		DestroyNode(Node *nodePtr);
+static void		IncCount(CkTextTag *tagPtr, int inc,
+			    TagInfo *tagInfoPtr);
+static void		Rebalance(BTree *treePtr, Node *nodePtr);
+static void		RecomputeNodeCounts(Node *nodePtr);
+static CkTextSegment *	SplitSeg(CkTextIndex *indexPtr);
+static void		ToggleCheckProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static CkTextSegment *	ToggleCleanupProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static int		ToggleDeleteProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr, int treeGone);
+static void		ToggleLineChangeProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
 
 /*
  * Type record for character segments:

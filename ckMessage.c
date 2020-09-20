@@ -122,21 +122,20 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		MessageEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static char *		MessageTextVarProc _ANSI_ARGS_((ClientData clientData,
+static void		MessageEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static char *		MessageTextVarProc(ClientData clientData,
 			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
-static int		MessageWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static void             MessageCmdDeletedProc _ANSI_ARGS_((
-                            ClientData clientData));
-static void		ComputeMessageGeometry _ANSI_ARGS_((Message *msgPtr));
-static int		ConfigureMessage _ANSI_ARGS_((Tcl_Interp *interp,
+			    int flags);
+static int		MessageWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static void             MessageCmdDeletedProc(ClientData clientData);
+static void		ComputeMessageGeometry(Message *msgPtr);
+static int		ConfigureMessage(Tcl_Interp *interp,
 			    Message *msgPtr, int argc, char **argv,
-			    int flags));
-static void		DestroyMessage _ANSI_ARGS_((ClientData clientData));
-static void		DisplayMessage _ANSI_ARGS_((ClientData clientData));
+			    int flags);
+static void		DestroyMessage(ClientData clientData);
+static void		DisplayMessage(ClientData clientData);
 
 /*
  *--------------------------------------------------------------
@@ -386,7 +385,7 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
      * Eliminate any existing trace on a variable monitored by the message.
@@ -432,7 +431,7 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
     /*
      * A few other options need special processing, such as setting
      * the background from a 3-D border or handling special defaults
-     * that couldn't be specified to Tk_ConfigureWidget.
+     * that couldn't be specified to Ck_ConfigureWidget.
      */
 
     if (msgPtr->string == NULL) {
@@ -449,7 +448,7 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
     ComputeMessageGeometry(msgPtr);
     if ((msgPtr->winPtr != NULL) && (msgPtr->winPtr->flags & CK_MAPPED)
 	    && !(msgPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
+	Tcl_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
 	msgPtr->flags |= REDRAW_PENDING;
     }
 
@@ -679,7 +678,7 @@ DisplayMessage(clientData)
  *
  * MessageEventProc --
  *
- *	This procedure is invoked by the Tk dispatcher for various
+ *	This procedure is invoked by the Tcl dispatcher for various
  *	events on messages.
  *
  * Results:
@@ -701,7 +700,7 @@ MessageEventProc(clientData, eventPtr)
 
     if (eventPtr->type == CK_EV_EXPOSE) {
         if (msgPtr->winPtr != NULL && !(msgPtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
+	    Tcl_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
 	    msgPtr->flags |= REDRAW_PENDING;
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
@@ -711,7 +710,7 @@ MessageEventProc(clientData, eventPtr)
                     Tcl_GetCommandName(msgPtr->interp, msgPtr->widgetCmd));
         }
 	if (msgPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayMessage, (ClientData) msgPtr);
+	    Tcl_CancelIdleCall(DisplayMessage, (ClientData) msgPtr);
 	}
 	Tcl_EventuallyFree((ClientData) msgPtr, (Ck_FreeProc *) DestroyMessage);
     }
@@ -777,7 +776,7 @@ MessageTextVarProc(clientData, interp, name1, name2, flags)
 
     if ((msgPtr->winPtr != NULL) && (msgPtr->winPtr->flags & CK_MAPPED)
 	    && !(msgPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
+	Tcl_DoWhenIdle(DisplayMessage, (ClientData) msgPtr);
 	msgPtr->flags |= REDRAW_PENDING;
     }
     return (char *) NULL;

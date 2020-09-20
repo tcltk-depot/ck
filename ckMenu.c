@@ -355,40 +355,36 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static int		ActivateMenuEntry _ANSI_ARGS_((Menu *menuPtr,
-			    int index));
-static void		ComputeMenuGeometry _ANSI_ARGS_((
-			    ClientData clientData));
-static int		ConfigureMenu _ANSI_ARGS_((Tcl_Interp *interp,
+static int		ActivateMenuEntry(Menu *menuPtr, int index);
+static void		ComputeMenuGeometry(ClientData clientData);
+static int		ConfigureMenu(Tcl_Interp *interp,
 			    Menu *menuPtr, int argc, char **argv,
-			    int flags));
-static int		ConfigureMenuEntry _ANSI_ARGS_((Tcl_Interp *interp,
+			    int flags);
+static int		ConfigureMenuEntry(Tcl_Interp *interp,
 			    Menu *menuPtr, MenuEntry *mePtr, int index,
-			    int argc, char **argv, int flags));
-static void		DestroyMenu _ANSI_ARGS_((ClientData clientData));
-static void		DestroyMenuEntry _ANSI_ARGS_((ClientData clientData));
-static void		DisplayMenu _ANSI_ARGS_((ClientData clientData));
-static void		EventuallyRedrawMenu _ANSI_ARGS_((Menu *menuPtr,
-			    MenuEntry *mePtr));
-static int		GetMenuIndex _ANSI_ARGS_((Tcl_Interp *interp,
+			    int argc, char **argv, int flags);
+static void		DestroyMenu(ClientData clientData);
+static void		DestroyMenuEntry(ClientData clientData);
+static void		DisplayMenu(ClientData clientData);
+static void		EventuallyRedrawMenu(Menu *menuPtr,
+			    MenuEntry *mePtr);
+static int		GetMenuIndex(Tcl_Interp *interp,
 			    Menu *menuPtr, char *string, int lastOK,
-			    int *indexPtr));
-static int		MenuAddOrInsert _ANSI_ARGS_((Tcl_Interp *interp,
+			    int *indexPtr);
+static int		MenuAddOrInsert(Tcl_Interp *interp,
 			    Menu *menuPtr, char *indexString, int argc,
-			    char **argv));
-static void		MenuCmdDeletedProc _ANSI_ARGS_((
-			    ClientData clientData));
-static void		MenuEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static MenuEntry *	MenuNewEntry _ANSI_ARGS_((Menu *menuPtr, int index,
-			    int type));
-static char *		MenuVarProc _ANSI_ARGS_((ClientData clientData,
+			    char **argv);
+static void		MenuCmdDeletedProc(ClientData clientData);
+static void		MenuEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static MenuEntry *	MenuNewEntry(Menu *menuPtr, int index, int type);
+static char *		MenuVarProc(ClientData clientData,
 			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
-static int		MenuWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		PostSubmenu _ANSI_ARGS_((Tcl_Interp *interp,
-			    Menu *menuPtr, MenuEntry *mePtr));
+			    int flags);
+static int		MenuWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		PostSubmenu(Tcl_Interp *interp,
+			    Menu *menuPtr, MenuEntry *mePtr);
 
 /*
  *--------------------------------------------------------------
@@ -614,7 +610,7 @@ MenuWidgetCmd(clientData, interp, argc, argv)
 	}
 	if (!(menuPtr->flags & RESIZE_PENDING)) {
 	    menuPtr->flags |= RESIZE_PENDING;
-	    Tk_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
+	    Tcl_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
 	}
     } else if ((c == 'e') && (length >= 7)
 	    && (strncmp(argv[1], "entrycget", length) == 0)) {
@@ -777,7 +773,7 @@ MenuWidgetCmd(clientData, interp, argc, argv)
 		return result;
 	    }
 	    if (menuPtr->flags & RESIZE_PENDING) {
-		Tk_CancelIdleCall(ComputeMenuGeometry, (ClientData) menuPtr);
+		Tcl_CancelIdleCall(ComputeMenuGeometry, (ClientData) menuPtr);
 		ComputeMenuGeometry((ClientData) menuPtr);
 	    }
 	}
@@ -1019,7 +1015,7 @@ ConfigureMenu(interp, menuPtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int i;
 
@@ -1047,7 +1043,7 @@ ConfigureMenu(interp, menuPtr, argc, argv, flags)
 
     if (!(menuPtr->flags & RESIZE_PENDING)) {
 	menuPtr->flags |= RESIZE_PENDING;
-	Tk_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
+	Tcl_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
     }
     return TCL_OK;
 }
@@ -1084,7 +1080,7 @@ ConfigureMenuEntry(interp, menuPtr, mePtr, index, argc, argv, flags)
     int argc;				/* Number of valid entries in argv. */
     char **argv;			/* Arguments. */
     int flags;				/* Additional flags to pass to
-					 * Tk_ConfigureWidget. */
+					 * Ck_ConfigureWidget. */
 {
     /*
      * If this entry is a cascade and the cascade is posted, then unpost
@@ -1096,7 +1092,7 @@ ConfigureMenuEntry(interp, menuPtr, mePtr, index, argc, argv, flags)
     if (menuPtr->postedCascade == mePtr) {
 	if (PostSubmenu(menuPtr->interp, menuPtr, (MenuEntry *) NULL)
 		!= TCL_OK) {
-	    Tk_BackgroundError(menuPtr->interp);
+	    Tcl_BackgroundError(menuPtr->interp);
 	}
     }
 
@@ -1190,7 +1186,7 @@ ConfigureMenuEntry(interp, menuPtr, mePtr, index, argc, argv, flags)
 
     if (!(menuPtr->flags & RESIZE_PENDING)) {
 	menuPtr->flags |= RESIZE_PENDING;
-	Tk_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
+	Tcl_DoWhenIdle(ComputeMenuGeometry, (ClientData) menuPtr);
     }
     return TCL_OK;
 }
@@ -1578,7 +1574,7 @@ GetMenuIndex(interp, menuPtr, string, lastOK, indexPtr)
  *
  * MenuEventProc --
  *
- *	This procedure is invoked by the Tk dispatcher for various
+ *	This procedure is invoked by the Tcl dispatcher for various
  *	events on menus.
  *
  * Results:
@@ -1606,10 +1602,10 @@ MenuEventProc(clientData, eventPtr)
 		    Tcl_GetCommandName(menuPtr->interp, menuPtr->widgetCmd));
 	}
 	if (menuPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayMenu, (ClientData) menuPtr);
+	    Tcl_CancelIdleCall(DisplayMenu, (ClientData) menuPtr);
 	}
 	if (menuPtr->flags & RESIZE_PENDING) {
-	    Tk_CancelIdleCall(ComputeMenuGeometry, (ClientData) menuPtr);
+	    Tcl_CancelIdleCall(ComputeMenuGeometry, (ClientData) menuPtr);
 	}
 	Tcl_EventuallyFree((ClientData) menuPtr, (Ck_FreeProc *) DestroyMenu);
     }
@@ -1930,7 +1926,7 @@ EventuallyRedrawMenu(menuPtr, mePtr)
 	    || (menuPtr->flags & REDRAW_PENDING)) {
 	return;
     }
-    Tk_DoWhenIdle(DisplayMenu, (ClientData) menuPtr);
+    Tcl_DoWhenIdle(DisplayMenu, (ClientData) menuPtr);
     menuPtr->flags |= REDRAW_PENDING;
 }
 

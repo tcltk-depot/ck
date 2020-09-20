@@ -31,8 +31,8 @@ static char dumpFile[100];      /* Records where to dump memory allocation
 static int quitFlag = 0;        /* 1 means the "checkmem" command was
                                  * invoked, so the application should quit
                                  * and dump memory allocation information. */
-static int	CheckmemCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char *argv[]));
+static int	CheckmemCmd(ClientData clientData,
+		    Tcl_Interp *interp, int argc, char *argv[]);
 #endif
 
 /*

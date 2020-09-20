@@ -91,7 +91,7 @@ typedef struct {
     char *command;		/* Command to execute when button is
 				 * invoked; valid for buttons only.
 				 * If not NULL, it's malloc-ed. */
-    char *takeFocus;		/* Tk 4.0 like. */
+    char *takeFocus;		/* Value of -takefocus option. */
     int flags;			/* Various flags;  see below for
 				 * definitions. */
 } Button;
@@ -279,25 +279,24 @@ static char *optionStrings[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void             ButtonCmdDeletedProc _ANSI_ARGS_((
-                            ClientData clientData));
-static void		ButtonEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static char *		ButtonTextVarProc _ANSI_ARGS_((ClientData clientData,
+static void             ButtonCmdDeletedProc(ClientData clientData);
+static void		ButtonEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static char *		ButtonTextVarProc(ClientData clientData,
 			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
-static char *		ButtonVarProc _ANSI_ARGS_((ClientData clientData,
+			    int flags);
+static char *		ButtonVarProc(ClientData clientData,
 			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
-static int		ButtonWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static void		ComputeButtonGeometry _ANSI_ARGS_((Button *butPtr));
-static int		ConfigureButton _ANSI_ARGS_((Tcl_Interp *interp,
+			    int flags);
+static int		ButtonWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static void		ComputeButtonGeometry(Button *butPtr);
+static int		ConfigureButton(Tcl_Interp *interp,
 			    Button *butPtr, int argc, char **argv,
-			    int flags));
-static void		DestroyButton _ANSI_ARGS_((ClientData clientData));
-static void		DisplayButton _ANSI_ARGS_((ClientData clientData));
-static int		InvokeButton  _ANSI_ARGS_((Button *butPtr));
+			    int flags);
+static void		DestroyButton(ClientData clientData);
+static void		DisplayButton(ClientData clientData);
+static int		InvokeButton(Button *butPtr);
 
 /*
  *--------------------------------------------------------------
@@ -570,7 +569,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
     redisplay:
     if ((butPtr->winPtr->flags & CK_MAPPED) &&
         !(butPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayButton, (ClientData) butPtr);
+	Tcl_DoWhenIdle(DisplayButton, (ClientData) butPtr);
 	butPtr->flags |= REDRAW_PENDING;
     }
     Tcl_Release((ClientData) butPtr);
@@ -607,7 +606,7 @@ DestroyButton(clientData)
 
     /*
      * Free up all the stuff that requires special handling, then
-     * let Tk_FreeOptions handle all the standard option-related
+     * let Ck_FreeOptions handle all the standard option-related
      * stuff.
      */
 
@@ -669,7 +668,7 @@ ButtonCmdDeletedProc(clientData)
  * ConfigureButton --
  *
  *	This procedure is called to process an argv/argc list, plus
- *	the Tk option database, in order to configure (or
+ *	the Ck option database, in order to configure (or
  *	reconfigure) a button widget.
  *
  * Results:
@@ -691,7 +690,7 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
      * Eliminate any existing trace on variables monitored by the button.
@@ -791,7 +790,7 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
 
     if ((butPtr->winPtr->flags & CK_MAPPED)
         && !(butPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayButton, (ClientData) butPtr);
+	Tcl_DoWhenIdle(DisplayButton, (ClientData) butPtr);
 	butPtr->flags |= REDRAW_PENDING;
     }
 
@@ -949,7 +948,7 @@ ButtonEventProc(clientData, eventPtr)
 
     if (eventPtr->type == CK_EV_EXPOSE || eventPtr->type == CK_EV_MAP) {
 	if ((butPtr->winPtr != NULL) && !(butPtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayButton, (ClientData) butPtr);
+	    Tcl_DoWhenIdle(DisplayButton, (ClientData) butPtr);
 	    butPtr->flags |= REDRAW_PENDING;
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
@@ -959,7 +958,7 @@ ButtonEventProc(clientData, eventPtr)
                     Tcl_GetCommandName(butPtr->interp, butPtr->widgetCmd));
         }
 	if (butPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayButton, (ClientData) butPtr);
+	    Tcl_CancelIdleCall(DisplayButton, (ClientData) butPtr);
 	}
 	Tcl_EventuallyFree((ClientData) butPtr, (Ck_FreeProc *) DestroyButton);
     }
@@ -1122,7 +1121,7 @@ ButtonVarProc(clientData, interp, name1, name2, flags)
  redisplay:
     if ((butPtr->winPtr != NULL) && (butPtr->winPtr->flags & CK_MAPPED)
 	    && !(butPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayButton, (ClientData) butPtr);
+	Tcl_DoWhenIdle(DisplayButton, (ClientData) butPtr);
 	butPtr->flags |= REDRAW_PENDING;
     }
     return (char *) NULL;
@@ -1187,7 +1186,7 @@ ButtonTextVarProc(clientData, interp, name1, name2, flags)
 
     if ((butPtr->winPtr != NULL) && (butPtr->winPtr->flags & CK_MAPPED)
 	    && !(butPtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayButton, (ClientData) butPtr);
+	Tcl_DoWhenIdle(DisplayButton, (ClientData) butPtr);
 	butPtr->flags |= REDRAW_PENDING;
     }
     return (char *) NULL;

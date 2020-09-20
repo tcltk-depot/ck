@@ -99,21 +99,20 @@ int ckTextDebug = 0;
  * Forward declarations for procedures defined later in this file:
  */
 
-static int		ConfigureText _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkText *textPtr, int argc, char **argv, int flags));
-static int		DeleteChars _ANSI_ARGS_((CkText *textPtr,
-			    char *index1String, char *index2String));
-static void		DestroyText _ANSI_ARGS_((ClientData clientData));
-static void		InsertChars _ANSI_ARGS_((CkText *textPtr,
-			    CkTextIndex *indexPtr, char *string));
-static void		TextCmdDeletedProc _ANSI_ARGS_((
-			    ClientData clientData));
-static void		TextEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static int		TextSearchCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		TextWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
+static int		ConfigureText(Tcl_Interp *interp,
+			    CkText *textPtr, int argc, char **argv, int flags);
+static int		DeleteChars(CkText *textPtr,
+			    char *index1String, char *index2String);
+static void		DestroyText(ClientData clientData);
+static void		InsertChars(CkText *textPtr,
+			    CkTextIndex *indexPtr, char *string);
+static void		TextCmdDeletedProc(ClientData clientData);
+static void		TextEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static int		TextSearchCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		TextWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
 
 /*
  *--------------------------------------------------------------

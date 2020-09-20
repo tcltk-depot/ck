@@ -118,10 +118,10 @@ static Tcl_HashTable slaveTable;
  * placer:
  */
 
-static void		PlaceRequestProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
-static void		PlaceLostSlaveProc _ANSI_ARGS_((ClientData clientData,
-			    CkWindow *winPtr));
+static void		PlaceRequestProc(ClientData clientData,
+			    CkWindow *winPtr);
+static void		PlaceLostSlaveProc(ClientData clientData,
+			    CkWindow *winPtr);
 
 static Ck_GeomMgr placerType = {
     "place",				/* name */
@@ -133,16 +133,16 @@ static Ck_GeomMgr placerType = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		SlaveStructureProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static int		ConfigureSlave _ANSI_ARGS_((Tcl_Interp *interp,
-			    Slave *slavePtr, int argc, char **argv));
-static Slave *		FindSlave _ANSI_ARGS_((CkWindow *winPtr));
-static Master *		FindMaster _ANSI_ARGS_((CkWindow *winPtr));
-static void		MasterStructureProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void		RecomputePlacement _ANSI_ARGS_((ClientData clientData));
-static void		UnlinkSlave _ANSI_ARGS_((Slave *slavePtr));
+static void		SlaveStructureProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static int		ConfigureSlave(Tcl_Interp *interp,
+			    Slave *slavePtr, int argc, char **argv);
+static Slave *		FindSlave(CkWindow *winPtr);
+static Master *		FindMaster(CkWindow *winPtr);
+static void		MasterStructureProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		RecomputePlacement(ClientData clientData);
+static void		UnlinkSlave(Slave *slavePtr);
 
 /*
  *--------------------------------------------------------------
@@ -610,7 +610,7 @@ done:
     }
     if (!(masterPtr->flags & PARENT_RECONFIG_PENDING)) {
 	masterPtr->flags |= PARENT_RECONFIG_PENDING;
-	Tk_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
     }
     return result;
 }
@@ -828,7 +828,7 @@ MasterStructureProc(clientData, eventPtr)
 	if ((masterPtr->slavePtr != NULL)
 		&& !(masterPtr->flags & PARENT_RECONFIG_PENDING)) {
 	    masterPtr->flags |= PARENT_RECONFIG_PENDING;
-	    Tk_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
+	    Tcl_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
 	for (slavePtr = masterPtr->slavePtr; slavePtr != NULL;
@@ -840,7 +840,7 @@ MasterStructureProc(clientData, eventPtr)
 	Tcl_DeleteHashEntry(Tcl_FindHashEntry(&masterTable,
 		(char *) masterPtr->winPtr));
 	if (masterPtr->flags & PARENT_RECONFIG_PENDING) {
-	    Tk_CancelIdleCall(RecomputePlacement, (ClientData) masterPtr);
+	    Tcl_CancelIdleCall(RecomputePlacement, (ClientData) masterPtr);
 	}
 	masterPtr->winPtr = NULL;
 	ckfree((char *) masterPtr);
@@ -918,7 +918,7 @@ PlaceRequestProc(clientData, winPtr)
     }
     if (!(masterPtr->flags & PARENT_RECONFIG_PENDING)) {
 	masterPtr->flags |= PARENT_RECONFIG_PENDING;
-	Tk_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
+	Tcl_DoWhenIdle(RecomputePlacement, (ClientData) masterPtr);
     }
 }
 

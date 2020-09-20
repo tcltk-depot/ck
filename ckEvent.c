@@ -31,9 +31,9 @@ typedef struct {
     CkMainInfo *mainPtr;	/* Pointer to Ck main info. */
 } CkQEvt;
 
-static int	Ck_HandleQEvent _ANSI_ARGS_((Tcl_Event *evPtr, int flags));
+static int	Ck_HandleQEvent(Tcl_Event *evPtr, int flags);
 #ifdef USE_NCURSES
-static void	TerminalResized _ANSI_ARGS_((CkWindow *parentPtr, int flag));
+static void	TerminalResized(CkWindow *parentPtr, int flag);
 #endif
 
 /*
@@ -106,7 +106,7 @@ static int genericHandlersActive = 0;
 #define DEFAULT_BARCODE_TIMEOUT 1000
 
 typedef struct barcodeData {
-    Tk_TimerToken timer;/* Barcode packet timer. */
+    Tcl_TimerToken timer;/* Barcode packet timer. */
     int pkttime;	/* Timeout value. */
     int startChar;	/* Start of barcode packet character. */
     int endChar;	/* End of barcode packet character. */
@@ -119,7 +119,7 @@ typedef struct barcodeData {
  * Timeout procedure for reading barcode packet:
  */
 
-static void BarcodeTimeout _ANSI_ARGS_((ClientData clientData));
+static void BarcodeTimeout(ClientData clientData);
 
 /*
  *--------------------------------------------------------------
@@ -738,13 +738,13 @@ decDone:
 
 	if (bd->index >= 0 || code == bd->startChar) {
 	    if (code == bd->startChar) {
-		Tk_DeleteTimerHandler(bd->timer);
-		bd->timer = Tk_CreateTimerHandler(bd->pkttime, BarcodeTimeout,
+		Tcl_DeleteTimerHandler(bd->timer);
+		bd->timer = Tcl_CreateTimerHandler(bd->pkttime, BarcodeTimeout,
 		    (ClientData) mainPtr);
 		bd->index = 0;
 	    } else if (code == bd->endChar) {
-		Tk_DeleteTimerHandler(bd->timer);
-		bd->timer = (Tk_TimerToken) NULL;
+		Tcl_DeleteTimerHandler(bd->timer);
+		bd->timer = (Tcl_TimerToken) NULL;
 		bd->delivered = 1;
 		event.key.type = CK_EV_BARCODE;
 		event.key.winPtr = mainPtr->focusPtr;
@@ -1054,7 +1054,7 @@ Ck_MainLoop()
     extern CkMainInfo *ckMainInfo;
 
     while (ckMainInfo != NULL) {
-	Tk_DoOneEvent(0);
+	Tcl_DoOneEvent(0);
     }
 }
 
@@ -1077,7 +1077,7 @@ BarcodeTimeout(clientData)
 
     if (bd != NULL) {
 	bd->index = -1;
-	bd->timer = (Tk_TimerToken) NULL;
+	bd->timer = (Tcl_TimerToken) NULL;
     }
 }
 
@@ -1145,7 +1145,7 @@ CkBarcodeCmd(clientData, interp, argc, argv)
 	if (strcmp(argv[2], "off") != 0)
 	    goto badArgs;
 	if (mainPtr->flags & CK_HAS_BARCODE) {
-	    Tk_DeleteTimerHandler(bd->timer);
+	    Tcl_DeleteTimerHandler(bd->timer);
 	    mainPtr->flags &= ~CK_HAS_BARCODE;
 	    mainPtr->barcodeData = NULL;
 	    ckfree((char *) bd);
@@ -1164,7 +1164,7 @@ CkBarcodeCmd(clientData, interp, argc, argv)
 	    mainPtr->flags |= CK_HAS_BARCODE;
 	    mainPtr->barcodeData = (ClientData) bd;
 	    bd->pkttime = DEFAULT_BARCODE_TIMEOUT;
-	    bd->timer = (Tk_TimerToken) NULL;
+	    bd->timer = (Tcl_TimerToken) NULL;
 	    bd->delivered = 0;
 	    bd->index = -1;
 	}

@@ -27,19 +27,19 @@
  * Forward references for procedures defined in this file:
  */
 
-static void		InsertUndisplayProc _ANSI_ARGS_((CkText *textPtr,
-			    CkTextDispChunk *chunkPtr));
-static int		MarkDeleteProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr, int treeGone));
-static CkTextSegment *	MarkCleanupProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static void		MarkCheckProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-static int		MarkLayoutProc _ANSI_ARGS_((CkText *textPtr,
+static void		InsertUndisplayProc(CkText *textPtr,
+			    CkTextDispChunk *chunkPtr);
+static int		MarkDeleteProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr, int treeGone);
+static CkTextSegment *	MarkCleanupProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static void		MarkCheckProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+static int		MarkLayoutProc(CkText *textPtr,
 			    CkTextIndex *indexPtr, CkTextSegment *segPtr,
 			    int offset, int maxX, int maxChars,
 			    int noCharsYet, Ck_Uid wrapMode,
-			    CkTextDispChunk *chunkPtr));
+			    CkTextDispChunk *chunkPtr);
 
 /*
  * The following structures declare the "mark" segment types.

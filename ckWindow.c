@@ -42,20 +42,17 @@ static InputInfo inputInfo = {
     NULL
 };
 
-static void		InputSetup _ANSI_ARGS_((InputInfo *inputInfo));
-static void		InputExit _ANSI_ARGS_((ClientData clientData));
-static void		InputThread _ANSI_ARGS_((void *arg));
-static LRESULT CALLBACK InputHandler _ANSI_ARGS_((HWND hwnd, UINT message,
-						 WPARAM wParam,
-						 LPARAM lParam));
-static void		InputHandler2 _ANSI_ARGS_((ClientData clientData));
+static void		InputSetup(InputInfo *inputInfo);
+static void		InputExit(ClientData clientData);
+static void		InputThread(void *arg);
+static LRESULT CALLBACK InputHandler(HWND hwnd, UINT message,
+				     WPARAM wParam, LPARAM lParam);
+static void		InputHandler2(ClientData clientData);
 #endif
 
-static void		CkEvtExit _ANSI_ARGS_((ClientData clientData));
-static void		CkEvtSetup _ANSI_ARGS_((ClientData clientData,
-						int flags));
-static void		CkEvtCheck _ANSI_ARGS_((ClientData clientData,
-						int flags));
+static void		CkEvtExit(ClientData clientData);
+static void		CkEvtSetup(ClientData clientData, int flags);
+static void		CkEvtCheck(ClientData clientData, int flags);
 
 /*
  * The variables below hold several uid's that are used in many places
@@ -71,9 +68,8 @@ Ck_Uid ckNormalUid = NULL;
  * the toolkit, and the C procedures that execute them.
  */
 
-typedef int (CkCmdProc) _ANSI_ARGS_((ClientData clientData,
-				     Tcl_Interp *interp,
-				     int argc, char **argv));
+typedef int (CkCmdProc)(ClientData clientData, Tcl_Interp *interp,
+			int argc, char **argv);
 
 typedef struct {
     char *name;				/* Name of command. */
@@ -129,29 +125,28 @@ CkCmd commands[] = {
  * Static procedures of this module.
  */
 
-static void	UnlinkWindow _ANSI_ARGS_((CkWindow *winPtr));
-static void	UnlinkToplevel _ANSI_ARGS_((CkWindow *winPtr));
-static void     ChangeToplevelFocus _ANSI_ARGS_((CkWindow *winPtr));
-static void	DoRefresh _ANSI_ARGS_((ClientData clientData));
-static void	RefreshToplevels _ANSI_ARGS_((CkWindow *winPtr));
-static void	RefreshThem _ANSI_ARGS_((CkWindow *winPtr));
-static void     UpdateHWCursor _ANSI_ARGS_((CkMainInfo *mainPtr));
-static CkWindow *GetWindowXY _ANSI_ARGS_((CkWindow *winPtr, int *xPtr,
-			int *yPtr));
-static int	DeadAppCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      ExecCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      PutsCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      CloseCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      FlushCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      ReadCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
-static int      GetsCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv));
+static void	UnlinkWindow(CkWindow *winPtr);
+static void	UnlinkToplevel(CkWindow *winPtr);
+static void     ChangeToplevelFocus(CkWindow *winPtr);
+static void	DoRefresh(ClientData clientData);
+static void	RefreshToplevels(CkWindow *winPtr);
+static void	RefreshThem(CkWindow *winPtr);
+static void     UpdateHWCursor(CkMainInfo *mainPtr);
+static CkWindow *GetWindowXY(CkWindow *winPtr, int *xPtr, int *yPtr);
+static int	DeadAppCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      ExecCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      PutsCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      CloseCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      FlushCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      ReadCmd (ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
+static int      GetsCmd(ClientData clientData,
+			Tcl_Interp *interp, int argc, char **argv);
 
 /*
  * Some plain Tcl commands are handled specially.
@@ -630,8 +625,7 @@ Ck_CreateMainWindow(interp, className)
     if (!isxterm && !(mainPtr->flags & CK_HAS_MOUSE)) {
 	int fd;
 	Gpm_Connect conn;
-	EXTERN void CkHandleGPMInput _ANSI_ARGS_((ClientData clientData,
-	    int mask));
+	EXTERN void CkHandleGPMInput(ClientData clientData, int mask);
 
 	conn.eventMask = GPM_DOWN | GPM_UP | GPM_MOVE;
 	conn.defaultMask = 0;
@@ -1936,7 +1930,7 @@ Ck_EventuallyRefresh(winPtr)
     CkWindow *winPtr;
 {
     if (++winPtr->mainPtr->refreshCount == 1)
-	Tk_DoWhenIdle(DoRefresh, (ClientData) winPtr->mainPtr);
+	Tcl_DoWhenIdle(DoRefresh, (ClientData) winPtr->mainPtr);
 }
 
 /*
@@ -1964,11 +1958,11 @@ DoRefresh(clientData)
     CkMainInfo *mainPtr = (CkMainInfo *) clientData;
 
     if (mainPtr->flags & CK_REFRESH_TIMER) {
-	Tk_DeleteTimerHandler(mainPtr->refreshTimer);
+	Tcl_DeleteTimerHandler(mainPtr->refreshTimer);
 	mainPtr->flags &= ~CK_REFRESH_TIMER;
     }
     if (--mainPtr->refreshCount > 0) {
-	Tk_DoWhenIdle2(DoRefresh, clientData);
+	Tcl_DoWhenIdle(DoRefresh, clientData);
 	return;
     }
     mainPtr->refreshCount = 0;
@@ -1979,7 +1973,7 @@ DoRefresh(clientData)
 	Tcl_GetTime(&tv);
 	t0 = (tv.sec + 0.000001 * tv.usec) * 1000;
 	if (t0 - mainPtr->lastRefresh < mainPtr->refreshDelay) {
-	    mainPtr->refreshTimer = Tk_CreateTimerHandler(
+	    mainPtr->refreshTimer = Tcl_CreateTimerHandler(
 		mainPtr->refreshDelay - (int) (t0 - mainPtr->lastRefresh),
 	        DoRefresh, clientData);
 	    mainPtr->flags |= CK_REFRESH_TIMER;
@@ -2682,7 +2676,7 @@ InputHandler(hwnd, message, wParam, lParam)
     if (message != WM_USER + 42) {
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
-    Tk_DoWhenIdle(InputHandler2, (ClientData) inputInfo);
+    Tcl_DoWhenIdle(InputHandler2, (ClientData) inputInfo);
     return 0;
 }
 

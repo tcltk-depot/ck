@@ -23,8 +23,8 @@
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		setargv _ANSI_ARGS_((int *argcPtr, char ***argvPtr));
-static void		CwshPanic _ANSI_ARGS_(TCL_VARARGS(char *,format));
+static void		setargv(int *argcPtr, char ***argvPtr);
+static void		CwshPanic(TCL_VARARGS(char *,format);
 
 
 /*

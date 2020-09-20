@@ -98,21 +98,6 @@ extern int errno;
 #endif
 
 /*
- * Provide some defines to get some Tk functionality which was in
- * tkEvent.c prior to Tcl version 7.5.
- */
-
-#define Tk_BackgroundError Tcl_BackgroundError
-#define Tk_DoWhenIdle Tcl_DoWhenIdle
-#define Tk_DoWhenIdle2 Tcl_DoWhenIdle
-#define Tk_CancelIdleCall Tcl_CancelIdleCall
-#define Tk_CreateTimerHandler Tcl_CreateTimerHandler
-#define Tk_DeleteTimerHandler Tcl_DeleteTimerHandler
-#define Tk_AfterCmd Tcl_AfterCmd
-#define Tk_FileeventCmd Tcl_FileEventCmd
-#define Tk_DoOneEvent Tcl_DoOneEvent
-
-/*
  * Declarations for various library procedures that may not be declared
  * in any other header file.
  */
@@ -129,7 +114,7 @@ extern void		panic();
 #   define RETSIGTYPE void
 #endif
 
-typedef RETSIGTYPE (*Ck_SignalProc) _ANSI_ARGS_((int));
+typedef RETSIGTYPE (*Ck_SignalProc)(int);
 
 
 #endif /* _CKPORT */

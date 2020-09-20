@@ -154,19 +154,17 @@ typedef struct CkTextIndex {
 
 typedef struct CkTextDispChunk CkTextDispChunk;
 
-typedef void 		Ck_ChunkDisplayProc _ANSI_ARGS_((
-			    CkTextDispChunk *chunkPtr, int x, int y,
+typedef void 		Ck_ChunkDisplayProc(CkTextDispChunk *chunkPtr,
+			    int x, int y,
 			    int height, int baseline, WINDOW *window,
-                            int screenY));
-typedef void		Ck_ChunkUndisplayProc _ANSI_ARGS_((
-			    struct CkText *textPtr,
-			    CkTextDispChunk *chunkPtr));
-typedef int		Ck_ChunkMeasureProc _ANSI_ARGS_((
-			    CkTextDispChunk *chunkPtr, int x));
-typedef void		Ck_ChunkBboxProc _ANSI_ARGS_((
-			    CkTextDispChunk *chunkPtr, int index, int y,
+                            int screenY);
+typedef void		Ck_ChunkUndisplayProc(struct CkText *textPtr,
+			    CkTextDispChunk *chunkPtr);
+typedef int		Ck_ChunkMeasureProc(CkTextDispChunk *chunkPtr, int x);
+typedef void		Ck_ChunkBboxProc(CkTextDispChunk *chunkPtr,
+			    int index, int y,
 			    int lineHeight, int baseline, int *xPtr,
-			    int *yPtr, int *widthPtr, int *heightPtr));
+			    int *yPtr, int *widthPtr, int *heightPtr);
 
 /*
  * The structure below represents a chunk of stuff that is displayed
@@ -492,22 +490,21 @@ typedef struct CkText {
  * segments of that type.
  */
 
-typedef CkTextSegment *	Ck_SegSplitProc _ANSI_ARGS_((
-			    struct CkTextSegment *segPtr, int index));
-typedef int		Ck_SegDeleteProc _ANSI_ARGS_((
-			    struct CkTextSegment *segPtr,
-			    CkTextLine *linePtr, int treeGone));
-typedef CkTextSegment *	Ck_SegCleanupProc _ANSI_ARGS_((
-			    struct CkTextSegment *segPtr, CkTextLine *linePtr));
-typedef void		Ck_SegLineChangeProc _ANSI_ARGS_((
-			    struct CkTextSegment *segPtr, CkTextLine *linePtr));
-typedef int		Ck_SegLayoutProc _ANSI_ARGS_((struct CkText *textPtr,
+typedef CkTextSegment *	Ck_SegSplitProc(struct CkTextSegment *segPtr,
+			    int index);
+typedef int		Ck_SegDeleteProc(struct CkTextSegment *segPtr,
+			    CkTextLine *linePtr, int treeGone);
+typedef CkTextSegment *	Ck_SegCleanupProc(struct CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+typedef void		Ck_SegLineChangeProc(struct CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+typedef int		Ck_SegLayoutProc(struct CkText *textPtr,
 			    struct CkTextIndex *indexPtr, CkTextSegment *segPtr,
 			    int offset, int maxX, int maxChars,
 			    int noCharsYet, Ck_Uid wrapMode,
-			    struct CkTextDispChunk *chunkPtr));
-typedef void		Ck_SegCheckProc _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
+			    struct CkTextDispChunk *chunkPtr);
+typedef void		Ck_SegCheckProc(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
 
 typedef struct Ck_SegType {
     char *name;				/* Name of this kind of segment. */
@@ -578,120 +575,115 @@ extern Ck_Uid		ckTextWordUid;
  * but shouldn't be used anywhere else in Ck (or by Ck clients):
  */
 
-extern int		CkBTreeCharTagged _ANSI_ARGS_((CkTextIndex *indexPtr,
-			    CkTextTag *tagPtr));
-extern void		CkBTreeCheck _ANSI_ARGS_((CkTextBTree tree));
-extern int		CkBTreeCharsInLine _ANSI_ARGS_((CkTextLine *linePtr));
-extern CkTextBTree	CkBTreeCreate _ANSI_ARGS_((void));
-extern void		CkBTreeDestroy _ANSI_ARGS_((CkTextBTree tree));
-extern void		CkBTreeDeleteChars _ANSI_ARGS_((CkTextIndex *index1Ptr,
-			    CkTextIndex *index2Ptr));
-extern CkTextLine *	CkBTreeFindLine _ANSI_ARGS_((CkTextBTree tree,
-			    int line));
-extern CkTextTag **	CkBTreeGetTags _ANSI_ARGS_((CkTextIndex *indexPtr,
-			    int *numTagsPtr));
-extern void		CkBTreeInsertChars _ANSI_ARGS_((CkTextIndex *indexPtr,
-			    char *string));
-extern int		CkBTreeLineIndex _ANSI_ARGS_((CkTextLine *linePtr));
-extern void		CkBTreeLinkSegment _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextIndex *indexPtr));
-extern CkTextLine *	CkBTreeNextLine _ANSI_ARGS_((CkTextLine *linePtr));
-extern int		CkBTreeNextTag _ANSI_ARGS_((CkTextSearch *searchPtr));
-extern int		CkBTreeNumLines _ANSI_ARGS_((CkTextBTree tree));
-extern void		CkBTreeStartSearch _ANSI_ARGS_((CkTextIndex *index1Ptr,
+extern int		CkBTreeCharTagged(CkTextIndex *indexPtr,
+			    CkTextTag *tagPtr);
+extern void		CkBTreeCheck(CkTextBTree tree);
+extern int		CkBTreeCharsInLine(CkTextLine *linePtr);
+extern CkTextBTree	CkBTreeCreate(void);
+extern void		CkBTreeDestroy(CkTextBTree tree);
+extern void		CkBTreeDeleteChars(CkTextIndex *index1Ptr,
+			    CkTextIndex *index2Ptr);
+extern CkTextLine *	CkBTreeFindLine(CkTextBTree tree, int line);
+extern CkTextTag **	CkBTreeGetTags(CkTextIndex *indexPtr, int *numTagsPtr);
+extern void		CkBTreeInsertChars(CkTextIndex *indexPtr,
+			    char *string);
+extern int		CkBTreeLineIndex(CkTextLine *linePtr);
+extern void		CkBTreeLinkSegment(CkTextSegment *segPtr,
+			    CkTextIndex *indexPtr);
+extern CkTextLine *	CkBTreeNextLine(CkTextLine *linePtr);
+extern int		CkBTreeNextTag(CkTextSearch *searchPtr);
+extern int		CkBTreeNumLines(CkTextBTree tree);
+extern void		CkBTreeStartSearch(CkTextIndex *index1Ptr,
 			    CkTextIndex *index2Ptr, CkTextTag *tagPtr,
-			    CkTextSearch *searchPtr));
-extern void		CkBTreeTag _ANSI_ARGS_((CkTextIndex *index1Ptr,
+			    CkTextSearch *searchPtr);
+extern void		CkBTreeTag(CkTextIndex *index1Ptr,
 			    CkTextIndex *index2Ptr, CkTextTag *tagPtr,
-			    int add));
-extern void		CkBTreeUnlinkSegment _ANSI_ARGS_((CkTextBTree tree,
-			    CkTextSegment *segPtr, CkTextLine *linePtr));
-extern void		CkTextBindProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-extern void		CkTextChanged _ANSI_ARGS_((CkText *textPtr,
-			    CkTextIndex *index1Ptr, CkTextIndex *index2Ptr));
-extern int		CkTextCharBbox _ANSI_ARGS_((CkText *textPtr,
+			    int add);
+extern void		CkBTreeUnlinkSegment(CkTextBTree tree,
+			    CkTextSegment *segPtr, CkTextLine *linePtr);
+extern void		CkTextBindProc(ClientData clientData,
+			    CkEvent *eventPtr);
+extern void		CkTextChanged(CkText *textPtr,
+			    CkTextIndex *index1Ptr, CkTextIndex *index2Ptr);
+extern int		CkTextCharBbox(CkText *textPtr,
 			    CkTextIndex *indexPtr, int *xPtr, int *yPtr,
-			    int *widthPtr, int *heightPtr));
-extern int		CkTextCharLayoutProc _ANSI_ARGS_((CkText *textPtr,
+			    int *widthPtr, int *heightPtr);
+extern int		CkTextCharLayoutProc(CkText *textPtr,
 			    CkTextIndex *indexPtr, CkTextSegment *segPtr,
 			    int offset, int maxX, int maxChars, int noBreakYet,
-			    Ck_Uid wrapMode, CkTextDispChunk *chunkPtr));
-extern void		CkTextCreateDInfo _ANSI_ARGS_((CkText *textPtr));
-extern int		CkTextDLineInfo _ANSI_ARGS_((CkText *textPtr,
+			    Ck_Uid wrapMode, CkTextDispChunk *chunkPtr);
+extern void		CkTextCreateDInfo(CkText *textPtr);
+extern int		CkTextDLineInfo(CkText *textPtr,
 			    CkTextIndex *indexPtr, int *xPtr, int *yPtr,
-			    int *widthPtr, int *heightPtr, int *basePtr));
-extern CkTextTag *	CkTextCreateTag _ANSI_ARGS_((CkText *textPtr,
-			    char *tagName));
-extern void		CkTextFreeDInfo _ANSI_ARGS_((CkText *textPtr));
-extern void		CkTextFreeTag _ANSI_ARGS_((CkText *textPtr,
-			    CkTextTag *tagPtr));
-extern int		CkTextGetIndex _ANSI_ARGS_((Tcl_Interp *interp,
+			    int *widthPtr, int *heightPtr, int *basePtr);
+extern CkTextTag *	CkTextCreateTag(CkText *textPtr, char *tagName);
+extern void		CkTextFreeDInfo(CkText *textPtr);
+extern void		CkTextFreeTag(CkText *textPtr, CkTextTag *tagPtr);
+extern int		CkTextGetIndex(Tcl_Interp *interp,
 			    CkText *textPtr, char *string,
-			    CkTextIndex *indexPtr));
-extern CkTextTabArray *	CkTextGetTabs _ANSI_ARGS_((Tcl_Interp *interp,
-			    CkWindow *winPtr, char *string));
-extern void		CkTextIndexBackBytes _ANSI_ARGS_((CkTextIndex *srcPtr,
-			    int count, CkTextIndex *dstPtr));
-extern void		CkTextIndexBackChars _ANSI_ARGS_((CkTextIndex *srcPtr,
-			    int count, CkTextIndex *dstPtr));
-extern int		CkTextIndexCmp _ANSI_ARGS_((CkTextIndex *index1Ptr,
-			    CkTextIndex *index2Ptr));
-extern void		CkTextIndexForwBytes _ANSI_ARGS_((CkTextIndex *srcPtr,
-			    int count, CkTextIndex *dstPtr));
-extern void		CkTextIndexForwChars _ANSI_ARGS_((CkTextIndex *srcPtr,
-			    int count, CkTextIndex *dstPtr));
-extern CkTextSegment *	CkTextIndexToSeg _ANSI_ARGS_((CkTextIndex *indexPtr,
-			    int *offsetPtr));
-extern void		CkTextInsertDisplayProc _ANSI_ARGS_((
-			    CkTextDispChunk *chunkPtr, int x, int y, int height,
-			    int baseline, WINDOW *window, int screenY));
-extern void		CkTextLostSelection _ANSI_ARGS_((
-			    ClientData clientData));
-extern CkTextIndex *	CkTextMakeByteIndex _ANSI_ARGS_((CkTextBTree tree,
+			    CkTextIndex *indexPtr);
+extern CkTextTabArray *	CkTextGetTabs(Tcl_Interp *interp,
+			    CkWindow *winPtr, char *string);
+extern void		CkTextIndexBackBytes(CkTextIndex *srcPtr,
+			    int count, CkTextIndex *dstPtr);
+extern void		CkTextIndexBackChars(CkTextIndex *srcPtr,
+			    int count, CkTextIndex *dstPtr);
+extern int		CkTextIndexCmp(CkTextIndex *index1Ptr,
+			    CkTextIndex *index2Ptr);
+extern void		CkTextIndexForwBytes(CkTextIndex *srcPtr,
+			    int count, CkTextIndex *dstPtr);
+extern void		CkTextIndexForwChars(CkTextIndex *srcPtr,
+			    int count, CkTextIndex *dstPtr);
+extern CkTextSegment *	CkTextIndexToSeg(CkTextIndex *indexPtr,
+			    int *offsetPtr);
+extern void		CkTextInsertDisplayProc(CkTextDispChunk *chunkPtr,
+			    int x, int y, int height,
+			    int baseline, WINDOW *window, int screenY);
+extern void		CkTextLostSelection(ClientData clientData);
+extern CkTextIndex *	CkTextMakeByteIndex(CkTextBTree tree,
 			    int lineIndex, int byteIndex,
-			    CkTextIndex *indexPtr));
-extern CkTextIndex *	CkTextMakeIndex _ANSI_ARGS_((CkTextBTree tree,
+			    CkTextIndex *indexPtr);
+extern CkTextIndex *	CkTextMakeIndex(CkTextBTree tree,
 			    int lineIndex, int charIndex,
-			    CkTextIndex *indexPtr));
-extern int		CkTextMarkCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextMarkNameToIndex _ANSI_ARGS_((CkText *textPtr,
-			    char *name, CkTextIndex *indexPtr));
-extern void		CkTextMarkSegToIndex _ANSI_ARGS_((CkText *textPtr,
-			    CkTextSegment *markPtr, CkTextIndex *indexPtr));
-extern void		CkTextEventuallyRepick _ANSI_ARGS_((CkText *textPtr));
-extern void		CkTextPickCurrent _ANSI_ARGS_((CkText *textPtr,
-			    CkEvent *eventPtr));
-extern void		CkTextPixelIndex _ANSI_ARGS_((CkText *textPtr,
-			    int x, int y, CkTextIndex *indexPtr));
-extern void		CkTextPrintIndex _ANSI_ARGS_((CkTextIndex *indexPtr,
-			    char *string));
-extern void		CkTextRedrawRegion _ANSI_ARGS_((CkText *textPtr,
-			    int x, int y, int width, int height));
-extern void		CkTextRedrawTag _ANSI_ARGS_((CkText *textPtr,
+			    CkTextIndex *indexPtr);
+extern int		CkTextMarkCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextMarkNameToIndex(CkText *textPtr,
+			    char *name, CkTextIndex *indexPtr);
+extern void		CkTextMarkSegToIndex(CkText *textPtr,
+			    CkTextSegment *markPtr, CkTextIndex *indexPtr);
+extern void		CkTextEventuallyRepick(CkText *textPtr);
+extern void		CkTextPickCurrent(CkText *textPtr,
+			    CkEvent *eventPtr);
+extern void		CkTextPixelIndex(CkText *textPtr,
+			    int x, int y, CkTextIndex *indexPtr);
+extern void		CkTextPrintIndex(CkTextIndex *indexPtr,
+			    char *string);
+extern void		CkTextRedrawRegion(CkText *textPtr,
+			    int x, int y, int width, int height);
+extern void		CkTextRedrawTag(CkText *textPtr,
 			    CkTextIndex *index1Ptr, CkTextIndex *index2Ptr,
-			    CkTextTag *tagPtr, int withTag));
-extern void		CkTextRelayoutWindow _ANSI_ARGS_((CkText *textPtr));
-extern int		CkTextScanCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextSeeCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextSegToOffset _ANSI_ARGS_((CkTextSegment *segPtr,
-			    CkTextLine *linePtr));
-extern CkTextSegment *	CkTextSetMark _ANSI_ARGS_((CkText *textPtr, char *name,
-			    CkTextIndex *indexPtr));
-extern void		CkTextSetYView _ANSI_ARGS_((CkText *textPtr,
-			    CkTextIndex *indexPtr, int pickPlace));
-extern int		CkTextTagCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextWindowCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextWindowIndex _ANSI_ARGS_((CkText *textPtr,
-			    char *name, CkTextIndex *indexPtr));
-extern int		CkTextXviewCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-extern int		CkTextYviewCmd _ANSI_ARGS_((CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    CkTextTag *tagPtr, int withTag);
+extern void		CkTextRelayoutWindow(CkText *textPtr);
+extern int		CkTextScanCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextSeeCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextSegToOffset(CkTextSegment *segPtr,
+			    CkTextLine *linePtr);
+extern CkTextSegment *	CkTextSetMark(CkText *textPtr, char *name,
+			    CkTextIndex *indexPtr);
+extern void		CkTextSetYView(CkText *textPtr,
+			    CkTextIndex *indexPtr, int pickPlace);
+extern int		CkTextTagCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextWindowCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextWindowIndex(CkText *textPtr,
+			    char *name, CkTextIndex *indexPtr);
+extern int		CkTextXviewCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
+extern int		CkTextYviewCmd(CkText *textPtr,
+			    Tcl_Interp *interp, int argc, char **argv);
 
 #endif /* _CKTEXT_H */

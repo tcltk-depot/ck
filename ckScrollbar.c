@@ -167,22 +167,20 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		ComputeScrollbarGeometry _ANSI_ARGS_((
-			    Scrollbar *scrollPtr));
-static int		ConfigureScrollbar _ANSI_ARGS_((Tcl_Interp *interp,
+static void		ComputeScrollbarGeometry(Scrollbar *scrollPtr);
+static int		ConfigureScrollbar(Tcl_Interp *interp,
 			    Scrollbar *scrollPtr, int argc, char **argv,
-			    int flags));
-static void		DestroyScrollbar _ANSI_ARGS_((ClientData clientData));
-static void		DisplayScrollbar _ANSI_ARGS_((ClientData clientData));
-static void		EventuallyRedraw _ANSI_ARGS_((Scrollbar *scrollPtr));
-static void		ScrollbarEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void             ScrollbarCmdDeletedProc _ANSI_ARGS_((
-                            ClientData clientData));
-static int              ScrollbarPosition _ANSI_ARGS_((Scrollbar *scrollPtr,
-			    int x, int y));
-static int		ScrollbarWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *, int argc, char **argv));
+			    int flags);
+static void		DestroyScrollbar(ClientData clientData);
+static void		DisplayScrollbar(ClientData clientData);
+static void		EventuallyRedraw(Scrollbar *scrollPtr);
+static void		ScrollbarEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void             ScrollbarCmdDeletedProc(ClientData clientData);
+static int              ScrollbarPosition(Scrollbar *scrollPtr,
+			    int x, int y);
+static int		ScrollbarWidgetCmd(ClientData clientData,
+			    Tcl_Interp *, int argc, char **argv);
 
 /*
  *--------------------------------------------------------------
@@ -737,7 +735,7 @@ ScrollbarEventProc(clientData, eventPtr)
                 Tcl_GetCommandName(scrollPtr->interp, scrollPtr->widgetCmd));
         }
 	if (scrollPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayScrollbar, (ClientData) scrollPtr);
+	    Tcl_CancelIdleCall(DisplayScrollbar, (ClientData) scrollPtr);
 	}
 	Tcl_EventuallyFree((ClientData) scrollPtr,
 	    (Ck_FreeProc *) DestroyScrollbar);
@@ -892,7 +890,7 @@ EventuallyRedraw(scrollPtr)
 	return;
     }
     if ((scrollPtr->flags & REDRAW_PENDING) == 0) {
-	Tk_DoWhenIdle(DisplayScrollbar, (ClientData) scrollPtr);
+	Tcl_DoWhenIdle(DisplayScrollbar, (ClientData) scrollPtr);
 	scrollPtr->flags |= REDRAW_PENDING;
     }
 }

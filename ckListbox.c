@@ -220,37 +220,32 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static void		ChangeListboxOffset _ANSI_ARGS_((Listbox *listPtr,
-			    int offset));
-static void		ChangeListboxView _ANSI_ARGS_((Listbox *listPtr,
-			    int index));
-static int		ConfigureListbox _ANSI_ARGS_((Tcl_Interp *interp,
+static void		ChangeListboxOffset(Listbox *listPtr, int offset);
+static void		ChangeListboxView(Listbox *listPtr, int index);
+static int		ConfigureListbox(Tcl_Interp *interp,
 			    Listbox *listPtr, int argc, char **argv,
-			    int flags));
-static void		DeleteEls _ANSI_ARGS_((Listbox *listPtr, int first,
-			    int last));
-static void		DestroyListbox _ANSI_ARGS_((ClientData clientData));
-static void		DisplayListbox _ANSI_ARGS_((ClientData clientData));
-static int		GetListboxIndex _ANSI_ARGS_((Tcl_Interp *interp,
+			    int flags);
+static void		DeleteEls(Listbox *listPtr, int first, int last);
+static void		DestroyListbox(ClientData clientData);
+static void		DisplayListbox(ClientData clientData);
+static int		GetListboxIndex(Tcl_Interp *interp,
 			    Listbox *listPtr, char *string, int numElsOK,
-			    int *indexPtr));
-static void		InsertEls _ANSI_ARGS_((Listbox *listPtr, int index,
-			    int argc, char **argv));
-static void		ListboxCmdDeletedProc _ANSI_ARGS_((
-			    ClientData clientData));
-static void		ListboxComputeGeometry _ANSI_ARGS_((Listbox *listPtr));
-static void		ListboxEventProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void		ListboxRedrawRange _ANSI_ARGS_((Listbox *listPtr,
-			    int first, int last));
-static void		ListboxSelect _ANSI_ARGS_((Listbox *listPtr,
-			    int first, int last, int select));
-static void		ListboxUpdateHScrollbar _ANSI_ARGS_((Listbox *listPtr));
-static void		ListboxUpdateVScrollbar _ANSI_ARGS_((Listbox *listPtr));
-static int		ListboxWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
-static int		NearestListboxElement _ANSI_ARGS_((Listbox *listPtr,
-			    int y));
+			    int *indexPtr);
+static void		InsertEls(Listbox *listPtr, int index,
+			    int argc, char **argv);
+static void		ListboxCmdDeletedProc(ClientData clientData);
+static void		ListboxComputeGeometry(Listbox *listPtr);
+static void		ListboxEventProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		ListboxRedrawRange(Listbox *listPtr,
+			    int first, int last);
+static void		ListboxSelect(Listbox *listPtr,
+			    int first, int last, int select);
+static void		ListboxUpdateHScrollbar(Listbox *listPtr);
+static void		ListboxUpdateVScrollbar(Listbox *listPtr);
+static int		ListboxWidgetCmd(ClientData clientData,
+			    Tcl_Interp *interp, int argc, char **argv);
+static int		NearestListboxElement(Listbox *listPtr, int y);
 
 /*
  *--------------------------------------------------------------
@@ -1268,7 +1263,7 @@ ListboxEventProc(clientData, eventPtr)
                 Tcl_GetCommandName(listPtr->interp, listPtr->widgetCmd));
         }
 	if (listPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayListbox, (ClientData) listPtr);
+	    Tcl_CancelIdleCall(DisplayListbox, (ClientData) listPtr);
 	}
 	Tcl_EventuallyFree((ClientData) listPtr,
 	    (Ck_FreeProc *) DestroyListbox);
@@ -1414,7 +1409,7 @@ ChangeListboxView(listPtr, index)
     if (listPtr->topIndex != index) {
 	listPtr->topIndex = index;
 	if (!(listPtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayListbox, (ClientData) listPtr);
+	    Tcl_DoWhenIdle(DisplayListbox, (ClientData) listPtr);
 	    listPtr->flags |= REDRAW_PENDING;
 	}
 	listPtr->flags |= UPDATE_V_SCROLLBAR;
@@ -1598,7 +1593,7 @@ ListboxRedrawRange(listPtr, first, last)
 	    || (listPtr->flags & REDRAW_PENDING)) {
 	return;
     }
-    Tk_DoWhenIdle(DisplayListbox, (ClientData) listPtr);
+    Tcl_DoWhenIdle(DisplayListbox, (ClientData) listPtr);
     listPtr->flags |= REDRAW_PENDING;
 }
 
@@ -1650,7 +1645,7 @@ ListboxUpdateVScrollbar(listPtr)
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(listPtr->interp,
 		"\n    (vertical scrolling command executed by listbox)");
-	Tk_BackgroundError(listPtr->interp);
+	Tcl_BackgroundError(listPtr->interp);
     }
 }
 
@@ -1703,6 +1698,6 @@ ListboxUpdateHScrollbar(listPtr)
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(listPtr->interp,
 		"\n    (horizontal scrolling command executed by listbox)");
-	Tk_BackgroundError(listPtr->interp);
+	Tcl_BackgroundError(listPtr->interp);
     }
 }

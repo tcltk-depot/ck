@@ -15,13 +15,13 @@
 #include "ckPort.h"
 #include "ck.h"
 
-static char *     WaitVariableProc _ANSI_ARGS_((ClientData clientData,
+static char *     WaitVariableProc(ClientData clientData,
 		      Tcl_Interp *interp, char *name1, char *name2,
-                      int flags));
-static void       WaitVisibilityProc _ANSI_ARGS_((ClientData clientData,
-                      CkEvent *eventPtr));
-static void       WaitWindowProc _ANSI_ARGS_((ClientData clientData,
-                      CkEvent *eventPtr));
+                      int flags);
+static void       WaitVisibilityProc(ClientData clientData,
+                      CkEvent *eventPtr);
+static void       WaitWindowProc(ClientData clientData,
+                      CkEvent *eventPtr);
 
 
 /*
@@ -283,7 +283,7 @@ Ck_UpdateCmd(clientData, interp, argc, argv)
     int flags;
 
     if (argc == 1)
-	flags = TK_DONT_WAIT;
+	flags = TCL_DONT_WAIT;
     else if (argc == 2) {
 	if (strncmp(argv[1], "screen", strlen(argv[1])) == 0) {
             wrefresh(curscr);
@@ -295,7 +295,7 @@ Ck_UpdateCmd(clientData, interp, argc, argv)
 		    "\": must be idletasks or screen", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	flags = TK_IDLE_EVENTS;
+	flags = TCL_IDLE_EVENTS;
     } else {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
 		argv[0], " ?idletasks|screen?\"", (char *) NULL);
@@ -307,7 +307,7 @@ Ck_UpdateCmd(clientData, interp, argc, argv)
      * again until all pending events have been handled.
      */
 
-    while (Tk_DoOneEvent(flags) != 0) {
+    while (Tcl_DoOneEvent(flags) != 0) {
 	/* Empty loop body */
     }
 
@@ -1033,7 +1033,7 @@ Ck_TkwaitCmd(clientData, interp, argc, argv)
 	}
 	done = 0;
 	while (!done) {
-	    Tk_DoOneEvent(0);
+	    Tcl_DoOneEvent(0);
 	}
 	Tcl_UntraceVar(interp, argv[2],
 		TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
@@ -1051,7 +1051,7 @@ Ck_TkwaitCmd(clientData, interp, argc, argv)
 	    WaitVisibilityProc, (ClientData) &done);
 	done = 0;
 	while (!done) {
-	    Tk_DoOneEvent(0);
+	    Tcl_DoOneEvent(0);
 	}
 	Ck_DeleteEventHandler(winPtr,
 	    CK_EV_MAP | CK_EV_UNMAP | CK_EV_EXPOSE | CK_EV_DESTROY,
@@ -1067,7 +1067,7 @@ Ck_TkwaitCmd(clientData, interp, argc, argv)
 	    WaitWindowProc, (ClientData) &done);
 	done = 0;
 	while (!done) {
-	    Tk_DoOneEvent(0);
+	    Tcl_DoOneEvent(0);
 	}
 	/*
 	 * Note:  there's no need to delete the event handler.  It was

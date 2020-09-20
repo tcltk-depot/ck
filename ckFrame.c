@@ -84,15 +84,15 @@ static Ck_ConfigSpec configSpecs[] = {
  * Forward declarations for procedures defined later in this file:
  */
 
-static int	ConfigureFrame _ANSI_ARGS_((Tcl_Interp *interp,
-		    Frame *framePtr, int argc, char **argv, int flags));
-static void	DestroyFrame _ANSI_ARGS_((ClientData clientData));
-static void     FrameCmdDeletedProc _ANSI_ARGS_((ClientData clientData));
-static void	DisplayFrame _ANSI_ARGS_((ClientData clientData));
-static void	FrameEventProc _ANSI_ARGS_((ClientData clientData,
-		    CkEvent *eventPtr));
-static int	FrameWidgetCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
+static int	ConfigureFrame(Tcl_Interp *interp,
+		    Frame *framePtr, int argc, char **argv, int flags);
+static void	DestroyFrame(ClientData clientData);
+static void     FrameCmdDeletedProc(ClientData clientData);
+static void	DisplayFrame(ClientData clientData);
+static void	FrameEventProc(ClientData clientData,
+		    CkEvent *eventPtr);
+static int	FrameWidgetCmd(ClientData clientData,
+		    Tcl_Interp *interp, int argc, char **argv);
 
 /*
  *--------------------------------------------------------------
@@ -395,7 +395,7 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
     char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, framePtr->winPtr, configSpecs,
 	    argc, argv, (char *) framePtr, flags) != TCL_OK) {
@@ -410,7 +410,7 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
 	    framePtr->height);
     if ((framePtr->winPtr->flags & CK_MAPPED)
 	    && !(framePtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayFrame, (ClientData) framePtr);
+	Tcl_DoWhenIdle(DisplayFrame, (ClientData) framePtr);
 	framePtr->flags |= REDRAW_PENDING;
     }
     return TCL_OK;
@@ -478,7 +478,7 @@ FrameEventProc(clientData, eventPtr)
 
     if (eventPtr->type == CK_EV_EXPOSE && framePtr->winPtr != NULL &&
 	!(framePtr->flags & REDRAW_PENDING)) {
-	Tk_DoWhenIdle(DisplayFrame, (ClientData) framePtr);
+	Tcl_DoWhenIdle(DisplayFrame, (ClientData) framePtr);
 	framePtr->flags |= REDRAW_PENDING;
     } else if (eventPtr->type == CK_EV_DESTROY) {
         if (framePtr->winPtr != NULL) {
@@ -487,7 +487,7 @@ FrameEventProc(clientData, eventPtr)
                     Tcl_GetCommandName(framePtr->interp, framePtr->widgetCmd));
         }
 	if (framePtr->flags & REDRAW_PENDING)
-	    Tk_CancelIdleCall(DisplayFrame, (ClientData) framePtr);
+	    Tcl_CancelIdleCall(DisplayFrame, (ClientData) framePtr);
 	Tcl_EventuallyFree((ClientData) framePtr, (Ck_FreeProc *) DestroyFrame);
     }
 }

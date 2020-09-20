@@ -16,8 +16,8 @@
 #include "ck.h"
 
 /*
- * Data structures of the following type are used by Tk_MaintainGeometry.
- * For each slave managed by Tk_MaintainGeometry, there is one of these
+ * Data structures of the following type are used by Ck_MaintainGeometry.
+ * For each slave managed by Ck_MaintainGeometry, there is one of these
  * structures associated with its master.
  */
 
@@ -36,7 +36,7 @@ typedef struct MaintainSlave {
 
 /*
  * For each window that has been specified as a master to
- * Tk_MaintainGeometry, there is a structure of the following type:
+ * Ck_MaintainGeometry, there is a structure of the following type:
  */
 
 typedef struct MaintainMaster {
@@ -68,11 +68,11 @@ static int initialized = 0;
  * Prototypes for static procedures in this file:
  */
 
-static void		MaintainCheckProc _ANSI_ARGS_((ClientData clientData));
-static void		MaintainMasterProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
-static void		MaintainSlaveProc _ANSI_ARGS_((ClientData clientData,
-			    CkEvent *eventPtr));
+static void		MaintainCheckProc(ClientData clientData);
+static void		MaintainMasterProc(ClientData clientData,
+			    CkEvent *eventPtr);
+static void		MaintainSlaveProc(ClientData clientData,
+			    CkEvent *eventPtr);
 
 /*
  *--------------------------------------------------------------
@@ -224,9 +224,9 @@ Ck_SetInternalBorder(winPtr, onoff)
  * Side effects:
  *	Event handlers are created and state is allocated to keep track
  *	of slave.  Note:  if slave was already managed for master by
- *	Tk_MaintainGeometry, then the previous information is replaced
+ *	Ck_MaintainGeometry, then the previous information is replaced
  *	with the new information.  The caller must eventually call
- *	Tk_UnmaintainGeometry to eliminate the correspondence (or, the
+ *	Ck_UnmaintainGeometry to eliminate the correspondence (or, the
  *	state is automatically freed when either window is destroyed).
  *
  *----------------------------------------------------------------------
@@ -415,7 +415,7 @@ Ck_UnmaintainGeometry(slave, master)
 	    }
 	}
 	if (masterPtr->checkScheduled) {
-	    Tk_CancelIdleCall(MaintainCheckProc, (ClientData) masterPtr);
+	    Tcl_CancelIdleCall(MaintainCheckProc, (ClientData) masterPtr);
 	}
 	Tcl_DeleteHashEntry(hPtr);
 	ckfree((char *) masterPtr);
@@ -458,7 +458,7 @@ MaintainMasterProc(clientData, eventPtr)
 	    || (eventPtr->type == CK_EV_UNMAP)) {
 	if (!masterPtr->checkScheduled) {
 	    masterPtr->checkScheduled = 1;
-	    Tk_DoWhenIdle(MaintainCheckProc, (ClientData) masterPtr);
+	    Tcl_DoWhenIdle(MaintainCheckProc, (ClientData) masterPtr);
 	}
     } else if (eventPtr->type == CK_EV_DESTROY) {
 	/*
@@ -483,9 +483,9 @@ MaintainMasterProc(clientData, eventPtr)
  *
  * MaintainSlaveProc --
  *
- *	This procedure is invoked by the Tk event dispatcher in
+ *	This procedure is invoked by the Tcl event dispatcher in
  *	response to StructureNotify events on a slave being managed
- *	by Tk_MaintainGeometry.
+ *	by Ck_MaintainGeometry.
  *
  * Results:
  *	None.
@@ -515,7 +515,7 @@ MaintainSlaveProc(clientData, eventPtr)
  *
  * MaintainCheckProc --
  *
- *	This procedure is invoked by the Tk event dispatcher as an
+ *	This procedure is invoked by the Tcl event dispatcher as an
  *	idle handler, when a master or one of its ancestors has been
  *	reconfigured, mapped, or unmapped.  Its job is to scan all of
  *	the slaves for the master and reposition them, map them, or
