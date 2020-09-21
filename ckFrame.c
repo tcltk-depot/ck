@@ -113,12 +113,12 @@ static int	FrameWidgetCmd(ClientData clientData,
  */
 
 int
-Ck_FrameCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_FrameCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkWindow *new;
@@ -191,16 +191,16 @@ Ck_FrameCmd(clientData, interp, argc, argv)
  */
 
 int
-CkInitFrame(interp, winPtr, argc, argv)
-    Tcl_Interp *interp;			/* Interpreter associated with the
+CkInitFrame(
+    Tcl_Interp *interp,			/* Interpreter associated with the
 					 * application. */
-    CkWindow *winPtr;			/* Window to use for frame or
+    CkWindow *winPtr,			/* Window to use for frame or
 					 * top-level. Caller must already
 					 * have set window's class. */
-    int argc;				/* Number of configuration arguments
+    int argc,				/* Number of configuration arguments
 					 * (not including class command and
 					 * window name). */
-    char *argv[];			/* Configuration arguments. */
+    char *argv[])			/* Configuration arguments. */
 {
     Frame *framePtr;
 
@@ -248,11 +248,11 @@ CkInitFrame(interp, winPtr, argc, argv)
  */
 
 static int
-FrameWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about frame widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+FrameWidgetCmd(
+    ClientData clientData,	/* Information about frame widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Frame *framePtr = (Frame *) clientData;
     int result = TCL_OK;
@@ -320,8 +320,7 @@ error:
  */
 
 static void
-DestroyFrame(clientData)
-    ClientData clientData;	/* Info about frame widget. */
+DestroyFrame(ClientData clientData)	/* Info about frame widget. */
 {
     Frame *framePtr = (Frame *) clientData;
 
@@ -348,8 +347,8 @@ DestroyFrame(clientData)
  */
 
 static void
-FrameCmdDeletedProc(clientData)
-    ClientData clientData;      /* Pointer to widget record for widget. */
+FrameCmdDeletedProc(
+    ClientData clientData)      /* Pointer to widget record for widget. */
 {
     Frame *framePtr = (Frame *) clientData;
     CkWindow *winPtr = framePtr->winPtr;
@@ -389,13 +388,13 @@ FrameCmdDeletedProc(clientData)
  */
 
 static int
-ConfigureFrame(interp, framePtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    Frame *framePtr;		/* Information about widget;  may or may
+ConfigureFrame(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    Frame *framePtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, framePtr->winPtr, configSpecs,
 	    argc, argv, (char *) framePtr, flags) != TCL_OK) {
@@ -434,8 +433,7 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
  */
 
 static void
-DisplayFrame(clientData)
-    ClientData clientData;	/* Information about widget. */
+DisplayFrame(ClientData clientData)	/* Information about widget. */
 {
     Frame *framePtr = (Frame *) clientData;
     CkWindow *winPtr = framePtr->winPtr;
@@ -470,9 +468,9 @@ DisplayFrame(clientData)
  */
 
 static void
-FrameEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+FrameEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     Frame *framePtr = (Frame *) clientData;
 

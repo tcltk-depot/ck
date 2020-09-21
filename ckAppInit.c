@@ -34,9 +34,9 @@
  */
 
 int
-main(argc, argv)
-    int argc;			/* Number of command-line arguments. */
-    char **argv;		/* Values of command-line arguments. */
+main(
+    int argc,			/* Number of command-line arguments. */
+    char **argv)		/* Values of command-line arguments. */
 {
     Tcl_FindExecutable(argv[0]);
     Ck_Main(argc, argv, Tcl_AppInit, Tcl_CreateInterp());
@@ -63,8 +63,8 @@ main(argc, argv)
  */
 
 int
-Tcl_AppInit(interp)
-    Tcl_Interp *interp;		/* Interpreter for application. */
+Tcl_AppInit(
+    Tcl_Interp *interp)		/* Interpreter for application. */
 {
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;

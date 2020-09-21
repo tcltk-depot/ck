@@ -97,13 +97,13 @@ static void		MaintainSlaveProc(ClientData clientData,
  */
 
 void
-Ck_ManageGeometry(winPtr, mgrPtr, clientData)
-    CkWindow *winPtr;		/* Window whose geometry is to
+Ck_ManageGeometry(
+    CkWindow *winPtr,		/* Window whose geometry is to
 				 * be managed by proc.  */
-    Ck_GeomMgr *mgrPtr;		/* Static structure describing the
+    Ck_GeomMgr *mgrPtr,		/* Static structure describing the
 				 * geometry manager.  This structure
 				 * must never go away. */
-    ClientData clientData;	/* Arbitrary one-word argument to
+    ClientData clientData)	/* Arbitrary one-word argument to
 				 * pass to geometry manager procedures. */
 {
     if ((winPtr->geomMgrPtr != NULL) && (mgrPtr != NULL)
@@ -142,11 +142,11 @@ Ck_ManageGeometry(winPtr, mgrPtr, clientData)
  */
 
 void
-Ck_GeometryRequest(winPtr, reqWidth, reqHeight)
-    CkWindow *winPtr;		/* Window that geometry information
-				 * pertains to. */
-    int reqWidth, reqHeight;	/* Minimum desired dimensions for
-				 * window, in pixels. */
+Ck_GeometryRequest(
+    CkWindow *winPtr,			/* Window that geometry information
+					 * pertains to. */
+    int reqWidth, int reqHeight)	/* Minimum desired dimensions for
+					 * window, in pixels. */
 {
     if (reqWidth <= 0) {
 	reqWidth = 1;
@@ -186,9 +186,9 @@ Ck_GeometryRequest(winPtr, reqWidth, reqHeight)
  */
 
 void
-Ck_SetInternalBorder(winPtr, onoff)
-    CkWindow *winPtr;		/* Window to modify. */
-    int onoff;			/* Border flag. */
+Ck_SetInternalBorder(
+    CkWindow *winPtr,		/* Window to modify. */
+    int onoff)			/* Border flag. */
 {
     if ((onoff && (winPtr->flags & CK_BORDER)) ||
         (!onoff && !(winPtr->flags & CK_BORDER)))
@@ -233,12 +233,12 @@ Ck_SetInternalBorder(winPtr, onoff)
  */
 
 void
-Ck_MaintainGeometry(slave, master, x, y, width, height)
-    CkWindow *slave;		/* Slave for geometry management. */
-    CkWindow *master;		/* Master for slave; must be a descendant
+Ck_MaintainGeometry(
+    CkWindow *slave,		/* Slave for geometry management. */
+    CkWindow *master,		/* Master for slave; must be a descendant
 				 * of slave's parent. */
-    int x, y;			/* Desired position of slave within master. */
-    int width, height;		/* Desired dimensions for slave. */
+    int x, int y,		/* Desired position of slave within master. */
+    int width, int height)	/* Desired dimensions for slave. */
 {
     Tcl_HashEntry *hPtr;
     MaintainMaster *masterPtr;
@@ -361,9 +361,9 @@ Ck_MaintainGeometry(slave, master, x, y, width, height)
  */
 
 void
-Ck_UnmaintainGeometry(slave, master)
-    CkWindow *slave;		/* Slave for geometry management. */
-    CkWindow *master;		/* Master for slave; must be a descendant
+Ck_UnmaintainGeometry(
+    CkWindow *slave,		/* Slave for geometry management. */
+    CkWindow *master)		/* Master for slave; must be a descendant
 				 * of slave's parent. */
 {
     Tcl_HashEntry *hPtr;
@@ -444,10 +444,10 @@ Ck_UnmaintainGeometry(slave, master)
  */
 
 static void
-MaintainMasterProc(clientData, eventPtr)
-    ClientData clientData;		/* Pointer to MaintainMaster structure
+MaintainMasterProc(
+    ClientData clientData,		/* Pointer to MaintainMaster structure
 					 * for the master window. */
-    CkEvent *eventPtr;			/* Describes what just happened. */
+    CkEvent *eventPtr)			/* Describes what just happened. */
 {
     MaintainMaster *masterPtr = (MaintainMaster *) clientData;
     MaintainSlave *slavePtr;
@@ -498,10 +498,10 @@ MaintainMasterProc(clientData, eventPtr)
  */
 
 static void
-MaintainSlaveProc(clientData, eventPtr)
-    ClientData clientData;		/* Pointer to MaintainSlave structure
+MaintainSlaveProc(
+    ClientData clientData,		/* Pointer to MaintainSlave structure
 					 * for master-slave pair. */
-    CkEvent *eventPtr;			/* Describes what just happened. */
+    CkEvent *eventPtr)			/* Describes what just happened. */
 {
     MaintainSlave *slavePtr = (MaintainSlave *) clientData;
 
@@ -532,8 +532,8 @@ MaintainSlaveProc(clientData, eventPtr)
  */
 
 static void
-MaintainCheckProc(clientData)
-    ClientData clientData;		/* Pointer to MaintainMaster structure
+MaintainCheckProc(
+    ClientData clientData)		/* Pointer to MaintainMaster structure
 					 * for the master window. */
 {
     MaintainMaster *masterPtr = (MaintainMaster *) clientData;

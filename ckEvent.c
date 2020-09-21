@@ -142,12 +142,12 @@ static void BarcodeTimeout(ClientData clientData);
  */
 
 void
-Ck_CreateEventHandler(winPtr, mask, proc, clientData)
-    CkWindow *winPtr;		/* Window in which to create handler. */
-    long mask;			/* Events for which proc should be called. */
-    Ck_EventProc *proc;		/* Procedure to call for each
+Ck_CreateEventHandler(
+    CkWindow *winPtr,		/* Window in which to create handler. */
+    long mask,			/* Events for which proc should be called. */
+    Ck_EventProc *proc,		/* Procedure to call for each
 				 * selected event */
-    ClientData clientData;	/* Arbitrary data to pass to proc. */
+    ClientData clientData)	/* Arbitrary data to pass to proc. */
 {
     CkEventHandler *handlerPtr;
     int found;
@@ -213,11 +213,11 @@ initHandler:
  */
 
 void
-Ck_DeleteEventHandler(winPtr, mask, proc, clientData)
-    CkWindow *winPtr;		/* Same as corresponding arguments passed */
-    long mask;			/* previously to Ck_CreateEventHandler. */
-    Ck_EventProc *proc;
-    ClientData clientData;
+Ck_DeleteEventHandler(
+    CkWindow *winPtr,		/* Same as corresponding arguments passed */
+    long mask,			/* previously to Ck_CreateEventHandler. */
+    Ck_EventProc *proc,
+    ClientData clientData)
 {
     CkEventHandler *handlerPtr;
     InProgress *ipPtr;
@@ -282,9 +282,9 @@ Ck_DeleteEventHandler(winPtr, mask, proc, clientData)
  */
 
 void
-Ck_CreateGenericHandler(proc, clientData)
-     Ck_GenericProc *proc;	/* Procedure to call on every event. */
-     ClientData clientData;	/* One-word value to pass to proc. */
+Ck_CreateGenericHandler(
+     Ck_GenericProc *proc,	/* Procedure to call on every event. */
+     ClientData clientData)	/* One-word value to pass to proc. */
 {
     GenericHandler *handlerPtr;
 
@@ -322,9 +322,9 @@ Ck_CreateGenericHandler(proc, clientData)
  */
 
 void
-Ck_DeleteGenericHandler(proc, clientData)
-     Ck_GenericProc *proc;
-     ClientData clientData;
+Ck_DeleteGenericHandler(
+     Ck_GenericProc *proc,
+     ClientData clientData)
 {
     GenericHandler * handler;
 
@@ -353,9 +353,9 @@ Ck_DeleteGenericHandler(proc, clientData)
  */
 
 void
-Ck_HandleEvent(mainPtr, eventPtr)
-    CkMainInfo *mainPtr;
-    CkEvent *eventPtr;		/* Event to dispatch. */
+Ck_HandleEvent(
+    CkMainInfo *mainPtr,
+    CkEvent *eventPtr)		/* Event to dispatch. */
 {
     CkEventHandler *handlerPtr;
     GenericHandler *genericPtr;
@@ -458,8 +458,8 @@ Ck_HandleEvent(mainPtr, eventPtr)
  */
 
 void
-CkEventDeadWindow(winPtr)
-    CkWindow *winPtr;		/* Information about the window
+CkEventDeadWindow(
+    CkWindow *winPtr)		/* Information about the window
 				 * that is being deleted. */
 {
     CkEventHandler *handlerPtr;
@@ -500,9 +500,9 @@ CkEventDeadWindow(winPtr)
  */
 
 static void
-TerminalResized(parentPtr, flag)
-    CkWindow *parentPtr;        /* Pointer to window. */
-    int flag;                   /* When true, deal with toplevels. */
+TerminalResized(
+    CkWindow *parentPtr,        /* Pointer to window. */
+    int flag)                   /* When true, deal with toplevels. */
 {
     CkMainInfo *mainPtr = parentPtr->mainPtr;
     CkWindow *winPtr;
@@ -576,8 +576,7 @@ TerminalResized(parentPtr, flag)
  */
 
 void
-CkFocusRestore(clientData)
-    ClientData clientData;
+CkFocusRestore(ClientData clientData)
 {
     CkWindow *winPtr = (CkWindow *) clientData;
 
@@ -605,9 +604,9 @@ CkFocusRestore(clientData)
  */
 
 void
-CkHandleInput(clientData, mask)
-    ClientData clientData;      /* Pointer to main info. */
-    int mask;                   /* OR-ed combination of the bits TK_READABLE,
+CkHandleInput(
+    ClientData clientData,      /* Pointer to main info. */
+    int mask)                   /* OR-ed combination of the bits TK_READABLE,
                                  * TK_WRITABLE, and TK_EXCEPTION, indicating
                                  * current state of file. */
 {
@@ -946,9 +945,9 @@ mkEvent:
 }
 
 static int
-Ck_HandleQEvent(evPtr, flags)
-    Tcl_Event *evPtr;
-    int flags;
+Ck_HandleQEvent(
+    Tcl_Event *evPtr,
+    int flags)
 {
     CkQEvt *qev = (CkQEvt *) evPtr;
 
@@ -980,9 +979,9 @@ Ck_HandleQEvent(evPtr, flags)
  */
 
 void
-CkHandleGPMInput(clientData, mask)
-    ClientData clientData;      /* Pointer to main info. */
-    int mask;                   /* OR-ed combination of the bits TK_READABLE,
+CkHandleGPMInput(
+    ClientData clientData,      /* Pointer to main info. */
+    int mask)                   /* OR-ed combination of the bits TK_READABLE,
                                  * TK_WRITABLE, and TK_EXCEPTION, indicating
                                  * current state of file. */
 {
@@ -1049,7 +1048,7 @@ CkHandleGPMInput(clientData, mask)
  */
 
 void
-Ck_MainLoop()
+Ck_MainLoop(void)
 {
     extern CkMainInfo *ckMainInfo;
 
@@ -1069,8 +1068,7 @@ Ck_MainLoop()
  */
 
 static void
-BarcodeTimeout(clientData)
-    ClientData clientData;
+BarcodeTimeout(ClientData clientData)
 {
     CkMainInfo *mainPtr = (CkMainInfo *) clientData;
     BarcodeData *bd = (BarcodeData *) mainPtr->barcodeData;
@@ -1092,8 +1090,7 @@ BarcodeTimeout(clientData)
  */
 
 char *
-CkGetBarcodeData(mainPtr)
-    CkMainInfo *mainPtr;
+CkGetBarcodeData(CkMainInfo *mainPtr)
 {
     BarcodeData *bd = (BarcodeData *) mainPtr->barcodeData;
 
@@ -1122,12 +1119,12 @@ CkGetBarcodeData(mainPtr)
  */
 
 int
-CkBarcodeCmd(clientData, interp, argc, argv)
-    ClientData clientData;      /* Main window associated with
+CkBarcodeCmd(
+    ClientData clientData,      /* Main window associated with
 			         * interpreter. */
-    Tcl_Interp *interp;         /* Current interpreter. */
-    int argc;                   /* Number of arguments. */
-    char **argv;                /* Argument strings. */
+    Tcl_Interp *interp,         /* Current interpreter. */
+    int argc,                   /* Number of arguments. */
+    char **argv)                /* Argument strings. */
 {
     CkMainInfo *mainPtr = ((CkWindow *) (clientData))->mainPtr;
     BarcodeData *bd = (BarcodeData *) mainPtr->barcodeData;

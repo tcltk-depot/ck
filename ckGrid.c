@@ -197,12 +197,12 @@ static Ck_GeomMgr gridMgrType = {
  */
 
 int
-Ck_GridCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_GridCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     size_t length;
@@ -725,11 +725,11 @@ Ck_GridCmd(clientData, interp, argc, argv)
  */
 
 static void
-GridReqProc(clientData, winPtr)
-    ClientData clientData;	/* GridBag's information about
+GridReqProc(
+    ClientData clientData,	/* GridBag's information about
 				 * window that got new preferred
 				 * geometry.  */
-    CkWindow *winPtr;		/* Other Ck-related information
+    CkWindow *winPtr)		/* Other Ck-related information
 				 * about the window. */
 {
     GridBag *gridPtr = (GridBag *) clientData;
@@ -760,10 +760,10 @@ GridReqProc(clientData, winPtr)
  */
 
 static void
-GridLostSlaveProc(clientData, winPtr)
-    ClientData clientData;	/* GridBag structure for slave window that
+GridLostSlaveProc(
+    ClientData clientData,	/* GridBag structure for slave window that
 				 * was stolen away. */
-    CkWindow *winPtr;		/* Pointer to the slave window. */
+    CkWindow *winPtr)		/* Pointer to the slave window. */
 {
     GridBag *slavePtr = (GridBag *) clientData;
 
@@ -790,9 +790,9 @@ GridLostSlaveProc(clientData, winPtr)
  */
 
 static void
-GetLayoutInfo(masterPtr, r)
-    GridBag *masterPtr;
-    LayoutInfo *r;
+GetLayoutInfo(
+    GridBag *masterPtr,
+    LayoutInfo *r)
 {
     GridBag *slavePtr;
     int i, k, px, py, pixels_diff, nextSize;
@@ -1047,8 +1047,7 @@ GetLayoutInfo(masterPtr, r)
  */
 
 static void
-GetCachedLayoutInfo(masterPtr)
-    GridBag *masterPtr;
+GetCachedLayoutInfo(GridBag *masterPtr)
 {
     if (masterPtr->valid == 0) {
 	if (!masterPtr->layoutCache)
@@ -1069,12 +1068,12 @@ GetCachedLayoutInfo(masterPtr)
  */
 
 static void
-AdjustForGravity(gridPtr, x, y, width, height)
-    GridBag *gridPtr;
-    int *x;
-    int *y;
-    int *width;
-    int *height;
+AdjustForGravity(
+    GridBag *gridPtr,
+    int *x,
+    int *y,
+    int *width,
+    int *height)
 {
     int diffx=0, diffy=0;
     int sticky = gridPtr->flags&STICK_ALL;
@@ -1122,11 +1121,11 @@ AdjustForGravity(gridPtr, x, y, width, height)
  */
 
 static void
-GetMinSize(masterPtr, info, minw, minh)
-    GridBag *masterPtr;
-    LayoutInfo *info;
-    int *minw;
-    int *minh;
+GetMinSize(
+    GridBag *masterPtr,
+    LayoutInfo *info,
+    int *minw,
+    int *minh)
 {
     int i, t;
     int intBWidth;	/* Width of internal border in parent window,
@@ -1166,8 +1165,8 @@ GetMinSize(masterPtr, info, minw, minh)
  */
 
 static void
-ArrangeGrid(clientData)
-    ClientData clientData;	/* Structure describing parent whose slaves
+ArrangeGrid(
+    ClientData clientData)	/* Structure describing parent whose slaves
 				 * are to be re-layed out. */
 {
     GridBag *masterPtr = (GridBag *) clientData;
@@ -1397,8 +1396,7 @@ ArrangeGrid(clientData)
  */
 
 static GridBag *
-GetGridBag(winPtr)
-    CkWindow *winPtr;		/* Pointer to window for which
+GetGridBag(CkWindow *winPtr)	/* Pointer to window for which
 				 * gridbag structure is desired. */
 {
     GridBag *gridPtr;
@@ -1468,8 +1466,7 @@ GetGridBag(winPtr)
  */
 
 static void
-Unlink(gridPtr)
-    GridBag *gridPtr;		/* Window to unlink. */
+Unlink(GridBag *gridPtr)		/* Window to unlink. */
 {
     GridBag *masterPtr, *gridPtr2;
 
@@ -1483,7 +1480,7 @@ Unlink(gridPtr)
     else {
 	for (gridPtr2 = masterPtr->slavePtr; ; gridPtr2 = gridPtr2->nextPtr) {
 	    if (gridPtr2 == NULL) {
-		panic("Unlink couldn't find previous window");
+		Tcl_Panic("Unlink couldn't find previous window");
 	    }
 	    if (gridPtr2->nextPtr == gridPtr) {
 		gridPtr2->nextPtr = gridPtr->nextPtr;
@@ -1522,8 +1519,7 @@ Unlink(gridPtr)
  */
 
 static void
-DestroyGridBag(memPtr)
-    char *memPtr;		/* Info about window that is now dead. */
+DestroyGridBag(char *memPtr)	/* Info about window that is now dead. */
 {
     GridBag *gridPtr = (GridBag *) memPtr;
 
@@ -1561,10 +1557,10 @@ DestroyGridBag(memPtr)
  */
 
 static void
-GridBagStructureProc(clientData, eventPtr)
-    ClientData clientData;		/* Our information about window
+GridBagStructureProc(
+    ClientData clientData,		/* Our information about window
 					 * referred to by eventPtr. */
-    CkEvent *eventPtr;			/* Describes what just happened. */
+    CkEvent *eventPtr)			/* Describes what just happened. */
 {
     GridBag *gridPtr = (GridBag *) clientData;
 
@@ -1625,12 +1621,12 @@ GridBagStructureProc(clientData, eventPtr)
  */
 
 static int
-ConfigureSlaves(interp, winPtr, argc, argv)
-    Tcl_Interp *interp;		/* Interpreter for error reporting. */
-    CkWindow *winPtr;		/* Any window in application containing
+ConfigureSlaves(
+    Tcl_Interp *interp,		/* Interpreter for error reporting. */
+    CkWindow *winPtr,		/* Any window in application containing
 				 * slaves.  Used to look up slave names. */
-    int argc;			/* Number of elements in argv. */
-    char *argv[];		/* Argument strings:  contains one or more
+    int argc,			/* Number of elements in argv. */
+    char *argv[])		/* Argument strings:  contains one or more
 				 * window names followed by any number
 				 * of "option value" pairs.  Caller must
 				 * make sure that there is at least one
@@ -1698,7 +1694,7 @@ ConfigureSlaves(interp, winPtr, argc, argv)
 		    }
 		    break;
 		default:
-		    panic("Invalid grid position indicator");
+		    Tcl_Panic("Invalid grid position indicator");
 	    }
 	    continue;
 	}
@@ -2054,9 +2050,9 @@ ConfigureSlaves(interp, winPtr, argc, argv)
  */
 
 static void
-StickyToString(flags, result)
-    int flags;		/* the sticky flags */
-    char *result;	/* where to put the result */
+StickyToString(
+    int flags,		/* the sticky flags */
+    char *result)	/* where to put the result */
 {
     int count = 0;
     if (flags & STICK_NORTH)
@@ -2083,8 +2079,7 @@ StickyToString(flags, result)
  */
 
 static int
-StringToSticky(string)
-    char *string;
+StringToSticky(char *string)
 {
     int sticky = 0;
     char c;

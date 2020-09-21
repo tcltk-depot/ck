@@ -208,8 +208,8 @@ static PatSeq *		MatchPatterns(BindingTable *bindPtr, PatSeq *psPtr);
  */
 
 Ck_BindingTable
-Ck_CreateBindingTable(interp)
-    Tcl_Interp *interp;		/* Interpreter to associate with the binding
+Ck_CreateBindingTable(
+    Tcl_Interp *interp)		/* Interpreter to associate with the binding
 				 * table:  commands are executed in this
 				 * interpreter. */
 {
@@ -279,8 +279,8 @@ Ck_CreateBindingTable(interp)
  */
 
 void
-Ck_DeleteBindingTable(bindingTable)
-    Ck_BindingTable bindingTable;	/* Token for the binding table to
+Ck_DeleteBindingTable(
+    Ck_BindingTable bindingTable)	/* Token for the binding table to
 					 * destroy. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -335,16 +335,16 @@ Ck_DeleteBindingTable(bindingTable)
  */
 
 int
-Ck_CreateBinding(interp, bindingTable, object, eventString, command, append)
-    Tcl_Interp *interp;			/* Used for error reporting. */
-    Ck_BindingTable bindingTable;	/* Table in which to create binding. */
-    ClientData object;			/* Token for object with which binding
+Ck_CreateBinding(
+    Tcl_Interp *interp,			/* Used for error reporting. */
+    Ck_BindingTable bindingTable,	/* Table in which to create binding. */
+    ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString;			/* String describing event sequence
+    char *eventString,			/* String describing event sequence
 					 * that triggers binding. */
-    char *command;			/* Contains Tcl command to execute
+    char *command,			/* Contains Tcl command to execute
 					 * when binding triggers. */
-    int append;				/* 0 means replace any existing
+    int append)				/* 0 means replace any existing
 					 * binding for eventString;  1 means
 					 * append to that binding. */
 {
@@ -392,12 +392,12 @@ Ck_CreateBinding(interp, bindingTable, object, eventString, command, append)
  */
 
 int
-Ck_DeleteBinding(interp, bindingTable, object, eventString)
-    Tcl_Interp *interp;			/* Used for error reporting. */
-    Ck_BindingTable bindingTable;	/* Table in which to delete binding. */
-    ClientData object;			/* Token for object with which binding
+Ck_DeleteBinding(
+    Tcl_Interp *interp,			/* Used for error reporting. */
+    Ck_BindingTable bindingTable,	/* Table in which to delete binding. */
+    ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString;			/* String describing event sequence
+    char *eventString)			/* String describing event sequence
 					 * that triggers binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -417,7 +417,7 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
 
     hPtr = Tcl_FindHashEntry(&bindPtr->objectTable, (char *) object);
     if (hPtr == NULL) {
-	panic("Ck_DeleteBinding couldn't find object table entry");
+	Tcl_Panic("Ck_DeleteBinding couldn't find object table entry");
     }
     prevPtr = (PatSeq *) Tcl_GetHashValue(hPtr);
     if (prevPtr == psPtr) {
@@ -425,7 +425,7 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
     } else {
 	for ( ; ; prevPtr = prevPtr->nextObjPtr) {
 	    if (prevPtr == NULL) {
-		panic("Ck_DeleteBinding couldn't find on object list");
+		Tcl_Panic("Ck_DeleteBinding couldn't find on object list");
 	    }
 	    if (prevPtr->nextObjPtr == psPtr) {
 		prevPtr->nextObjPtr = psPtr->nextObjPtr;
@@ -443,7 +443,7 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
     } else {
 	for ( ; ; prevPtr = prevPtr->nextSeqPtr) {
 	    if (prevPtr == NULL) {
-		panic("Ck_DeleteBinding couldn't find on hash chain");
+		Tcl_Panic("Ck_DeleteBinding couldn't find on hash chain");
 	    }
 	    if (prevPtr->nextSeqPtr == psPtr) {
 		prevPtr->nextSeqPtr = psPtr->nextSeqPtr;
@@ -479,13 +479,13 @@ Ck_DeleteBinding(interp, bindingTable, object, eventString)
  */
 
 char *
-Ck_GetBinding(interp, bindingTable, object, eventString)
-    Tcl_Interp *interp;			/* Interpreter for error reporting. */
-    Ck_BindingTable bindingTable;	/* Table in which to look for
+Ck_GetBinding(
+    Tcl_Interp *interp,			/* Interpreter for error reporting. */
+    Ck_BindingTable bindingTable,	/* Table in which to look for
 					 * binding. */
-    ClientData object;			/* Token for object with which binding
+    ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString;			/* String describing event sequence
+    char *eventString)			/* String describing event sequence
 					 * that triggers binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -519,12 +519,12 @@ Ck_GetBinding(interp, bindingTable, object, eventString)
  */
 
 void
-Ck_GetAllBindings(interp, bindingTable, object)
-    Tcl_Interp *interp;			/* Interpreter returning result or
+Ck_GetAllBindings(
+    Tcl_Interp *interp,			/* Interpreter returning result or
 					 * error. */
-    Ck_BindingTable bindingTable;	/* Table in which to look for
+    Ck_BindingTable bindingTable,	/* Table in which to look for
 					 * bindings. */
-    ClientData object;			/* Token for object. */
+    ClientData object)			/* Token for object. */
 
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -656,10 +656,10 @@ endPat:
  */
 
 void
-Ck_DeleteAllBindings(bindingTable, object)
-    Ck_BindingTable bindingTable;	/* Table in which to delete
+Ck_DeleteAllBindings(
+    Ck_BindingTable bindingTable,	/* Table in which to delete
 					 * bindings. */
-    ClientData object;			/* Token for object. */
+    ClientData object)			/* Token for object. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
     PatSeq *psPtr, *prevPtr;
@@ -690,7 +690,7 @@ Ck_DeleteAllBindings(bindingTable, object)
 	} else {
 	    for ( ; ; prevPtr = prevPtr->nextSeqPtr) {
 		if (prevPtr == NULL) {
-		    panic("Ck_DeleteAllBindings couldn't find on hash chain");
+		    Tcl_Panic("Ck_DeleteAllBindings couldn't find on hash chain");
 		}
 		if (prevPtr->nextSeqPtr == psPtr) {
 		    prevPtr->nextSeqPtr = psPtr->nextSeqPtr;
@@ -727,13 +727,13 @@ Ck_DeleteAllBindings(bindingTable, object)
  */
 
 void
-Ck_BindEvent(bindingTable, eventPtr, winPtr, numObjects, objectPtr)
-    Ck_BindingTable bindingTable;	/* Table in which to look for
+Ck_BindEvent(
+    Ck_BindingTable bindingTable,	/* Table in which to look for
 					 * bindings. */
-    CkEvent *eventPtr;			/* What actually happened. */
-    CkWindow *winPtr;			/* Window where event occurred. */
-    int numObjects;			/* Number of objects at *objectPtr. */
-    ClientData *objectPtr;		/* Array of one or more objects
+    CkEvent *eventPtr,			/* What actually happened. */
+    CkWindow *winPtr,			/* Window where event occurred. */
+    int numObjects,			/* Number of objects at *objectPtr. */
+    ClientData *objectPtr)		/* Array of one or more objects
 					 * to check for a matching binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -756,7 +756,7 @@ Ck_BindEvent(bindingTable, eventPtr, winPtr, numObjects, objectPtr)
     if (bindPtr->curEvent >= EVENT_BUFFER_SIZE)
 	bindPtr->curEvent = 0;
     ringPtr = &bindPtr->eventRing[bindPtr->curEvent];
-    memcpy((VOID *) ringPtr, (VOID *) eventPtr, sizeof (CkEvent));
+    memcpy((void *) ringPtr, (void *) eventPtr, sizeof (CkEvent));
     detail = 0;
     bindPtr->detailRing[bindPtr->curEvent] = 0;
     if (ringPtr->type == CK_EV_KEYPRESS)
@@ -904,16 +904,16 @@ Ck_BindEvent(bindingTable, eventPtr, winPtr, numObjects, objectPtr)
  */
 
 static PatSeq *
-FindSequence(interp, bindPtr, object, eventString, create)
-    Tcl_Interp *interp;		/* Interpreter to use for error
+FindSequence(
+    Tcl_Interp *interp,		/* Interpreter to use for error
 				 * reporting. */
-    BindingTable *bindPtr;	/* Table to use for lookup. */
-    ClientData object;		/* Token for object(s) with which binding
+    BindingTable *bindPtr,	/* Table to use for lookup. */
+    ClientData object,		/* Token for object(s) with which binding
 				 * is associated. */
-    char *eventString;		/* String description of pattern to
+    char *eventString,		/* String description of pattern to
 				 * match on.  See user documentation
 				 * for details. */
-    int create;			/* 0 means don't create the entry if
+    int create)			/* 0 means don't create the entry if
 				 * it doesn't already exist.   Non-zero
 				 * means create. */
 
@@ -1129,7 +1129,7 @@ closeAngle:
     }
     Tcl_SetHashValue(hPtr, psPtr);
 
-    memcpy((VOID *) psPtr->pats, (VOID *) patPtr, sequenceSize);
+    memcpy((void *) psPtr->pats, (void *) patPtr, sequenceSize);
 
 done:
     return psPtr;
@@ -1159,10 +1159,10 @@ done:
  */
 
 static char *
-GetField(p, copy, size)
-    char *p;			/* Pointer to part of pattern. */
-    char *copy;			/* Place to copy field. */
-    int size;			/* Maximum number of characters to
+GetField(
+    char *p,			/* Pointer to part of pattern. */
+    char *copy,			/* Place to copy field. */
+    int size)			/* Maximum number of characters to
 				 * copy. */
 {
     while ((*p != '\0') && !isspace((unsigned char) *p) && (*p != '>')
@@ -1198,10 +1198,10 @@ GetField(p, copy, size)
  */
 
 static PatSeq *
-MatchPatterns(bindPtr, psPtr)
-    BindingTable *bindPtr;	/* Information about binding table, such
+MatchPatterns(
+    BindingTable *bindPtr,	/* Information about binding table, such
 				 * as ring of recent events. */
-    PatSeq *psPtr;		/* List of pattern sequences. */
+    PatSeq *psPtr)		/* List of pattern sequences. */
 {
     PatSeq *bestPtr = NULL;
 
@@ -1322,16 +1322,16 @@ MatchPatterns(bindPtr, psPtr)
  */
 
 static void
-ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
-    CkWindow *winPtr;		/* Window where event occurred:  needed to
+ExpandPercents(
+    CkWindow *winPtr,		/* Window where event occurred:  needed to
 				 * get input context. */
-    char *before;		/* Command containing percent
+    char *before,		/* Command containing percent
 				 * expressions to be replaced. */
-    CkEvent *eventPtr;		/* Event containing information
+    CkEvent *eventPtr,		/* Event containing information
 				 * to be used in % replacements. */
-    KeySym keySym;		/* KeySym: only relevant for
+    KeySym keySym,		/* KeySym: only relevant for
 				 * CK_EV_KEYPRESS events). */
-    Tcl_DString *dsPtr;		/* Dynamic string in which to append
+    Tcl_DString *dsPtr)		/* Dynamic string in which to append
 				 * new command. */
 {
     int spaceNeeded, cvtFlags;	/* Used to substitute string as proper Tcl
@@ -1509,8 +1509,7 @@ ExpandPercents(winPtr, before, eventPtr, keySym, dsPtr)
  */
 
 KeySym
-CkStringToKeysym(name)
-    char *name;			/* Name of a keysym. */
+CkStringToKeysym(char *name)		/* Name of a keysym. */
 {
     Tcl_HashEntry *hPtr;
 
@@ -1540,9 +1539,7 @@ CkStringToKeysym(name)
  */
 
 char *
-CkKeysymToString(keySym, printControl)
-    KeySym keySym;
-    int printControl;
+CkKeysymToString(KeySym keySym, int printControl)
 {
     Tcl_HashEntry *hPtr;
     static char buffer[64];
@@ -1576,9 +1573,9 @@ CkKeysymToString(keySym, printControl)
  */
 
 int
-CkTermHasKey(interp, name)
-    Tcl_Interp *interp;		/* Interpreter used for result. */
-    char *name;			/* Name of a keysym. */
+CkTermHasKey(
+    Tcl_Interp *interp,		/* Interpreter used for result. */
+    char *name)			/* Name of a keysym. */
 {
 #ifndef __WIN32__
     Tcl_HashEntry *hPtr;
@@ -1644,8 +1641,7 @@ error:
  */
 
 int
-CkAllKeyNames(interp)
-    Tcl_Interp *interp;		/* Interpreter used for result. */
+CkAllKeyNames(Tcl_Interp *interp)	/* Interpreter used for result. */
 {
     KeySymInfo *kPtr;
     int i;

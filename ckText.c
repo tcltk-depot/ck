@@ -132,12 +132,12 @@ static int		TextWidgetCmd(ClientData clientData,
  */
 
 int
-Ck_TextCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_TextCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
@@ -255,11 +255,11 @@ Ck_TextCmd(clientData, interp, argc, argv)
  */
 
 static int
-TextWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+TextWidgetCmd(
+    ClientData clientData,	/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkText *textPtr = (CkText *) clientData;
     int result = TCL_OK;
@@ -575,8 +575,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
  */
 
 static void
-DestroyText(clientData)
-    ClientData clientData;	/* Info about text widget. */
+DestroyText(ClientData clientData)	/* Info about text widget. */
 {
     CkText *textPtr = (CkText *) clientData;
     Tcl_HashSearch search;
@@ -643,13 +642,13 @@ DestroyText(clientData)
  */
 
 static int
-ConfigureText(interp, textPtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    CkText *textPtr;		/* Information about widget;  may or may
+ConfigureText(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    CkText *textPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, textPtr->winPtr, configSpecs,
 	    argc, argv, (char *) textPtr, flags) != TCL_OK) {
@@ -771,9 +770,9 @@ ConfigureText(interp, textPtr, argc, argv, flags)
  */
 
 static void
-TextEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+TextEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     CkText *textPtr = (CkText *) clientData;
     CkWindow *winPtr = textPtr->winPtr;
@@ -829,8 +828,8 @@ TextEventProc(clientData, eventPtr)
  */
 
 static void
-TextCmdDeletedProc(clientData)
-    ClientData clientData;	/* Pointer to widget record for widget. */
+TextCmdDeletedProc(
+    ClientData clientData)	/* Pointer to widget record for widget. */
 {
     CkText *textPtr = (CkText *) clientData;
     CkWindow *winPtr = textPtr->winPtr;
@@ -867,11 +866,11 @@ TextCmdDeletedProc(clientData)
  */
 
 static void
-InsertChars(textPtr, indexPtr, string)
-    CkText *textPtr;		/* Overall information about text widget. */
-    CkTextIndex *indexPtr;	/* Where to insert new characters.  May be
+InsertChars(
+    CkText *textPtr,		/* Overall information about text widget. */
+    CkTextIndex *indexPtr,	/* Where to insert new characters.  May be
 				 * modified and/or invalidated. */
-    char *string;		/* Null-terminated string containing new
+    char *string)		/* Null-terminated string containing new
 				 * information to add to text. */
 {
     int lineIndex;
@@ -920,11 +919,11 @@ InsertChars(textPtr, indexPtr, string)
  */
 
 static int
-DeleteChars(textPtr, index1String, index2String)
-    CkText *textPtr;		/* Overall information about text widget. */
-    char *index1String;		/* String describing location of first
+DeleteChars(
+    CkText *textPtr,		/* Overall information about text widget. */
+    char *index1String,		/* String describing location of first
 				 * character to delete. */
-    char *index2String;		/* String describing location of last
+    char *index2String)		/* String describing location of last
 				 * character to delete.  NULL means just
 				 * delete the one character given by
 				 * index1String. */
@@ -1074,11 +1073,11 @@ DeleteChars(textPtr, index1String, index2String)
  */
 
 static int
-TextSearchCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+TextSearchCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     int backwards, exact, c, i, argsLeft, noCase, leftToScan;
     size_t length;
@@ -1445,11 +1444,11 @@ TextSearchCmd(textPtr, interp, argc, argv)
  */
 
 CkTextTabArray *
-CkTextGetTabs(interp, winPtr, string)
-    Tcl_Interp *interp;			/* Used for error reporting. */
-    CkWindow *winPtr;			/* Window in which the tabs will be
+CkTextGetTabs(
+    Tcl_Interp *interp,			/* Used for error reporting. */
+    CkWindow *winPtr,			/* Window in which the tabs will be
 					 * used. */
-    char *string;			/* Description of the tab stops.  See
+    char *string)			/* Description of the tab stops.  See
 					 * text manual entry for details. */
 {
     int argc, i, count, c = 0;

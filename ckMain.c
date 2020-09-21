@@ -55,14 +55,14 @@ static int	CheckmemCmd(ClientData clientData,
  */
 
 void
-Ck_Main(argc, argv, appInitProc, interp)
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Array of argument strings. */
-    int (*appInitProc)();               /* Application-specific initialization
+Ck_Main(
+    int argc,				/* Number of arguments. */
+    char **argv,			/* Array of argument strings. */
+    int (*appInitProc)(Tcl_Interp *),   /* Application-specific initialization
 					 * procedure to call after most
 					 * initialization but before starting
 					 * to execute commands. */
-    Tcl_Interp *interp;
+    Tcl_Interp *interp)
 {
     char *args, *msg, *argv0;
     char buf[20];
@@ -259,11 +259,11 @@ errorExit:
 #ifdef TCL_MEM_DEBUG
 
 static int
-CheckmemCmd(clientData, interp, argc, argv)
-    ClientData clientData;		/* Not used. */
-    Tcl_Interp *interp;			/* Interpreter for evaluation. */
-    int argc;				/* Number of arguments. */
-    char *argv[];			/* String values of arguments. */
+CheckmemCmd(
+    ClientData clientData,		/* Not used. */
+    Tcl_Interp *interp,			/* Interpreter for evaluation. */
+    int argc,				/* Number of arguments. */
+    char *argv[])			/* String values of arguments. */
 {
     if (argc != 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],

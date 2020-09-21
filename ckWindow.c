@@ -192,8 +192,7 @@ typedef struct {
  */
 
 static CkWindow *
-NewWindow(parentPtr)
-    CkWindow *parentPtr;
+NewWindow(CkWindow *parentPtr)
 {
     CkWindow *winPtr;
 
@@ -245,12 +244,12 @@ NewWindow(parentPtr)
  */
 
 static int
-NameWindow(interp, winPtr, parentPtr, name)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
-    CkWindow *winPtr;		/* Window that is to be named and inserted. */
-    CkWindow *parentPtr;	/* Pointer to logical parent for winPtr
+NameWindow(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
+    CkWindow *winPtr,		/* Window that is to be named and inserted. */
+    CkWindow *parentPtr,	/* Pointer to logical parent for winPtr
 				 * (used for naming, options, etc.). */
-    char *name;			/* Name for winPtr;   must be unique among
+    char *name)			/* Name for winPtr;   must be unique among
 				 * parentPtr's children. */
 {
 #define FIXED_SIZE 200
@@ -346,8 +345,8 @@ NameWindow(interp, winPtr, parentPtr, name)
  */
 
 CkWindow *
-Ck_MainWindow(interp)
-    Tcl_Interp *interp;		/* Interpreter that embodies application,
+Ck_MainWindow(
+    Tcl_Interp *interp)		/* Interpreter that embodies application,
     				 * also used for error reporting. */
 {
     if (ckMainInfo == NULL || ckMainInfo->interp != interp) {
@@ -400,9 +399,9 @@ HandleWinch(int sig)
  */
 
 CkWindow *
-Ck_CreateMainWindow(interp, className)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
-    char *className;		/* Class name of the new main window. */
+Ck_CreateMainWindow(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
+    char *className)		/* Class name of the new main window. */
 {
     int dummy;
     Tcl_HashEntry *hPtr;
@@ -497,7 +496,7 @@ Ck_CreateMainWindow(interp, className)
     }
 #endif
     if (mainPtr->isoEncoding == NULL) {
-	panic("standard encoding not found");
+	Tcl_Panic("standard encoding not found");
     }
     if (strcmp(Tcl_GetEncodingName(mainPtr->isoEncoding), "utf-8") == 0) {
 	Tcl_FreeEncoding(mainPtr->isoEncoding);
@@ -738,8 +737,7 @@ Ck_CreateMainWindow(interp, className)
  */
 
 int
-Ck_Init(interp)
-    Tcl_Interp *interp;         /* Interpreter to initialize. */
+Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 {
     CkWindow *mainWindow;
     char *p, *name, *class;
@@ -810,14 +808,14 @@ init";
  */
 
 CkWindow *
-Ck_CreateWindow(interp, parentPtr, name, toplevel)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting.
+Ck_CreateWindow(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting.
 				 * Interp->result is assumed to be
 				 * initialized by the caller. */
-    CkWindow *parentPtr;	/* Parent of new window. */
-    char *name;			/* Name for new window.  Must be unique
+    CkWindow *parentPtr,	/* Parent of new window. */
+    char *name,			/* Name for new window.  Must be unique
 				 * among parent's children. */
-    int toplevel;               /* If true, create toplevel window. */
+    int toplevel)               /* If true, create toplevel window. */
 {
     CkWindow *winPtr;
 
@@ -870,17 +868,17 @@ Ck_CreateWindow(interp, parentPtr, name, toplevel)
  */
 
 CkWindow *
-Ck_CreateWindowFromPath(interp, anywin, pathName, toplevel)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting.
+Ck_CreateWindowFromPath(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting.
 				 * Interp->result is assumed to be
 				 * initialized by the caller. */
-    CkWindow *anywin;		/* Pointer to any window in application
+    CkWindow *anywin,		/* Pointer to any window in application
 				 * that is to contain new window. */
-    char *pathName;		/* Path name for new window within the
+    char *pathName,		/* Path name for new window within the
 				 * application of anywin. The parent of
 				 * this window must already exist, but
 				 * the window itself must not exist. */
-    int toplevel;               /* If true, create toplevel window. */
+    int toplevel)               /* If true, create toplevel window. */
 {
 #define FIXED_SPACE 5
     char fixedSpace[FIXED_SPACE+1];
@@ -977,8 +975,7 @@ Ck_CreateWindowFromPath(interp, anywin, pathName, toplevel)
  */
 
 void
-Ck_DestroyWindow(winPtr)
-    CkWindow *winPtr;		/* Window to destroy. */
+Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
 {
     CkWindowEvent event;
     Tcl_HashEntry *hPtr;
@@ -1127,8 +1124,7 @@ done:
  */
 
 void
-Ck_MapWindow(winPtr)
-    CkWindow *winPtr;		/* Pointer to window to map. */
+Ck_MapWindow(CkWindow *winPtr)		/* Pointer to window to map. */
 {
     if (winPtr == NULL || (winPtr->flags & CK_MAPPED))
 	return;
@@ -1157,8 +1153,7 @@ Ck_MapWindow(winPtr)
  */
 
 void
-Ck_MakeWindowExist(winPtr)
-    CkWindow *winPtr;		/* Pointer to window. */
+Ck_MakeWindowExist(CkWindow *winPtr)		/* Pointer to window. */
 {
     int x, y;
     CkMainInfo *mainPtr;
@@ -1252,9 +1247,9 @@ Ck_MakeWindowExist(winPtr)
  */
 
 void
-Ck_MoveWindow(winPtr, x, y)
-    CkWindow *winPtr;		/* Window to move. */
-    int x, y;			/* New location for window (within
+Ck_MoveWindow(
+    CkWindow *winPtr,		/* Window to move. */
+    int x, int y)		/* New location for window (within
 				 * parent). */
 {
     CkWindow *childPtr, *parentPtr;
@@ -1336,9 +1331,9 @@ Ck_MoveWindow(winPtr, x, y)
  */
 
 void
-Ck_ResizeWindow(winPtr, width, height)
-    CkWindow *winPtr;		/* Window to resize. */
-    int width, height;		/* New dimensions for window. */
+Ck_ResizeWindow(
+    CkWindow *winPtr,		/* Window to resize. */
+    int width, int height)	/* New dimensions for window. */
 {
     CkWindow *childPtr, *parentPtr;
     CkWindow *mainWin = winPtr->mainPtr->winPtr;
@@ -1457,8 +1452,7 @@ Ck_ResizeWindow(winPtr, width, height)
  */
 
 void
-Ck_UnmapWindow(winPtr)
-    CkWindow *winPtr;		/* Pointer to window to unmap. */
+Ck_UnmapWindow(CkWindow *winPtr)	/* Pointer to window to unmap. */
 {
     CkWindow *childPtr;
     CkMainInfo *mainPtr = winPtr->mainPtr;
@@ -1494,10 +1488,10 @@ Ck_UnmapWindow(winPtr)
 }
 
 void
-Ck_SetWindowAttr(winPtr, fg, bg, attr)
-    CkWindow *winPtr;		/* Window to manipulate. */
-    int fg, bg;			/* Foreground/background colors. */
-    int attr;			/* Video attributes. */
+Ck_SetWindowAttr(
+    CkWindow *winPtr,		/* Window to manipulate. */
+    int fg, int bg,		/* Foreground/background colors. */
+    int attr)			/* Video attributes. */
 {
     winPtr->fg = fg;
     winPtr->bg = bg;
@@ -1519,9 +1513,10 @@ Ck_SetWindowAttr(winPtr, fg, bg, attr)
 }
 
 void
-Ck_GetRootGeometry(winPtr, xPtr, yPtr, widthPtr, heightPtr)
-    CkWindow *winPtr;
-    int *xPtr, *yPtr, *widthPtr, *heightPtr;
+Ck_GetRootGeometry(
+    CkWindow *winPtr,
+    int *xPtr, int *yPtr,
+    int *widthPtr, int *heightPtr)
 {
     int x, y;
 
@@ -1565,10 +1560,10 @@ Ck_GetRootGeometry(winPtr, xPtr, yPtr, widthPtr, heightPtr)
  */
 
 CkWindow *
-Ck_NameToWindow(interp, pathName, winPtr)
-    Tcl_Interp *interp;		/* Where to report errors. */
-    char *pathName;		/* Path name of window. */
-    CkWindow *winPtr;		/* Pointer to window:  name is assumed to
+Ck_NameToWindow(
+    Tcl_Interp *interp,		/* Where to report errors. */
+    char *pathName,		/* Path name of window. */
+    CkWindow *winPtr)		/* Pointer to window:  name is assumed to
 				 * belong to the same main window as winPtr. */
 {
     Tcl_HashEntry *hPtr;
@@ -1600,9 +1595,9 @@ Ck_NameToWindow(interp, pathName, winPtr)
  */
 
 void
-Ck_SetClass(winPtr, className)
-    CkWindow *winPtr;		/* Window to assign class. */
-    char *className;		/* New class for window. */
+Ck_SetClass(
+    CkWindow *winPtr,		/* Window to assign class. */
+    char *className)		/* New class for window. */
 {
     winPtr->classUid = Ck_GetUid(className);
     CkOptionClassChanged(winPtr);
@@ -1626,8 +1621,7 @@ Ck_SetClass(winPtr, className)
  */
 
 static void
-UnlinkWindow(winPtr)
-    CkWindow *winPtr;			/* Child window to be unlinked. */
+UnlinkWindow(CkWindow *winPtr)		/* Child window to be unlinked. */
 {
     CkWindow *prevPtr;
 
@@ -1642,7 +1636,7 @@ UnlinkWindow(winPtr)
 	while (prevPtr->nextPtr != winPtr) {
 	    prevPtr = prevPtr->nextPtr;
 	    if (prevPtr == NULL)
-		panic("UnlinkWindow couldn't find child in parent");
+		Tcl_Panic("UnlinkWindow couldn't find child in parent");
 	}
 	prevPtr->nextPtr = winPtr->nextPtr;
 	if (winPtr->nextPtr == NULL)
@@ -1667,8 +1661,7 @@ UnlinkWindow(winPtr)
  */
 
 static void
-UnlinkToplevel(winPtr)
-    CkWindow *winPtr;
+UnlinkToplevel(CkWindow *winPtr)
 {
     CkWindow *prevPtr;
 
@@ -1679,7 +1672,7 @@ UnlinkToplevel(winPtr)
 	while (prevPtr->topLevPtr != winPtr) {
 	    prevPtr = prevPtr->topLevPtr;
 	    if (prevPtr == NULL)
-		panic("UnlinkToplevel couldn't find toplevel");
+		Tcl_Panic("UnlinkToplevel couldn't find toplevel");
 	}
 	prevPtr->topLevPtr = winPtr->topLevPtr;
     }
@@ -1704,12 +1697,12 @@ UnlinkToplevel(winPtr)
  */
 
 int
-Ck_RestackWindow(winPtr, aboveBelow, otherPtr)
-    CkWindow *winPtr;		/* Pointer to window whose position in
+Ck_RestackWindow(
+    CkWindow *winPtr,		/* Pointer to window whose position in
 				 * the stacking order is to change. */
-    int aboveBelow;		/* Indicates new position of winPtr relative
+    int aboveBelow,		/* Indicates new position of winPtr relative
 				 * to other;  must be Above or Below. */
-    CkWindow *otherPtr;		/* WinPtr will be moved to a position that
+    CkWindow *otherPtr)		/* WinPtr will be moved to a position that
 				 * puts it just above or below this window.
 				 * If NULL then winPtr goes above or below
 				 * all windows in the same parent. */
@@ -1830,8 +1823,7 @@ done:
  */
 
 void
-Ck_SetFocus(winPtr)
-    CkWindow *winPtr;		/* Window that is to be the new focus. */
+Ck_SetFocus(CkWindow *winPtr)	/* Window that is to be the new focus. */
 {
     CkMainInfo *mainPtr = winPtr->mainPtr;
     CkEvent event;
@@ -1878,8 +1870,7 @@ Ck_SetFocus(winPtr)
  */
 
 static void
-ChangeToplevelFocus(winPtr)
-    CkWindow *winPtr;
+ChangeToplevelFocus(CkWindow *winPtr)
 {
     CkWindow *winTop, *oldTop;
     CkMainInfo *mainPtr;
@@ -1926,8 +1917,7 @@ ChangeToplevelFocus(winPtr)
  */
 
 void
-Ck_EventuallyRefresh(winPtr)
-    CkWindow *winPtr;
+Ck_EventuallyRefresh(CkWindow *winPtr)
 {
     if (++winPtr->mainPtr->refreshCount == 1)
 	Tcl_DoWhenIdle(DoRefresh, (ClientData) winPtr->mainPtr);
@@ -1952,8 +1942,7 @@ Ck_EventuallyRefresh(winPtr)
  */
 
 static void
-DoRefresh(clientData)
-    ClientData clientData;
+DoRefresh(ClientData clientData)
 {
     CkMainInfo *mainPtr = (CkMainInfo *) clientData;
 
@@ -2001,8 +1990,7 @@ DoRefresh(clientData)
  */
 
 static void
-RefreshToplevels(winPtr)
-    CkWindow *winPtr;
+RefreshToplevels(CkWindow *winPtr)
 {
     if (winPtr->topLevPtr != NULL)
 	RefreshToplevels(winPtr->topLevPtr);
@@ -2028,8 +2016,7 @@ RefreshToplevels(winPtr)
  */
 
 static void
-RefreshThem(winPtr)
-    CkWindow *winPtr;
+RefreshThem(CkWindow *winPtr)
 {
     if (winPtr->nextPtr != NULL)
         RefreshThem(winPtr->nextPtr);
@@ -2057,8 +2044,7 @@ RefreshThem(winPtr)
  */
 
 static void
-UpdateHWCursor(mainPtr)
-    CkMainInfo *mainPtr;
+UpdateHWCursor(CkMainInfo *mainPtr)
 {
     int x, y;
     CkWindow *wPtr, *stopAtWin, *winPtr = mainPtr->focusPtr;
@@ -2120,9 +2106,9 @@ invisible:
  */
 
 static CkWindow *
-GetWindowXY(winPtr, xPtr, yPtr)
-    CkWindow *winPtr;
-    int *xPtr, *yPtr;
+GetWindowXY(
+    CkWindow *winPtr,
+    int *xPtr, int *yPtr)
 {
     int x, y;
     CkWindow *wPtr;
@@ -2161,9 +2147,9 @@ GetWindowXY(winPtr, xPtr, yPtr)
  */
 
 CkWindow *
-Ck_GetWindowXY(mainPtr, xPtr, yPtr, mode)
-    CkMainInfo *mainPtr;
-    int *xPtr, *yPtr, mode;
+Ck_GetWindowXY(
+    CkMainInfo *mainPtr,
+    int *xPtr, int *yPtr, int mode)
 {
     int x, y, x0, y0;
     CkWindow *wPtr;
@@ -2208,9 +2194,9 @@ nextToplevel:
  */
 
 void
-Ck_SetHWCursor(winPtr, newState)
-    CkWindow *winPtr;
-    int newState;
+Ck_SetHWCursor(
+    CkWindow *winPtr,
+    int newState)
 {
     int oldState = (winPtr->flags & CK_SHOW_CURSOR) != 0;
 
@@ -2244,9 +2230,9 @@ refresh:
  */
 
 void
-Ck_ClearToEol(winPtr, x, y)
-    CkWindow *winPtr;
-    int x, y;
+Ck_ClearToEol(
+    CkWindow *winPtr,
+    int x, int y)
 {
     WINDOW *window = winPtr->window;
 
@@ -2275,9 +2261,9 @@ Ck_ClearToEol(winPtr, x, y)
  */
 
 void
-Ck_ClearToBot(winPtr, x, y)
-    CkWindow *winPtr;
-    int x, y;
+Ck_ClearToBot(
+    CkWindow *winPtr,
+    int x, int y)
 {
     WINDOW *window = winPtr->window;
 
@@ -2308,11 +2294,11 @@ Ck_ClearToBot(winPtr, x, y)
  */
 
 static int
-DeadAppCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+DeadAppCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     Tcl_SetResult(interp, "toolkit uninstalled", TCL_STATIC);
     return TCL_ERROR;
@@ -2333,11 +2319,11 @@ DeadAppCmd(clientData, interp, argc, argv)
  */
 
 static int
-ExecCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+ExecCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2412,11 +2398,11 @@ ExecCmd(clientData, interp, argc, argv)
  */
 
 static int
-PutsCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+PutsCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2457,11 +2443,11 @@ toStderr:
  */
 
 static int
-CloseCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+CloseCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2492,11 +2478,11 @@ CloseCmd(clientData, interp, argc, argv)
  */
 
 static int
-FlushCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+FlushCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2527,11 +2513,11 @@ FlushCmd(clientData, interp, argc, argv)
  */
 
 static int
-ReadCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+ReadCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2563,11 +2549,11 @@ ReadCmd(clientData, interp, argc, argv)
  */
 
 static int
-GetsCmd(clientData, interp, argc, argv)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
+GetsCmd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int argc,
+    char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2593,8 +2579,7 @@ GetsCmd(clientData, interp, argc, argv)
  */
 
 static void
-InputSetup(inputInfo)
-    InputInfo *inputInfo;
+InputSetup(InputInfo *inputInfo)
 {
     WNDCLASS class;
     DWORD id;
@@ -2618,7 +2603,7 @@ InputSetup(inputInfo)
 			 0, 0, NULL, NULL, class.hInstance, NULL);
     }
     if (inputInfo->hwnd == NULL) {
-        panic("cannot create curses input window");
+        Tcl_Panic("cannot create curses input window");
     }
     SetWindowLong(inputInfo->hwnd, GWL_USERDATA, (LONG) inputInfo);
     inputInfo->thread = CreateThread(NULL, 4096,
@@ -2628,8 +2613,7 @@ InputSetup(inputInfo)
 }
 
 static void
-InputExit(clientData)
-    ClientData clientData;
+InputExit(ClientData clientData)
 {
     InputInfo *inputInfo = (InputInfo *) clientData;
 
@@ -2645,8 +2629,7 @@ InputExit(clientData)
 }
 
 static void
-InputThread(arg)
-    void *arg;
+InputThread(void *arg)
 {
     InputInfo *inputInfo = (InputInfo *) arg;
     INPUT_RECORD ip;
@@ -2665,11 +2648,11 @@ InputThread(arg)
 }
 
 static LRESULT CALLBACK
-InputHandler(hwnd, message, wParam, lParam)
-    HWND hwnd;
-    UINT message;
-    WPARAM wParam;
-    LPARAM lParam;
+InputHandler(
+    HWND hwnd,
+    UINT message,
+    WPARAM wParam,
+    LPARAM lParam)
 {
     InputInfo *inputInfo = (InputInfo *) GetWindowLong(hwnd, GWL_USERDATA);
 
@@ -2681,8 +2664,7 @@ InputHandler(hwnd, message, wParam, lParam)
 }
 
 static void
-InputHandler2(clientData)
-    ClientData clientData;
+InputHandler2(ClientData clientData)
 {
     InputInfo *inputInfo = (InputInfo *) clientData;
     INPUT_RECORD ip;
@@ -2706,16 +2688,13 @@ InputHandler2(clientData)
  */
 
 static void
-CkEvtExit(clientData)
-    ClientData clientData;
+CkEvtExit(ClientData clientData)
 {
     Tcl_DeleteEventSource(CkEvtSetup, CkEvtCheck, clientData);
 }
 
 static void
-CkEvtSetup(clientData, flags)
-    ClientData clientData;
-    int flags;
+CkEvtSetup(ClientData clientData, int flags)
 {
     if (!(flags & TCL_WINDOW_EVENTS)) {
 	return;
@@ -2723,9 +2702,7 @@ CkEvtSetup(clientData, flags)
 }
 
 static void
-CkEvtCheck(clientData, flags)
-    ClientData clientData;
-    int flags;
+CkEvtCheck(ClientData clientData, int flags)
 {
     if (!(flags & TCL_WINDOW_EVENTS)) {
 	return;

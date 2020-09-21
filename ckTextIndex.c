@@ -50,13 +50,13 @@ static char *		StartEnd(char *string, CkTextIndex *indexPtr);
  */
 
 CkTextIndex *
-CkTextMakeByteIndex(tree, lineIndex, byteIndex, indexPtr)
-    CkTextBTree tree;		/* Tree that lineIndex and charIndex refer
+CkTextMakeByteIndex(
+    CkTextBTree tree,		/* Tree that lineIndex and charIndex refer
 				 * to. */
-    int lineIndex;		/* Index of desired line (0 means first
+    int lineIndex,		/* Index of desired line (0 means first
 				 * line of text). */
-    int byteIndex;		/* Byte index of desired character. */
-    CkTextIndex *indexPtr;	/* Structure to fill in. */
+    int byteIndex,		/* Byte index of desired character. */
+    CkTextIndex *indexPtr)	/* Structure to fill in. */
 {
     CkTextSegment *segPtr;
     int index;
@@ -141,13 +141,13 @@ CkTextMakeByteIndex(tree, lineIndex, byteIndex, indexPtr)
  */
 
 CkTextIndex *
-CkTextMakeIndex(tree, lineIndex, charIndex, indexPtr)
-    CkTextBTree tree;		/* Tree that lineIndex and charIndex refer
+CkTextMakeIndex(
+    CkTextBTree tree,		/* Tree that lineIndex and charIndex refer
 				 * to. */
-    int lineIndex;		/* Index of desired line (0 means first
+    int lineIndex,		/* Index of desired line (0 means first
 				 * line of text). */
-    int charIndex;		/* Index of desired character. */
-    CkTextIndex *indexPtr;	/* Structure to fill in. */
+    int charIndex,		/* Index of desired character. */
+    CkTextIndex *indexPtr)	/* Structure to fill in. */
 {
     CkTextSegment *segPtr;
     int index;
@@ -230,9 +230,9 @@ CkTextMakeIndex(tree, lineIndex, charIndex, indexPtr)
  */
 
 CkTextSegment *
-CkTextIndexToSeg(indexPtr, offsetPtr)
-    CkTextIndex *indexPtr;		/* Text index. */
-    int *offsetPtr;			/* Where to store offset within
+CkTextIndexToSeg(
+    CkTextIndex *indexPtr,		/* Text index. */
+    int *offsetPtr)			/* Where to store offset within
 					 * segment, or NULL if offset isn't
 					 * wanted. */
 {
@@ -270,9 +270,9 @@ CkTextIndexToSeg(indexPtr, offsetPtr)
  */
 
 int
-CkTextSegToOffset(segPtr, linePtr)
-    CkTextSegment *segPtr;		/* Segment whose offset is desired. */
-    CkTextLine *linePtr;		/* Line containing segPtr. */
+CkTextSegToOffset(
+    CkTextSegment *segPtr,		/* Segment whose offset is desired. */
+    CkTextLine *linePtr)		/* Line containing segPtr. */
 {
     CkTextSegment *segPtr2;
     int offset;
@@ -306,11 +306,11 @@ CkTextSegToOffset(segPtr, linePtr)
  */
 
 int
-CkTextGetIndex(interp, textPtr, string, indexPtr)
-    Tcl_Interp *interp;		/* Use this for error reporting. */
-    CkText *textPtr;		/* Information about text widget. */
-    char *string;		/* Textual description of position. */
-    CkTextIndex *indexPtr;	/* Index structure to fill in. */
+CkTextGetIndex(
+    Tcl_Interp *interp,		/* Use this for error reporting. */
+    CkText *textPtr,		/* Information about text widget. */
+    char *string,		/* Textual description of position. */
+    CkTextIndex *indexPtr)	/* Index structure to fill in. */
 {
     char *p;
     char *end, *endOfBase;
@@ -537,9 +537,9 @@ CkTextGetIndex(interp, textPtr, string, indexPtr)
  */
 
 void
-CkTextPrintIndex(indexPtr, string)
-    CkTextIndex *indexPtr;	/* Pointer to index. */
-    char *string;		/* Place to store the position.  Must have
+CkTextPrintIndex(
+    CkTextIndex *indexPtr,	/* Pointer to index. */
+    char *string)		/* Place to store the position.  Must have
 				 * at least TK_POS_CHARS characters. */
 {
     CkTextSegment *segPtr;
@@ -587,9 +587,9 @@ CkTextPrintIndex(indexPtr, string)
  */
 
 int
-CkTextIndexCmp(index1Ptr, index2Ptr)
-    CkTextIndex *index1Ptr;		/* First index. */
-    CkTextIndex *index2Ptr;		/* Second index. */
+CkTextIndexCmp(
+    CkTextIndex *index1Ptr,		/* First index. */
+    CkTextIndex *index2Ptr)		/* Second index. */
 {
     int line1, line2;
 
@@ -634,12 +634,12 @@ CkTextIndexCmp(index1Ptr, index2Ptr)
  */
 
 static char *
-ForwBack(string, indexPtr)
-    char *string;		/* String to parse for additional info
+ForwBack(
+    char *string,		/* String to parse for additional info
 				 * about modifier (count and units).
 				 * Points to "+" or "-" that starts
 				 * modifier. */
-    CkTextIndex *indexPtr;	/* Index to update as specified in string. */
+    CkTextIndex *indexPtr)	/* Index to update as specified in string. */
 {
     char *p;
     char *end, *units;
@@ -727,11 +727,11 @@ ForwBack(string, indexPtr)
  */
 
 void
-CkTextIndexForwBytes(srcPtr, byteCount, dstPtr)
-    CkTextIndex *srcPtr;	/* Source index. */
-    int byteCount;		/* How many bytes forward to move.  May be
+CkTextIndexForwBytes(
+    CkTextIndex *srcPtr,	/* Source index. */
+    int byteCount,		/* How many bytes forward to move.  May be
 				 * negative. */
-    CkTextIndex *dstPtr;	/* Destination index: gets modified. */
+    CkTextIndex *dstPtr)	/* Destination index: gets modified. */
 {
     CkTextLine *linePtr;
     CkTextSegment *segPtr;
@@ -794,11 +794,11 @@ CkTextIndexForwBytes(srcPtr, byteCount, dstPtr)
  */
 
 void
-CkTextIndexForwChars(srcPtr, count, dstPtr)
-    CkTextIndex *srcPtr;		/* Source index. */
-    int count;				/* How many characters forward to
+CkTextIndexForwChars(
+    CkTextIndex *srcPtr,		/* Source index. */
+    int count,				/* How many characters forward to
 					 * move.  May be negative. */
-    CkTextIndex *dstPtr;		/* Destination index: gets modified. */
+    CkTextIndex *dstPtr)		/* Destination index: gets modified. */
 {
     CkTextLine *linePtr;
     CkTextSegment *segPtr;
@@ -892,11 +892,11 @@ CkTextIndexForwChars(srcPtr, count, dstPtr)
  */
 
 void
-CkTextIndexBackBytes(srcPtr, byteCount, dstPtr)
-    CkTextIndex *srcPtr;	/* Source index. */
-    int byteCount;		/* How many bytes backward to move.  May be
+CkTextIndexBackBytes(
+    CkTextIndex *srcPtr,	/* Source index. */
+    int byteCount,		/* How many bytes backward to move.  May be
 				 * negative. */
-    CkTextIndex *dstPtr;	/* Destination index: gets modified. */
+    CkTextIndex *dstPtr)	/* Destination index: gets modified. */
 {
     CkTextSegment *segPtr;
     int lineIndex;
@@ -957,11 +957,11 @@ CkTextIndexBackBytes(srcPtr, byteCount, dstPtr)
  */
 
 void
-CkTextIndexBackChars(srcPtr, count, dstPtr)
-    CkTextIndex *srcPtr;		/* Source index. */
-    int count;				/* How many characters backward to
+CkTextIndexBackChars(
+    CkTextIndex *srcPtr,		/* Source index. */
+    int count,				/* How many characters backward to
 					 * move.  May be negative. */
-    CkTextIndex *dstPtr;		/* Destination index: gets modified. */
+    CkTextIndex *dstPtr)		/* Destination index: gets modified. */
 {
     CkTextSegment *segPtr;
     int lineIndex;
@@ -1093,12 +1093,12 @@ CkTextIndexBackChars(srcPtr, count, dstPtr)
  */
 
 static char *
-StartEnd(string, indexPtr)
-    char *string;		/* String to parse for additional info
+StartEnd(
+    char *string,		/* String to parse for additional info
 				 * about modifier (count and units).
 				 * Points to first character of modifer
 				 * word. */
-    CkTextIndex *indexPtr;	/* Index to mdoify based on string. */
+    CkTextIndex *indexPtr)	/* Index to mdoify based on string. */
 {
     char *p;
     int c, offset;

@@ -146,12 +146,12 @@ static int		YExpansion(Packer *slavePtr, int cavityHeight);
  */
 
 int
-Ck_PackCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_PackCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     size_t length;
@@ -327,11 +327,11 @@ Ck_PackCmd(clientData, interp, argc, argv)
  */
 
 static void
-PackReqProc(clientData, winPtr)
-    ClientData clientData;	/* Packer's information about
+PackReqProc(
+    ClientData clientData,	/* Packer's information about
 				 * window that got new preferred
 				 * geometry.  */
-    CkWindow *winPtr;		/* Other information about the window. */
+    CkWindow *winPtr)		/* Other information about the window. */
 {
     Packer *packPtr = (Packer *) clientData;
 
@@ -360,10 +360,10 @@ PackReqProc(clientData, winPtr)
  */
 
 static void
-PackLostSlaveProc(clientData, winPtr)
-    ClientData clientData;	/* Packer structure for slave window that
+PackLostSlaveProc(
+    ClientData clientData,	/* Packer structure for slave window that
 				 * was stolen away. */
-    CkWindow *winPtr;		/* Pointer to window. */
+    CkWindow *winPtr)		/* Pointer to window. */
 {
     Packer *slavePtr = (Packer *) clientData;
 
@@ -396,8 +396,8 @@ PackLostSlaveProc(clientData, winPtr)
  */
 
 static void
-ArrangePacking(clientData)
-    ClientData clientData;	/* Structure describing parent whose slaves
+ArrangePacking(
+    ClientData clientData)	/* Structure describing parent whose slaves
 				 * are to be re-layed out. */
 {
     Packer *masterPtr = (Packer *) clientData;
@@ -632,7 +632,7 @@ ArrangePacking(clientData)
 		y = frameY + (frameHeight - height)/2;
 		break;
 	    default:
-		panic("bad frame factor in ArrangePacking");
+		Tcl_Panic("bad frame factor in ArrangePacking");
 	}
 
 	/*
@@ -698,10 +698,10 @@ done:
  */
 
 static int
-XExpansion(slavePtr, cavityWidth)
-    Packer *slavePtr;			/* First in list of remaining
+XExpansion(
+    Packer *slavePtr,			/* First in list of remaining
 					 * slaves. */
-    int cavityWidth;			/* Horizontal space left for all
+    int cavityWidth)			/* Horizontal space left for all
 					 * remaining slaves. */
 {
     int numExpand, minExpand, curExpand;
@@ -762,10 +762,10 @@ XExpansion(slavePtr, cavityWidth)
  */
 
 static int
-YExpansion(slavePtr, cavityHeight)
-    Packer *slavePtr;			/* First in list of remaining
+YExpansion(
+    Packer *slavePtr,			/* First in list of remaining
 					 * slaves. */
-    int cavityHeight;			/* Vertical space left for all
+    int cavityHeight)			/* Vertical space left for all
 					 * remaining slaves. */
 {
     int numExpand, minExpand, curExpand;
@@ -821,8 +821,7 @@ YExpansion(slavePtr, cavityHeight)
  */
 
 static Packer *
-GetPacker(winPtr)
-    CkWindow *winPtr;		/* Pointer to window for which
+GetPacker(CkWindow *winPtr)	/* Pointer to window for which
 				 * packer structure is desired. */
 {
     Packer *packPtr;
@@ -878,8 +877,7 @@ GetPacker(winPtr)
  */
 
 static void
-Unlink(packPtr)
-    Packer *packPtr;			/* Window to unlink. */
+Unlink(Packer *packPtr)			/* Window to unlink. */
 {
     Packer *masterPtr, *packPtr2;
 
@@ -892,7 +890,7 @@ Unlink(packPtr)
     } else {
 	for (packPtr2 = masterPtr->slavePtr; ; packPtr2 = packPtr2->nextPtr) {
 	    if (packPtr2 == NULL) {
-		panic("Unlink couldn't find previous window");
+		Tcl_Panic("Unlink couldn't find previous window");
 	    }
 	    if (packPtr2->nextPtr == packPtr) {
 		packPtr2->nextPtr = packPtr->nextPtr;
@@ -930,8 +928,7 @@ Unlink(packPtr)
  */
 
 static void
-DestroyPacker(clientData)
-    ClientData clientData;		/* Info about packed window that
+DestroyPacker(ClientData clientData)	/* Info about packed window that
 					 * is now dead. */
 {
     Packer *packPtr = (Packer *) clientData;
@@ -959,10 +956,10 @@ DestroyPacker(clientData)
  */
 
 static void
-PackStructureProc(clientData, eventPtr)
-    ClientData clientData;		/* Our information about window
+PackStructureProc(
+    ClientData clientData,		/* Our information about window
 					 * referred to by eventPtr. */
-    CkEvent *eventPtr;			/* Describes what just happened. */
+    CkEvent *eventPtr)			/* Describes what just happened. */
 {
     Packer *packPtr = (Packer *) clientData;
 
@@ -1017,12 +1014,12 @@ PackStructureProc(clientData, eventPtr)
  */
 
 static int
-ConfigureSlaves(interp, winPtr, argc, argv)
-    Tcl_Interp *interp;		/* Interpreter for error reporting. */
-    CkWindow *winPtr;		/* Any window in application containing
+ConfigureSlaves(
+    Tcl_Interp *interp,		/* Interpreter for error reporting. */
+    CkWindow *winPtr,		/* Any window in application containing
 				 * slaves.  Used to look up slave names. */
-    int argc;			/* Number of elements in argv. */
-    char *argv[];		/* Argument strings:  contains one or more
+    int argc,			/* Number of elements in argv. */
+    char *argv[])		/* Argument strings:  contains one or more
 				 * window names followed by any number
 				 * of "option value" pairs.  Caller must
 				 * make sure that there is at least one

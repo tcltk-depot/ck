@@ -81,8 +81,7 @@ static struct {
  */
 
 Ck_Uid
-Ck_GetUid(string)
-    char *string;		/* String to convert. */
+Ck_GetUid(char *string)		/* String to convert. */
 {
     int dummy;
 
@@ -113,10 +112,10 @@ Ck_GetUid(string)
  */
 
 int
-Ck_GetColor(interp, name, colorPtr)
-    Tcl_Interp *interp;
-    char *name;
-    int *colorPtr;
+Ck_GetColor(
+    Tcl_Interp *interp,
+    char *name,
+    int *colorPtr)
 {
     int i, len;
 
@@ -149,8 +148,7 @@ Ck_GetColor(interp, name, colorPtr)
  */
 
 char *
-Ck_NameOfColor(color)
-    int color;		/* Curses color to get name for */
+Ck_NameOfColor(int color)	/* Curses color to get name for */
 {
     int i;
 
@@ -179,10 +177,10 @@ Ck_NameOfColor(color)
  */
 
 int
-Ck_GetAttr(interp, name, attrPtr)
-    Tcl_Interp *interp;
-    char *name;
-    int *attrPtr;
+Ck_GetAttr(
+    Tcl_Interp *interp,
+    char *name,
+    int *attrPtr)
 {
     int i, k, len, largc;
     char **largv;
@@ -231,8 +229,7 @@ Ck_GetAttr(interp, name, attrPtr)
  */
 
 char *
-Ck_NameOfAttr(attr)
-    int attr;
+Ck_NameOfAttr(int attr)
 {
     int i;
     char *result;
@@ -271,9 +268,7 @@ Ck_NameOfAttr(attr)
  */
 
 int
-Ck_GetPair(winPtr, fg, bg)
-    CkWindow *winPtr;
-    int fg, bg;
+Ck_GetPair(CkWindow *winPtr, int fg, int bg)
 {
     int i;
 
@@ -319,10 +314,10 @@ Ck_GetPair(winPtr, fg, bg)
  */
 
 int
-Ck_GetAnchor(interp, string, anchorPtr)
-    Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a direction. */
-    Ck_Anchor *anchorPtr;	/* Where to store Ck_Anchor corresponding
+Ck_GetAnchor(
+    Tcl_Interp *interp,		/* Use this for error reporting. */
+    char *string,		/* String describing a direction. */
+    Ck_Anchor *anchorPtr)	/* Where to store Ck_Anchor corresponding
 				 * to string. */
 {
     switch (string[0]) {
@@ -396,9 +391,8 @@ Ck_GetAnchor(interp, string, anchorPtr)
  */
 
 char *
-Ck_NameOfAnchor(anchor)
-    Ck_Anchor anchor;		/* Anchor for which identifying string
-				 * is desired. */
+Ck_NameOfAnchor(Ck_Anchor anchor)	/* Anchor for which identifying string
+					 * is desired. */
 {
     switch (anchor) {
 	case CK_ANCHOR_N: return "n";
@@ -435,10 +429,10 @@ Ck_NameOfAnchor(anchor)
  */
 
 int
-Ck_GetJustify(interp, string, justifyPtr)
-    Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a justification style. */
-    Ck_Justify *justifyPtr;	/* Where to store Ck_Justify corresponding
+Ck_GetJustify(
+    Tcl_Interp *interp,		/* Use this for error reporting. */
+    char *string,		/* String describing a justification style. */
+    Ck_Justify *justifyPtr)	/* Where to store Ck_Justify corresponding
 				 * to string. */
 {
     int c, length;
@@ -487,8 +481,8 @@ Ck_GetJustify(interp, string, justifyPtr)
  */
 
 char *
-Ck_NameOfJustify(justify)
-    Ck_Justify justify;		/* Justification style for which
+Ck_NameOfJustify(
+    Ck_Justify justify)		/* Justification style for which
 				 * identifying string is desired. */
 {
     switch (justify) {
@@ -518,11 +512,11 @@ Ck_NameOfJustify(justify)
  */
 
 int
-Ck_GetCoord(interp, winPtr, string, intPtr)
-    Tcl_Interp *interp;        /* Use this for error reporting. */
-    CkWindow *winPtr;          /* Window (not used). */
-    char *string;              /* String to convert. */
-    int *intPtr;               /* Place to store converted result. */
+Ck_GetCoord(
+    Tcl_Interp *interp,        /* Use this for error reporting. */
+    CkWindow *winPtr,          /* Window (not used). */
+    char *string,              /* String to convert. */
+    int *intPtr)               /* Place to store converted result. */
 {
     int value;
 

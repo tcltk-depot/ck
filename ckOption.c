@@ -223,12 +223,12 @@ static void		SetupStacks(CkWindow *winPtr, int leaf);
  */
 
 void
-Ck_AddOption(winPtr, name, value, priority)
-    CkWindow *winPtr;		/* Window pointer; option will be associated
+Ck_AddOption(
+    CkWindow *winPtr,		/* Window pointer; option will be associated
 				 * with main window for this window. */
-    char *name;			/* Multi-element name of option. */
-    char *value;		/* String value for option. */
-    int priority;		/* Overall priority level to use for
+    char *name,			/* Multi-element name of option. */
+    char *value,		/* String value for option. */
+    int priority)		/* Overall priority level to use for
 				 * this option, such as CK_USER_DEFAULT_PRIO
 				 * or CK_INTERACTIVE_PRIO.  Must be between
 				 * 0 and CK_MAX_PRIO. */
@@ -380,11 +380,11 @@ Ck_AddOption(winPtr, name, value, priority)
  */
 
 Ck_Uid
-Ck_GetOption(winPtr, name, className)
-    CkWindow *winPtr;		/* Pointer to window that option is
+Ck_GetOption(
+    CkWindow *winPtr,		/* Pointer to window that option is
 				 * associated with. */
-    char *name;			/* Name of option. */
-    char *className;		/* Class of option.  NULL means there
+    char *name,			/* Name of option. */
+    char *className)		/* Class of option.  NULL means there
 				 * is no class for this option:  just
 				 * check for name. */
 {
@@ -459,12 +459,12 @@ Ck_GetOption(winPtr, name, className)
  */
 
 int
-Ck_OptionCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_OptionCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     size_t length;
@@ -573,8 +573,7 @@ Ck_OptionCmd(clientData, interp, argc, argv)
  */
 
 void
-CkOptionDeadWindow(winPtr)
-    CkWindow *winPtr;			/* Window to be cleaned up. */
+CkOptionDeadWindow(CkWindow *winPtr)		/* Window to be cleaned up. */
 {
     /*
      * If this window is in the option stacks, then clear the stacks.
@@ -622,8 +621,7 @@ CkOptionDeadWindow(winPtr)
  */
 
 void
-CkOptionClassChanged(winPtr)
-    CkWindow *winPtr;			/* Window whose class changed. */
+CkOptionClassChanged(CkWindow *winPtr)	/* Window whose class changed. */
 {
     int i, j, *basePtr;
     ElArray *arrayPtr;
@@ -678,9 +676,9 @@ CkOptionClassChanged(winPtr)
  */
 
 static int
-ParsePriority(interp, string)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
-    char *string;		/* Describes a priority level, either
+ParsePriority(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
+    char *string)		/* Describes a priority level, either
 				 * symbolically or numerically. */
 {
     int priority, c;
@@ -740,12 +738,12 @@ ParsePriority(interp, string)
  */
 
 static int
-AddFromString(interp, winPtr, string, priority)
-    Tcl_Interp *interp;		/* Interpreter to use for reporting results. */
-    CkWindow *winPtr;		/* Pointer to window:  options are entered
+AddFromString(
+    Tcl_Interp *interp,		/* Interpreter to use for reporting results. */
+    CkWindow *winPtr,		/* Pointer to window:  options are entered
 				 * for this window's main window. */
-    char *string;		/* String containing option specifiers. */
-    int priority;		/* Priority level to use for options in
+    char *string,		/* String containing option specifiers. */
+    int priority)		/* Priority level to use for options in
 				 * this string, such as TK_USER_DEFAULT_PRIO
 				 * or TK_INTERACTIVE_PRIO.  Must be between
 				 * 0 and TK_MAX_PRIO. */
@@ -885,12 +883,12 @@ AddFromString(interp, winPtr, string, priority)
  */
 
 static int
-ReadOptionFile(interp, winPtr, fileName, priority)
-    Tcl_Interp *interp;		/* Interpreter to use for reporting results. */
-    CkWindow *winPtr;		/* Pointer to window:  options are entered
+ReadOptionFile(
+    Tcl_Interp *interp,		/* Interpreter to use for reporting results. */
+    CkWindow *winPtr,		/* Pointer to window:  options are entered
 				 * for this window's main window. */
-    char *fileName;		/* Name of file containing options. */
-    int priority;		/* Priority level to use for options in
+    char *fileName,		/* Name of file containing options. */
+    int priority)		/* Priority level to use for options in
 				 * this file, such as TK_USER_DEFAULT_PRIO
 				 * or TK_INTERACTIVE_PRIO.  Must be between
 				 * 0 and TK_MAX_PRIO. */
@@ -956,8 +954,7 @@ ReadOptionFile(interp, winPtr, fileName, priority)
  */
 
 static ElArray *
-NewArray(numEls)
-    int numEls;			/* How many elements of space to allocate. */
+NewArray(int numEls)		/* How many elements of space to allocate. */
 {
     ElArray *arrayPtr;
 
@@ -987,9 +984,9 @@ NewArray(numEls)
  */
 
 static ElArray *
-ExtendArray(arrayPtr, elPtr)
-    ElArray *arrayPtr;			/* Array to be extended. */
-    Element *elPtr;			/* Element to be copied into array. */
+ExtendArray(
+    ElArray *arrayPtr,			/* Array to be extended. */
+    Element *elPtr)			/* Element to be copied into array. */
 {
     /*
      * If the current array has filled up, make it bigger.
@@ -1002,7 +999,7 @@ ExtendArray(arrayPtr, elPtr)
 	newPtr->arraySize = 2*arrayPtr->arraySize;
 	newPtr->numUsed = arrayPtr->numUsed;
 	newPtr->nextToUse = &newPtr->els[newPtr->numUsed];
-	memcpy((VOID *) newPtr->els, (VOID *) arrayPtr->els,
+	memcpy((void *) newPtr->els, (void *) arrayPtr->els,
 		(arrayPtr->arraySize*sizeof(Element)));
 	ckfree((char *) arrayPtr);
 	arrayPtr = newPtr;
@@ -1033,10 +1030,10 @@ ExtendArray(arrayPtr, elPtr)
  */
 
 static void
-SetupStacks(winPtr, leaf)
-    CkWindow *winPtr;		/* Window for which information is to
+SetupStacks(
+    CkWindow *winPtr,		/* Window for which information is to
 				 * be cached. */
-    int leaf;			/* Non-zero means this is the leaf
+    int leaf)			/* Non-zero means this is the leaf
 				 * window being probed.  Zero means this
 				 * is an ancestor of the desired leaf. */
 {
@@ -1124,7 +1121,7 @@ SetupStacks(winPtr, leaf)
 
 	newLevels = (StackLevel *) ckalloc((unsigned)
 		(numLevels*2*sizeof(StackLevel)));
-	memcpy((VOID *) newLevels, (VOID *) levels,
+	memcpy((void *) newLevels, (void *) levels,
 		(numLevels*sizeof(StackLevel)));
 	ckfree((char *) levels);
 	numLevels *= 2;
@@ -1206,9 +1203,9 @@ SetupStacks(winPtr, leaf)
  */
 
 static void
-ExtendStacks(arrayPtr, leaf)
-    ElArray *arrayPtr;		/* Array of elements to copy onto stacks. */
-    int leaf;			/* If zero, then don't copy exact leaf
+ExtendStacks(
+    ElArray *arrayPtr,		/* Array of elements to copy onto stacks. */
+    int leaf)			/* If zero, then don't copy exact leaf
 				 * elements. */
 {
     int count;
@@ -1240,8 +1237,7 @@ ExtendStacks(arrayPtr, leaf)
  */
 
 static void
-OptionInit(mainPtr)
-    CkMainInfo *mainPtr;		/* Top-level information about
+OptionInit(CkMainInfo *mainPtr)		/* Top-level information about
 					 * window that isn't initialized
 					 * yet. */
 {
@@ -1294,8 +1290,8 @@ OptionInit(mainPtr)
  */
 
 static void
-ClearOptionTree(arrayPtr)
-    ElArray *arrayPtr;		/* Array of options;  delete everything
+ClearOptionTree(
+    ElArray *arrayPtr)		/* Array of options;  delete everything
 				 * referred to recursively by this. */
 {
     Element *elPtr;

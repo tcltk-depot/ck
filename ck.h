@@ -45,7 +45,7 @@
 #define CK_VERSION "8.1"
 #define CK_MINOR_VERSION 1
 #else
-#error unsupported Tcl minor version 
+#error unsupported Tcl minor version
 #endif
 
 #ifndef RESOURCE_INCLUDED
@@ -652,7 +652,7 @@ EXTERN CkWindow *Ck_GetWindowXY(CkMainInfo *mainPtr, int *xPtr,
 EXTERN void	Ck_HandleEvent(CkMainInfo *mainPtr, CkEvent *eventPtr);
 EXTERN int	Ck_Init(Tcl_Interp *interp);
 EXTERN void	Ck_Main(int argc, char **argv,
-		    int (*appInitProc)(), Tcl_Interp *interp);
+		    int (*appInitProc)(Tcl_Interp *), Tcl_Interp *interp);
 EXTERN void	Ck_MainLoop(void);
 EXTERN CkWindow	*Ck_MainWindow(Tcl_Interp *interp);
 EXTERN void	Ck_MaintainGeometry(CkWindow *slave, CkWindow *master,
