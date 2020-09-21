@@ -23,21 +23,6 @@
 #   define _XOPEN_SOURCE
 #endif
 
-/*
- * Macro to use instead of "void" for arguments that must have
- * type "void *" in ANSI C;  maps them to type "char *" in
- * non-ANSI systems.  This macro may be used in some of the include
- * files below, which is why it is defined here.
- */
-
-#ifndef VOID
-#   ifdef __STDC__
-#       define VOID void
-#   else
-#       define VOID char
-#   endif
-#endif
-
 #include <stdio.h>
 #include <ctype.h>
 #include <fcntl.h>
@@ -95,15 +80,6 @@
 
 #if !defined(_WIN32) && !defined(WIN32)
 extern int errno;
-#endif
-
-/*
- * Declarations for various library procedures that may not be declared
- * in any other header file.
- */
-
-#ifndef panic
-extern void		panic();
 #endif
 
 /*

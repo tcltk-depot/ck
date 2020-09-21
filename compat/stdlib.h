@@ -23,23 +23,23 @@
 #include <tcl.h>
 
 extern void		abort(void);
-extern double		atof(CONST char *string);
-extern int		atoi(CONST char *string);
-extern long		atol(CONST char *string);
+extern double		atof(const char *string);
+extern int		atoi(const char *string);
+extern long		atol(const char *string);
 extern char *		calloc(unsigned int numElements,
 			    unsigned int size);
 extern void		exit(int status);
 extern int		free(char *blockPtr);
-extern char *		getenv(CONST char *name);
+extern char *		getenv(const char *name);
 extern char *		malloc(unsigned int numBytes);
-extern void		qsort(VOID *base, int n, int size,
-			    int (*compar)(CONST VOID *element1, CONST VOID
+extern void		qsort(void *base, int n, int size,
+			    int (*compar)(const void *element1, const void
 			    *element2));
 extern char *		realloc(char *ptr, unsigned int numBytes);
-extern double		strtod(CONST char *string, char **endPtr);
-extern long		strtol(CONST char *string, char **endPtr,
+extern double		strtod(const char *string, char **endPtr);
+extern long		strtol(const char *string, char **endPtr,
 			    int base);
-extern unsigned long	strtoul(CONST char *string,
+extern unsigned long	strtoul(const char *string,
 			    char **endPtr, int base);
 
 #endif /* _STDLIB */

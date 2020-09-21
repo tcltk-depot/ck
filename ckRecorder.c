@@ -54,9 +54,9 @@ static void	RecorderReplay(ClientData clientData);
  */
 
 static int
-RecorderInput(clientData, eventPtr)
-    ClientData clientData;
-    CkEvent *eventPtr;
+RecorderInput(
+    ClientData clientData,
+    CkEvent *eventPtr)
 {
     Recorder *recPtr = (Recorder *) clientData;
     int hadEvent = 0, type = eventPtr->any.type;
@@ -178,9 +178,9 @@ printPctSNL:
  */
 
 static int
-DStringGets(chan, dsPtr)
-    Tcl_Channel chan;
-    Tcl_DString *dsPtr;
+DStringGets(
+    Tcl_Channel chan,
+    Tcl_DString *dsPtr)
 {
     char *p;
     int length, code;
@@ -215,8 +215,7 @@ DStringGets(chan, dsPtr)
  */
 
 static void
-DeliverEvent(clientData)
-    ClientData clientData;
+DeliverEvent(ClientData clientData)
 {
     Recorder *recPtr = (Recorder *) clientData;
 
@@ -239,8 +238,7 @@ DeliverEvent(clientData)
  */
 
 static void
-RecorderReplay(clientData)
-    ClientData clientData;
+RecorderReplay(ClientData clientData)
 {
     Recorder *recPtr = (Recorder *) clientData;
     Tcl_DString input;
@@ -387,12 +385,12 @@ doMouse:
  */
 
 int
-Ck_RecorderCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_RecorderCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Recorder *recPtr = ckRecorder;
     CkWindow *mainPtr = (CkWindow *) clientData;

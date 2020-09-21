@@ -317,12 +317,12 @@ static int		InvokeButton(Button *butPtr);
  */
 
 int
-Ck_ButtonCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_ButtonCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Button *butPtr;
     int type;
@@ -436,11 +436,11 @@ Ck_ButtonCmd(clientData, interp, argc, argv)
  */
 
 static int
-ButtonWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about button widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+ButtonWidgetCmd(
+    ClientData clientData,	/* Information about button widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Button *butPtr = (Button *) clientData;
     int result = TCL_OK;
@@ -599,8 +599,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
  */
 
 static void
-DestroyButton(clientData)
-    ClientData clientData;		/* Info about entry widget. */
+DestroyButton(ClientData clientData)	/* Info about entry widget. */
 {
     Button *butPtr = (Button *) clientData;
 
@@ -643,8 +642,8 @@ DestroyButton(clientData)
  */
 
 static void
-ButtonCmdDeletedProc(clientData)
-    ClientData clientData;      /* Pointer to widget record for widget. */
+ButtonCmdDeletedProc(
+    ClientData clientData)	/* Pointer to widget record for widget. */
 {
     Button *butPtr = (Button *) clientData;
     CkWindow *winPtr = butPtr->winPtr;
@@ -684,13 +683,13 @@ ButtonCmdDeletedProc(clientData)
  */
 
 static int
-ConfigureButton(interp, butPtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    Button *butPtr;             /* Information about widget;  may or may
+ConfigureButton(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    Button *butPtr,             /* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
      * Eliminate any existing trace on variables monitored by the button.
@@ -815,8 +814,7 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
  */
 
 static void
-DisplayButton(clientData)
-    ClientData clientData;	/* Information about widget. */
+DisplayButton(ClientData clientData)	/* Information about widget. */
 {
     Button *butPtr = (Button *) clientData;
     int x, y, fg, bg, attr, textWidth, charWidth;
@@ -940,9 +938,9 @@ DisplayButton(clientData)
  */
 
 static void
-ButtonEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+ButtonEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     Button *butPtr = (Button *) clientData;
 
@@ -983,8 +981,8 @@ ButtonEventProc(clientData, eventPtr)
  */
 
 static void
-ComputeButtonGeometry(butPtr)
-    Button *butPtr;	/* Button whose geometry may have changed. */
+ComputeButtonGeometry(
+    Button *butPtr)	/* Button whose geometry may have changed. */
 {
     int width, height, dummy;
     CkWindow *winPtr = butPtr->winPtr;
@@ -1035,8 +1033,7 @@ ComputeButtonGeometry(butPtr)
  */
 
 static int
-InvokeButton(butPtr)
-    Button *butPtr;		/* Information about button. */
+InvokeButton(Button *butPtr)		/* Information about button. */
 {
     if (butPtr->type == TYPE_CHECK_BUTTON) {
 	if (butPtr->flags & SELECTED) {
@@ -1076,12 +1073,12 @@ InvokeButton(butPtr)
  */
 
 static char *
-ButtonVarProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;	/* Information about button. */
-    Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
-    int flags;			/* Information about what happened. */
+ButtonVarProc(
+    ClientData clientData,	/* Information about button. */
+    Tcl_Interp *interp,		/* Interpreter containing variable. */
+    char *name1,		/* Name of variable. */
+    char *name2,		/* Second part of variable name. */
+    int flags)			/* Information about what happened. */
 {
     Button *butPtr = (Button *) clientData;
     char *value;
@@ -1146,12 +1143,12 @@ ButtonVarProc(clientData, interp, name1, name2, flags)
  */
 
 static char *
-ButtonTextVarProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;	/* Information about button. */
-    Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
-    int flags;			/* Information about what happened. */
+ButtonTextVarProc(
+    ClientData clientData,	/* Information about button. */
+    Tcl_Interp *interp,		/* Interpreter containing variable. */
+    char *name1,		/* Name of variable. */
+    char *name2,		/* Second part of variable name. */
+    int flags)			/* Information about what happened. */
 {
     Button *butPtr = (Button *) clientData;
     char *value;

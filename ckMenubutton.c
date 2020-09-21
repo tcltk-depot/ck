@@ -236,12 +236,12 @@ static void		DisplayMenuButton(ClientData clientData);
  */
 
 int
-Ck_MenubuttonCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_MenubuttonCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     MenuButton *mbPtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -329,11 +329,11 @@ Ck_MenubuttonCmd(clientData, interp, argc, argv)
  */
 
 static int
-MenuButtonWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about button widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+MenuButtonWidgetCmd(
+    ClientData clientData,	/* Information about button widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
     int result = TCL_OK;
@@ -404,8 +404,7 @@ MenuButtonWidgetCmd(clientData, interp, argc, argv)
  */
 
 static void
-DestroyMenuButton(clientData)
-    ClientData clientData;	/* Info about button widget. */
+DestroyMenuButton(ClientData clientData)	/* Info about button widget. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
 
@@ -446,13 +445,13 @@ DestroyMenuButton(clientData)
  */
 
 static int
-ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    MenuButton *mbPtr;		/* Information about widget;  may or may
+ConfigureMenuButton(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    MenuButton *mbPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int result;
 
@@ -543,8 +542,7 @@ ConfigureMenuButton(interp, mbPtr, argc, argv, flags)
  */
 
 static void
-DisplayMenuButton(clientData)
-    ClientData clientData;	/* Information about widget. */
+DisplayMenuButton(ClientData clientData)	/* Information about widget. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
     int x, y, fg, bg, attr, textWidth, charWidth;
@@ -662,9 +660,9 @@ DisplayMenuButton(clientData)
  */
 
 static void
-MenuButtonEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+MenuButtonEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
 
@@ -706,8 +704,8 @@ MenuButtonEventProc(clientData, eventPtr)
  */
 
 static void
-MenuButtonCmdDeletedProc(clientData)
-    ClientData clientData;	/* Pointer to widget record for widget. */
+MenuButtonCmdDeletedProc(
+    ClientData clientData)	/* Pointer to widget record for widget. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
     CkWindow *winPtr = mbPtr->winPtr;
@@ -744,8 +742,8 @@ MenuButtonCmdDeletedProc(clientData)
  */
 
 static void
-ComputeMenuButtonGeometry(mbPtr)
-    MenuButton *mbPtr;			/* Widget record for menu button. */
+ComputeMenuButtonGeometry(
+    MenuButton *mbPtr)			/* Widget record for menu button. */
 {
     int width, height, dummy;
     CkWindow *winPtr = mbPtr->winPtr;
@@ -793,12 +791,12 @@ ComputeMenuButtonGeometry(mbPtr)
  */
 
 static char *
-MenuButtonTextVarProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;	/* Information about button. */
-    Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
-    int flags;			/* Information about what happened. */
+MenuButtonTextVarProc(
+    ClientData clientData,	/* Information about button. */
+    Tcl_Interp *interp,		/* Interpreter containing variable. */
+    char *name1,		/* Name of variable. */
+    char *name2,		/* Second part of variable name. */
+    int flags)			/* Information about what happened. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
     char *value;

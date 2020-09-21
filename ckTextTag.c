@@ -56,8 +56,8 @@ static CkTextTag *	FindTag(Tcl_Interp *interp,
 			    CkText *textPtr, char *tagName);
 static void		SortTags(int numTags,
 			    CkTextTag **tagArrayPtr);
-static int		TagSortProc(CONST VOID *first,
-			    CONST VOID *second);
+static int		TagSortProc(const void *first,
+			    const void *second);
 
 /*
  *--------------------------------------------------------------
@@ -78,11 +78,11 @@ static int		TagSortProc(CONST VOID *first,
  */
 
 int
-CkTextTagCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+CkTextTagCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "tag". */
 {
@@ -579,9 +579,9 @@ CkTextTagCmd(textPtr, interp, argc, argv)
  */
 
 CkTextTag *
-CkTextCreateTag(textPtr, tagName)
-    CkText *textPtr;		/* Widget in which tag is being used. */
-    char *tagName;		/* Name of desired tag. */
+CkTextCreateTag(
+    CkText *textPtr,		/* Widget in which tag is being used. */
+    char *tagName)		/* Name of desired tag. */
 {
     CkTextTag *tagPtr;
     Tcl_HashEntry *hPtr;
@@ -640,12 +640,12 @@ CkTextCreateTag(textPtr, tagName)
  */
 
 static CkTextTag *
-FindTag(interp, textPtr, tagName)
-    Tcl_Interp *interp;		/* Interpreter to use for error message;
+FindTag(
+    Tcl_Interp *interp,		/* Interpreter to use for error message;
 				 * if NULL, then don't record an error
 				 * message. */
-    CkText *textPtr;		/* Widget in which tag is being used. */
-    char *tagName;		/* Name of desired tag. */
+    CkText *textPtr,		/* Widget in which tag is being used. */
+    char *tagName)		/* Name of desired tag. */
 {
     Tcl_HashEntry *hPtr;
 
@@ -678,9 +678,9 @@ FindTag(interp, textPtr, tagName)
  */
 
 void
-CkTextFreeTag(textPtr, tagPtr)
-    CkText *textPtr;			/* Info about overall widget. */
-    CkTextTag *tagPtr;			/* Tag being deleted. */
+CkTextFreeTag(
+    CkText *textPtr,			/* Info about overall widget. */
+    CkTextTag *tagPtr)			/* Tag being deleted. */
 {
     if (tagPtr->justifyString != NULL) {
 	ckfree(tagPtr->justifyString);
@@ -722,9 +722,9 @@ CkTextFreeTag(textPtr, tagPtr)
  */
 
 static void
-SortTags(numTags, tagArrayPtr)
-    int numTags;		/* Number of tag pointers at *tagArrayPtr. */
-    CkTextTag **tagArrayPtr;	/* Pointer to array of pointers. */
+SortTags(
+    int numTags,		/* Number of tag pointers at *tagArrayPtr. */
+    CkTextTag **tagArrayPtr)	/* Pointer to array of pointers. */
 {
     int i, j, prio;
     CkTextTag **tagPtrPtr;
@@ -748,7 +748,7 @@ SortTags(numTags, tagArrayPtr)
 	    *tagArrayPtr = tmp;
 	}
     } else {
-	qsort((VOID *) tagArrayPtr, (unsigned) numTags, sizeof (CkTextTag *),
+	qsort((void *) tagArrayPtr, (unsigned) numTags, sizeof (CkTextTag *),
 		    TagSortProc);
     }
 }
@@ -774,8 +774,8 @@ SortTags(numTags, tagArrayPtr)
  */
 
 static int
-TagSortProc(first, second)
-    CONST VOID *first, *second;		/* Elements to be compared. */
+TagSortProc(
+    const void *first, const void *second)	/* Elements to be compared. */
 {
     CkTextTag *tagPtr1, *tagPtr2;
 
@@ -806,11 +806,11 @@ TagSortProc(first, second)
  */
 
 static void
-ChangeTagPriority(textPtr, tagPtr, prio)
-    CkText *textPtr;			/* Information about text widget. */
-    CkTextTag *tagPtr;			/* Tag whose priority is to be
+ChangeTagPriority(
+    CkText *textPtr,			/* Information about text widget. */
+    CkTextTag *tagPtr,			/* Tag whose priority is to be
 					 * changed. */
-    int prio;				/* New priority for tag. */
+    int prio)				/* New priority for tag. */
 {
     int low, high, delta;
     CkTextTag *tagPtr2;
@@ -863,9 +863,9 @@ ChangeTagPriority(textPtr, tagPtr, prio)
  */
 
 void
-CkTextBindProc(clientData, eventPtr)
-    ClientData clientData;		/* Pointer to text structure. */
-    CkEvent *eventPtr;			/* Pointer to X event that just
+CkTextBindProc(
+    ClientData clientData,		/* Pointer to text structure. */
+    CkEvent *eventPtr)			/* Pointer to X event that just
 					 * happened. */
 {
 }
@@ -893,10 +893,10 @@ CkTextBindProc(clientData, eventPtr)
  */
 
 void
-CkTextPickCurrent(textPtr, eventPtr)
-    CkText *textPtr;			/* Text widget in which to select
+CkTextPickCurrent(
+    CkText *textPtr,			/* Text widget in which to select
 					 * current character. */
-    CkEvent *eventPtr;			/* Event describing location of
+    CkEvent *eventPtr)			/* Event describing location of
 					 * mouse cursor.  Must be EnterWindow,
 					 * LeaveWindow, ButtonRelease, or
 					 * MotionNotify. */

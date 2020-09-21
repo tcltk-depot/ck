@@ -156,12 +156,12 @@ static void		DisplayMessage(ClientData clientData);
  */
 
 int
-Ck_MessageCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_MessageCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Message *msgPtr;
     CkWindow *new;
@@ -234,11 +234,11 @@ error:
  */
 
 static int
-MessageWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about message widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+MessageWidgetCmd(
+    ClientData clientData,	/* Information about message widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Message *msgPtr = (Message *) clientData;
     size_t length;
@@ -299,8 +299,7 @@ MessageWidgetCmd(clientData, interp, argc, argv)
  */
 
 static void
-DestroyMessage(clientData)
-    ClientData clientData;	/* Info about message widget. */
+DestroyMessage(ClientData clientData)	/* Info about message widget. */
 {
     Message *msgPtr = (Message *) clientData;
 
@@ -338,8 +337,8 @@ DestroyMessage(clientData)
  */
 
 static void
-MessageCmdDeletedProc(clientData)
-    ClientData clientData;      /* Pointer to widget record for widget. */
+MessageCmdDeletedProc(
+    ClientData clientData)      /* Pointer to widget record for widget. */
 {
     Message *msgPtr = (Message *) clientData;
     CkWindow *winPtr = msgPtr->winPtr;
@@ -379,13 +378,13 @@ MessageCmdDeletedProc(clientData)
  */
 
 static int
-ConfigureMessage(interp, msgPtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    Message *msgPtr;		/* Information about widget;  may or may
+ConfigureMessage(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    Message *msgPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
      * Eliminate any existing trace on a variable monitored by the message.
@@ -475,8 +474,8 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
  */
 
 static void
-ComputeMessageGeometry(msgPtr)
-    Message *msgPtr;		/* Information about window. */
+ComputeMessageGeometry(
+    Message *msgPtr)		/* Information about window. */
 {
     char *p;
     int width, inc, height, numLines;
@@ -580,8 +579,7 @@ ComputeMessageGeometry(msgPtr)
  */
 
 static void
-DisplayMessage(clientData)
-    ClientData clientData;	/* Information about window. */
+DisplayMessage(ClientData clientData)	/* Information about window. */
 {
     Message *msgPtr = (Message *) clientData;
     CkWindow *winPtr = msgPtr->winPtr;
@@ -692,9 +690,9 @@ DisplayMessage(clientData)
  */
 
 static void
-MessageEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+MessageEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     Message *msgPtr = (Message *) clientData;
 
@@ -735,12 +733,12 @@ MessageEventProc(clientData, eventPtr)
  */
 
 static char *
-MessageTextVarProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;	/* Information about message. */
-    Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
-    int flags;			/* Information about what happened. */
+MessageTextVarProc(
+    ClientData clientData,	/* Information about message. */
+    Tcl_Interp *interp,		/* Interpreter containing variable. */
+    char *name1,		/* Name of variable. */
+    char *name2,		/* Second part of variable name. */
+    int flags)			/* Information about what happened. */
 {
     Message *msgPtr = (Message *) clientData;
     char *value;

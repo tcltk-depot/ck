@@ -64,16 +64,16 @@ static char *           FormatConfigValue(Tcl_Interp *interp,
  */
 
 int
-Ck_ConfigureWidget(interp, winPtr, specs, argc, argv, widgRec, flags)
-    Tcl_Interp *interp;		/* Interpreter for error reporting. */
-    CkWindow *winPtr;		/* Window containing widget. */
-    Ck_ConfigSpec *specs;	/* Describes legal options. */
-    int argc;			/* Number of elements in argv. */
-    char **argv;		/* Command-line options. */
-    char *widgRec;		/* Record whose fields are to be
+Ck_ConfigureWidget(
+    Tcl_Interp *interp,		/* Interpreter for error reporting. */
+    CkWindow *winPtr,		/* Window containing widget. */
+    Ck_ConfigSpec *specs,	/* Describes legal options. */
+    int argc,			/* Number of elements in argv. */
+    char **argv,		/* Command-line options. */
+    char *widgRec,		/* Record whose fields are to be
 				 * modified.  Values must be properly
 				 * initialized. */
-    int flags;			/* Used to specify additional flags
+    int flags)			/* Used to specify additional flags
 				 * that must be present in config specs
 				 * for them to be considered.  Also,
 				 * may have CK_CONFIG_ARGV_ONLY set. */
@@ -221,15 +221,15 @@ Ck_ConfigureWidget(interp, winPtr, specs, argc, argv, widgRec, flags)
  */
 
 static Ck_ConfigSpec *
-FindConfigSpec(interp, specs, argvName, needFlags, hateFlags)
-    Tcl_Interp *interp;		/* Used for reporting errors. */
-    Ck_ConfigSpec *specs;	/* Pointer to table of configuration
+FindConfigSpec(
+    Tcl_Interp *interp,		/* Used for reporting errors. */
+    Ck_ConfigSpec *specs,	/* Pointer to table of configuration
 				 * specifications for a widget. */
-    char *argvName;		/* Name (suitable for use in a "config"
+    char *argvName,		/* Name (suitable for use in a "config"
 				 * command) identifying particular option. */
-    int needFlags;		/* Flags that must be present in matching
+    int needFlags,		/* Flags that must be present in matching
 				 * entry. */
-    int hateFlags;		/* Flags that must NOT be present in
+    int hateFlags)		/* Flags that must NOT be present in
 				 * matching entry. */
 {
     Ck_ConfigSpec *specPtr;
@@ -316,14 +316,14 @@ FindConfigSpec(interp, specs, argvName, needFlags, hateFlags)
  */
 
 static int
-DoConfig(interp, winPtr, specPtr, value, valueIsUid, widgRec)
-    Tcl_Interp *interp;		/* Interpreter for error reporting. */
-    CkWindow *winPtr;		/* Window containing widget. */
-    Ck_ConfigSpec *specPtr;	/* Specifier to apply. */
-    char *value;		/* Value to use to fill in widgRec. */
-    int valueIsUid;		/* Non-zero means value is a Ck_Uid;
+DoConfig(
+    Tcl_Interp *interp,		/* Interpreter for error reporting. */
+    CkWindow *winPtr,		/* Window containing widget. */
+    Ck_ConfigSpec *specPtr,	/* Specifier to apply. */
+    char *value,		/* Value to use to fill in widgRec. */
+    int valueIsUid,		/* Non-zero means value is a Ck_Uid;
 				 * zero means it's an ordinary string. */
-    char *widgRec;		/* Record whose fields are to be
+    char *widgRec)		/* Record whose fields are to be
 				 * modified.  Values must be properly
 				 * initialized. */
 {
@@ -492,16 +492,16 @@ DoConfig(interp, winPtr, specPtr, value, valueIsUid, widgRec)
  */
 
 int
-Ck_ConfigureInfo(interp, winPtr, specs, widgRec, argvName, flags)
-    Tcl_Interp *interp;		/* Interpreter for error reporting. */
-    CkWindow *winPtr;		/* Window corresponding to widgRec. */
-    Ck_ConfigSpec *specs;	/* Describes legal options. */
-    char *widgRec;		/* Record whose fields contain current
+Ck_ConfigureInfo(
+    Tcl_Interp *interp,		/* Interpreter for error reporting. */
+    CkWindow *winPtr,		/* Window corresponding to widgRec. */
+    Ck_ConfigSpec *specs,	/* Describes legal options. */
+    char *widgRec,		/* Record whose fields contain current
 				 * values for options. */
-    char *argvName;		/* If non-NULL, indicates a single option
+    char *argvName,		/* If non-NULL, indicates a single option
 				 * whose info is to be returned.  Otherwise
 				 * info is returned for all options. */
-    int flags;			/* Used to specify additional flags
+    int flags)			/* Used to specify additional flags
 				 * that must be present in config specs
 				 * for them to be considered. */
 {
@@ -579,15 +579,15 @@ Ck_ConfigureInfo(interp, winPtr, specs, widgRec, argvName, flags)
  */
 
 int
-Ck_ConfigureValue(interp, winPtr, specs, widgRec, argvName, flags)
-    Tcl_Interp *interp;         /* Interpreter for error reporting. */
-    CkWindow *winPtr;           /* Window corresponding to widgRec. */
-    Ck_ConfigSpec *specs;       /* Describes legal options. */
-    char *widgRec;              /* Record whose fields contain current
+Ck_ConfigureValue(
+    Tcl_Interp *interp,         /* Interpreter for error reporting. */
+    CkWindow *winPtr,           /* Window corresponding to widgRec. */
+    Ck_ConfigSpec *specs,       /* Describes legal options. */
+    char *widgRec,              /* Record whose fields contain current
                                  * values for options. */
-    char *argvName;             /* Gives the command-line name for the
+    char *argvName,             /* Gives the command-line name for the
                                  * option whose value is to be returned. */
-    int flags;                  /* Used to specify additional flags
+    int flags)                  /* Used to specify additional flags
                                  * that must be present in config specs
                                  * for them to be considered. */
 {
@@ -635,13 +635,13 @@ Ck_ConfigureValue(interp, winPtr, specs, widgRec, argvName, flags)
  */
 
 static char *
-FormatConfigInfo(interp, winPtr, specPtr, widgRec)
-    Tcl_Interp *interp;			/* Interpreter to use for things
+FormatConfigInfo(
+    Tcl_Interp *interp,			/* Interpreter to use for things
 					 * like floating-point precision. */
-    CkWindow *winPtr;			/* Window corresponding to widget. */
-    Ck_ConfigSpec *specPtr;		/* Pointer to information describing
+    CkWindow *winPtr,			/* Window corresponding to widget. */
+    Ck_ConfigSpec *specPtr,		/* Pointer to information describing
 					 * option. */
-    char *widgRec;			/* Pointer to record holding current
+    char *widgRec)			/* Pointer to record holding current
 					 * values of info for widget. */
 {
     char *argv[6], *result;
@@ -703,16 +703,16 @@ FormatConfigInfo(interp, winPtr, specPtr, widgRec)
  */
 
 static char *
-FormatConfigValue(interp, winPtr, specPtr, widgRec, buffer, freeProcPtr)
-    Tcl_Interp *interp;         /* Interpreter for use in real conversions. */
-    CkWindow *winPtr;           /* Window corresponding to widget. */
-    Ck_ConfigSpec *specPtr;     /* Pointer to information describing option.
+FormatConfigValue(
+    Tcl_Interp *interp,         /* Interpreter for use in real conversions. */
+    CkWindow *winPtr,           /* Window corresponding to widget. */
+    Ck_ConfigSpec *specPtr,     /* Pointer to information describing option.
                                  * Must not point to a synonym option. */
-    char *widgRec;              /* Pointer to record holding current
+    char *widgRec,              /* Pointer to record holding current
                                  * values of info for widget. */
-    char *buffer;               /* Static buffer to use for small values.
+    char *buffer,               /* Static buffer to use for small values.
                                  * Must have at least 200 bytes of storage. */
-    Tcl_FreeProc **freeProcPtr; /* Pointer to word to fill in with address
+    Tcl_FreeProc **freeProcPtr) /* Pointer to word to fill in with address
                                  * of procedure to free the result, or NULL
                                  * if result is static. */
 {
@@ -809,11 +809,11 @@ FormatConfigValue(interp, winPtr, specPtr, widgRec, buffer, freeProcPtr)
  */
 
 void
-Ck_FreeOptions(specs, widgRec, needFlags)
-    Ck_ConfigSpec *specs;	/* Describes legal options. */
-    char *widgRec;		/* Record whose fields contain current
+Ck_FreeOptions(
+    Ck_ConfigSpec *specs,	/* Describes legal options. */
+    char *widgRec,		/* Record whose fields contain current
 				 * values for options. */
-    int needFlags;		/* Used to specify additional flags
+    int needFlags)		/* Used to specify additional flags
 				 * that must be present in config specs
 				 * for them to be considered. */
 {

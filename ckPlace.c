@@ -163,11 +163,11 @@ static void		UnlinkSlave(Slave *slavePtr);
  */
 
 int
-Ck_PlaceCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+Ck_PlaceCmd(
+    ClientData clientData,	/* Main window associated with interpreter. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr;
     Slave *slavePtr;
@@ -329,8 +329,7 @@ Ck_PlaceCmd(clientData, interp, argc, argv)
  */
 
 static Slave *
-FindSlave(winPtr)
-    CkWindow *winPtr;		/* Pointer to desired slave. */
+FindSlave(CkWindow *winPtr)		/* Pointer to desired slave. */
 {
     Tcl_HashEntry *hPtr;
     Slave *slavePtr;
@@ -377,8 +376,7 @@ FindSlave(winPtr)
  */
 
 static void
-UnlinkSlave(slavePtr)
-    Slave *slavePtr;		/* Slave structure to be unlinked. */
+UnlinkSlave(Slave *slavePtr)		/* Slave structure to be unlinked. */
 {
     Master *masterPtr;
     Slave *prevPtr;
@@ -393,7 +391,7 @@ UnlinkSlave(slavePtr)
 	for (prevPtr = masterPtr->slavePtr; ;
 		prevPtr = prevPtr->nextPtr) {
 	    if (prevPtr == NULL) {
-		panic("UnlinkSlave couldn't find slave to unlink");
+		Tcl_Panic("UnlinkSlave couldn't find slave to unlink");
 	    }
 	    if (prevPtr->nextPtr == slavePtr) {
 		prevPtr->nextPtr = slavePtr->nextPtr;
@@ -422,8 +420,7 @@ UnlinkSlave(slavePtr)
  */
 
 static Master *
-FindMaster(winPtr)
-    CkWindow *winPtr;		/* Pointer to desired master. */
+FindMaster(CkWindow *winPtr)		/* Pointer to desired master. */
 {
     Tcl_HashEntry *hPtr;
     Master *masterPtr;
@@ -470,12 +467,12 @@ FindMaster(winPtr)
  */
 
 static int
-ConfigureSlave(interp, slavePtr, argc, argv)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    Slave *slavePtr;		/* Pointer to current information
+ConfigureSlave(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    Slave *slavePtr,		/* Pointer to current information
 				 * about slave. */
-    int argc;			/* Number of config arguments. */
-    char **argv;		/* String values for arguments. */
+    int argc,			/* Number of config arguments. */
+    char **argv)		/* String values for arguments. */
 {
     Master *masterPtr;
     int c, length, result;
@@ -633,8 +630,7 @@ done:
  */
 
 static void
-RecomputePlacement(clientData)
-    ClientData clientData;	/* Pointer to Master record. */
+RecomputePlacement(ClientData clientData)	/* Pointer to Master record. */
 {
     Master *masterPtr = (Master *) clientData;
     Slave *slavePtr;
@@ -815,10 +811,10 @@ RecomputePlacement(clientData)
  */
 
 static void
-MasterStructureProc(clientData, eventPtr)
-    ClientData clientData;	/* Pointer to Master structure for window
+MasterStructureProc(
+    ClientData clientData,	/* Pointer to Master structure for window
 				 * referred to by eventPtr. */
-    CkEvent *eventPtr;		/* Describes what just happened. */
+    CkEvent *eventPtr)		/* Describes what just happened. */
 {
     Master *masterPtr = (Master *) clientData;
     Slave *slavePtr, *nextPtr;
@@ -866,10 +862,10 @@ MasterStructureProc(clientData, eventPtr)
  */
 
 static void
-SlaveStructureProc(clientData, eventPtr)
-    ClientData clientData;	/* Pointer to Slave structure for window
+SlaveStructureProc(
+    ClientData clientData,	/* Pointer to Slave structure for window
 				 * referred to by eventPtr. */
-    CkEvent *eventPtr;		/* Describes what just happened. */
+    CkEvent *eventPtr)		/* Describes what just happened. */
 {
     Slave *slavePtr = (Slave *) clientData;
 
@@ -900,9 +896,9 @@ SlaveStructureProc(clientData, eventPtr)
  */
 
 static void
-PlaceRequestProc(clientData, winPtr)
-    ClientData clientData;		/* Pointer to our record for slave. */
-    CkWindow *winPtr;			/* Window that changed its desired
+PlaceRequestProc(
+    ClientData clientData,		/* Pointer to our record for slave. */
+    CkWindow *winPtr)			/* Window that changed its desired
 					 * size. */
 {
     Slave *slavePtr = (Slave *) clientData;
@@ -940,10 +936,10 @@ PlaceRequestProc(clientData, winPtr)
  */
 
 static void
-PlaceLostSlaveProc(clientData, winPtr)
-    ClientData clientData;	/* Slave structure for slave window that
+PlaceLostSlaveProc(
+    ClientData clientData,	/* Slave structure for slave window that
 				 * was stolen away. */
-    CkWindow *winPtr;		/* Slave window. */
+    CkWindow *winPtr)		/* Slave window. */
 {
     Slave *slavePtr = (Slave *) clientData;
 

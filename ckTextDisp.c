@@ -296,8 +296,8 @@ static int		SizeOfTab(CkText *textPtr,
  */
 
 void
-CkTextCreateDInfo(textPtr)
-    CkText *textPtr;		/* Overall information for text widget. */
+CkTextCreateDInfo(
+    CkText *textPtr)		/* Overall information for text widget. */
 {
     DInfo *dInfoPtr;
 
@@ -335,8 +335,8 @@ CkTextCreateDInfo(textPtr)
  */
 
 void
-CkTextFreeDInfo(textPtr)
-    CkText *textPtr;		/* Overall information for text widget. */
+CkTextFreeDInfo(
+    CkText *textPtr)		/* Overall information for text widget. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
 
@@ -374,9 +374,9 @@ CkTextFreeDInfo(textPtr)
  */
 
 static Style *
-GetStyle(textPtr, indexPtr)
-    CkText *textPtr;		/* Overall information about text widget. */
-    CkTextIndex *indexPtr;	/* The character in the text for which
+GetStyle(
+    CkText *textPtr,		/* Overall information about text widget. */
+    CkTextIndex *indexPtr)	/* The character in the text for which
 				 * display information is wanted. */
 {
     CkTextTag **tagPtrs;
@@ -406,7 +406,7 @@ GetStyle(textPtr, indexPtr)
     bgPrio = fgPrio = attrPrio = justifyPrio = -1;
     lMargin1Prio = lMargin2Prio = rMarginPrio = -1;
     tabPrio = wrapPrio = -1;
-    memset((VOID *) &styleValues, 0, sizeof(StyleValues));
+    memset((void *) &styleValues, 0, sizeof(StyleValues));
     styleValues.fg = textPtr->fg;
     styleValues.bg = textPtr->bg;
     styleValues.attr = textPtr->attr;
@@ -507,9 +507,9 @@ GetStyle(textPtr, indexPtr)
  */
 
 static void
-FreeStyle(textPtr, stylePtr)
-    CkText *textPtr;		/* Information about overall widget. */
-    Style *stylePtr;		/* Information about style to be freed. */
+FreeStyle(
+    CkText *textPtr,		/* Information about overall widget. */
+    Style *stylePtr)		/* Information about style to be freed. */
 
 {
     stylePtr->refCount--;
@@ -539,9 +539,9 @@ FreeStyle(textPtr, stylePtr)
  */
 
 static DLine *
-LayoutDLine(textPtr, indexPtr)
-    CkText *textPtr;		/* Overall information about text widget. */
-    CkTextIndex *indexPtr;	/* Beginning of display line.  May not
+LayoutDLine(
+    CkText *textPtr,		/* Overall information about text widget. */
+    CkTextIndex *indexPtr)	/* Beginning of display line.  May not
 				 * necessarily point to a character segment. */
 {
     DLine *dlPtr;			/* New display line. */
@@ -761,7 +761,7 @@ LayoutDLine(textPtr, indexPtr)
 	chunkPtr = NULL;
     }
     if (noCharsYet) {
-	panic("LayoutDLine couldn't place any characters on a line");
+	Tcl_Panic("LayoutDLine couldn't place any characters on a line");
     }
     wholeLine = (segPtr == NULL);
 
@@ -874,8 +874,8 @@ LayoutDLine(textPtr, indexPtr)
  */
 
 static void
-UpdateDisplayInfo(textPtr)
-    CkText *textPtr;			/* Text widget to update. */
+UpdateDisplayInfo(
+    CkText *textPtr)			/* Text widget to update. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
     DLine *dlPtr, *prevPtr;
@@ -1126,7 +1126,7 @@ UpdateDisplayInfo(textPtr)
 	for (dlPtr = dInfoPtr->dLinePtr; dlPtr != NULL;
 		dlPtr = dlPtr->nextPtr) {
 	    if (y > dInfoPtr->maxY) {
-		panic("Added too many new lines in UpdateDisplayInfo");
+		Tcl_Panic("Added too many new lines in UpdateDisplayInfo");
 	    }
 	    dlPtr->y = y;
 	    y += dlPtr->height;
@@ -1217,14 +1217,14 @@ UpdateDisplayInfo(textPtr)
  */
 
 static void
-FreeDLines(textPtr, firstPtr, lastPtr, unlink)
-    CkText *textPtr;			/* Information about overall text
+FreeDLines(
+    CkText *textPtr,			/* Information about overall text
 					 * widget. */
-    DLine *firstPtr;			/* Pointer to first DLine to free up. */
-    DLine *lastPtr;			/* Pointer to DLine just after last
+    DLine *firstPtr,			/* Pointer to first DLine to free up. */
+    DLine *lastPtr,			/* Pointer to DLine just after last
 					 * one to free (NULL means everything
 					 * starting with firstPtr). */
-    int unlink;				/* 1 means DLines are currently linked
+    int unlink)				/* 1 means DLines are currently linked
 					 * into the list rooted at
 					 * textPtr->dInfoPtr->dLinePtr and
 					 * they have to be unlinked.  0 means
@@ -1283,12 +1283,12 @@ FreeDLines(textPtr, firstPtr, lastPtr, unlink)
  */
 
 static void
-DisplayDLine(textPtr, dlPtr, prevPtr, window)
-    CkText *textPtr;		/* Text widget in which to draw line. */
-    DLine *dlPtr;		/* Information about line to draw. */
-    DLine *prevPtr;		/* Line just before one to draw, or NULL
+DisplayDLine(
+    CkText *textPtr,		/* Text widget in which to draw line. */
+    DLine *dlPtr,		/* Information about line to draw. */
+    DLine *prevPtr,		/* Line just before one to draw, or NULL
 				 * if dlPtr is the top line. */
-    WINDOW *window;
+    WINDOW *window)
 {
     CkTextDispChunk *chunkPtr;
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -1360,8 +1360,8 @@ DisplayDLine(textPtr, dlPtr, prevPtr, window)
  */
 
 static void
-DisplayText(clientData)
-    ClientData clientData;	/* Information about widget. */
+DisplayText(
+    ClientData clientData)	/* Information about widget. */
 {
     CkText *textPtr = (CkText *) clientData;
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -1550,10 +1550,9 @@ done:
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
 void
-CkTextEventuallyRepick(textPtr)
-    CkText *textPtr;		/* Widget record for text widget. */
+CkTextEventuallyRepick(
+    CkText *textPtr)		/* Widget record for text widget. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
 
@@ -1582,14 +1581,13 @@ CkTextEventuallyRepick(textPtr)
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
 void
-CkTextRedrawRegion(textPtr, x, y, width, height)
-    CkText *textPtr;		/* Widget record for text widget. */
-    int x, y;			/* Coordinates of upper-left corner of area
+CkTextRedrawRegion(
+    CkText *textPtr,		/* Widget record for text widget. */
+    int x, int y,		/* Coordinates of upper-left corner of area
 				 * to be redrawn, in pixels relative to
 				 * textPtr's window. */
-    int width, height;		/* Width and height of area to be redrawn. */
+    int width, int height)	/* Width and height of area to be redrawn. */
 {
     DLine *dlPtr;
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -1646,10 +1644,10 @@ CkTextRedrawRegion(textPtr, x, y, width, height)
  */
 
 void
-CkTextChanged(textPtr, index1Ptr, index2Ptr)
-    CkText *textPtr;		/* Widget record for text widget. */
-    CkTextIndex *index1Ptr;	/* Index of first character to redisplay. */
-    CkTextIndex *index2Ptr;	/* Index of character just after last one
+CkTextChanged(
+    CkText *textPtr,		/* Widget record for text widget. */
+    CkTextIndex *index1Ptr,	/* Index of first character to redisplay. */
+    CkTextIndex *index2Ptr)	/* Index of character just after last one
 				 * to redisplay. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -1726,16 +1724,16 @@ CkTextChanged(textPtr, index1Ptr, index2Ptr)
  */
 
 void
-CkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tagPtr, withTag)
-    CkText *textPtr;		/* Widget record for text widget. */
-    CkTextIndex *index1Ptr;	/* First character in range to consider
+CkTextRedrawTag(
+    CkText *textPtr,		/* Widget record for text widget. */
+    CkTextIndex *index1Ptr,	/* First character in range to consider
 				 * for redisplay.  NULL means start at
 				 * beginning of text. */
-    CkTextIndex *index2Ptr;	/* Character just after last one to consider
+    CkTextIndex *index2Ptr,	/* Character just after last one to consider
 				 * for redisplay.  NULL means process all
 				 * the characters in the text. */
-    CkTextTag *tagPtr;		/* Information about tag. */
-    int withTag;		/* 1 means redraw characters that have the
+    CkTextTag *tagPtr,		/* Information about tag. */
+    int withTag)		/* 1 means redraw characters that have the
 				 * tag, 0 means redraw those without. */
 {
     DLine *dlPtr;
@@ -1878,8 +1876,8 @@ CkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tagPtr, withTag)
  */
 
 void
-CkTextRelayoutWindow(textPtr)
-    CkText *textPtr;		/* Widget record for text widget. */
+CkTextRelayoutWindow(
+    CkText *textPtr)		/* Widget record for text widget. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
 
@@ -1943,11 +1941,11 @@ CkTextRelayoutWindow(textPtr)
  */
 
 void
-CkTextSetYView(textPtr, indexPtr, pickPlace)
-    CkText *textPtr;		/* Widget record for text widget. */
-    CkTextIndex *indexPtr;	/* Position that is to appear somewhere
+CkTextSetYView(
+    CkText *textPtr,		/* Widget record for text widget. */
+    CkTextIndex *indexPtr,	/* Position that is to appear somewhere
 				 * in the view. */
-    int pickPlace;		/* 0 means topLine must appear at top of
+    int pickPlace)		/* 0 means topLine must appear at top of
 				 * screen.  1 means we get to pick where it
 				 * appears:  minimize screen motion or else
 				 * display line at center of screen. */
@@ -2083,14 +2081,14 @@ CkTextSetYView(textPtr, indexPtr, pickPlace)
  */
 
 static void
-MeasureUp(textPtr, srcPtr, distance, dstPtr)
-    CkText *textPtr;		/* Text widget in which to measure. */
-    CkTextIndex *srcPtr;	/* Index of character from which to start
+MeasureUp(
+    CkText *textPtr,		/* Text widget in which to measure. */
+    CkTextIndex *srcPtr,	/* Index of character from which to start
 				 * measuring. */
-    int distance;		/* Vertical distance in pixels measured
+    int distance,		/* Vertical distance in pixels measured
 				 * from the pixel just below the lowest
 				 * one in srcPtr's line. */
-    CkTextIndex *dstPtr;	/* Index to fill in with result. */
+    CkTextIndex *dstPtr)	/* Index to fill in with result. */
 {
     int lineNum;		/* Number of current line. */
     int charsToCount;		/* Maximum number of characters to measure
@@ -2180,11 +2178,11 @@ MeasureUp(textPtr, srcPtr, distance, dstPtr)
  */
 
 int
-CkTextSeeCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+CkTextSeeCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "see". */
 {
@@ -2297,11 +2295,11 @@ CkTextSeeCmd(textPtr, interp, argc, argv)
  */
 
 int
-CkTextXviewCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+CkTextXviewCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "xview". */
 {
@@ -2366,9 +2364,9 @@ CkTextXviewCmd(textPtr, interp, argc, argv)
  */
 
 static void
-ScrollByLines(textPtr, offset)
-    CkText *textPtr;		/* Widget to scroll. */
-    int offset;			/* Amount by which to scroll, in *screen*
+ScrollByLines(
+    CkText *textPtr,		/* Widget to scroll. */
+    int offset)			/* Amount by which to scroll, in *screen*
 				 * lines.  Positive means that information
 				 * later in text becomes visible, negative
 				 * means that information earlier in the
@@ -2478,11 +2476,11 @@ ScrollByLines(textPtr, offset)
  */
 
 int
-CkTextYviewCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+CkTextYviewCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "yview". */
 {
@@ -2651,12 +2649,12 @@ CkTextYviewCmd(textPtr, interp, argc, argv)
  */
 
 static void
-GetXView(interp, textPtr, report)
-    Tcl_Interp *interp;			/* If "report" is FALSE, string
+GetXView(
+    Tcl_Interp *interp,			/* If "report" is FALSE, string
 					 * describing visible range gets
 					 * stored in interp's result. */
-    CkText *textPtr;			/* Information about text widget. */
-    int report;				/* Non-zero means report info to
+    CkText *textPtr,			/* Information about text widget. */
+    int report)				/* Non-zero means report info to
 					 * scrollbar if it has changed. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -2722,12 +2720,12 @@ GetXView(interp, textPtr, report)
  */
 
 static void
-GetYView(interp, textPtr, report)
-    Tcl_Interp *interp;			/* If "report" is FALSE, string
+GetYView(
+    Tcl_Interp *interp,			/* If "report" is FALSE, string
 					 * describing visible range gets
 					 * stored in interp's result. */
-    CkText *textPtr;			/* Information about text widget. */
-    int report;				/* Non-zero means report info to
+    CkText *textPtr,			/* Information about text widget. */
+    int report)				/* Non-zero means report info to
 					 * scrollbar if it has changed. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -2802,10 +2800,10 @@ GetYView(interp, textPtr, report)
  */
 
 static DLine *
-FindDLine(dlPtr, indexPtr)
-    DLine *dlPtr;		/* Pointer to first in list of DLines
+FindDLine(
+    DLine *dlPtr,		/* Pointer to first in list of DLines
 				 * to search. */
-    CkTextIndex *indexPtr;	/* Index of desired character. */
+    CkTextIndex *indexPtr)	/* Index of desired character. */
 {
     CkTextLine *linePtr;
 
@@ -2834,7 +2832,7 @@ FindDLine(dlPtr, indexPtr)
 	}
 	linePtr = CkBTreeNextLine(linePtr);
 	if (linePtr == NULL) {
-	    panic("FindDLine reached end of text");
+	    Tcl_Panic("FindDLine reached end of text");
 	}
     }
     if (indexPtr->linePtr != dlPtr->index.linePtr) {
@@ -2873,11 +2871,11 @@ FindDLine(dlPtr, indexPtr)
  */
 
 void
-CkTextPixelIndex(textPtr, x, y, indexPtr)
-    CkText *textPtr;		/* Widget record for text widget. */
-    int x, y;			/* Pixel coordinates of point in widget's
+CkTextPixelIndex(
+    CkText *textPtr,		/* Widget record for text widget. */
+    int x, int y,		/* Pixel coordinates of point in widget's
 				 * window. */
-    CkTextIndex *indexPtr;	/* This index gets filled in with the
+    CkTextIndex *indexPtr)	/* This index gets filled in with the
 				 * index of the character nearest to (x,y). */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -2978,13 +2976,14 @@ CkTextPixelIndex(textPtr, x, y, indexPtr)
  */
 
 int
-CkTextCharBbox(textPtr, indexPtr, xPtr, yPtr, widthPtr, heightPtr)
-    CkText *textPtr;		/* Widget record for text widget. */
-    CkTextIndex *indexPtr;	/* Index of character whose bounding
+CkTextCharBbox(
+    CkText *textPtr,		/* Widget record for text widget. */
+    CkTextIndex *indexPtr,	/* Index of character whose bounding
 				 * box is desired. */
-    int *xPtr, *yPtr;		/* Filled with character's upper-left
+    int *xPtr, int *yPtr,	/* Filled with character's upper-left
 				 * coordinate. */
-    int *widthPtr, *heightPtr;	/* Filled in with character's dimensions. */
+    int *widthPtr,		/* Filled in with character's dimensions. */
+    int *heightPtr)
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
     DLine *dlPtr;
@@ -3086,14 +3085,15 @@ CkTextCharBbox(textPtr, indexPtr, xPtr, yPtr, widthPtr, heightPtr)
  */
 
 int
-CkTextDLineInfo(textPtr, indexPtr, xPtr, yPtr, widthPtr, heightPtr, basePtr)
-    CkText *textPtr;		/* Widget record for text widget. */
-    CkTextIndex *indexPtr;	/* Index of character whose bounding
+CkTextDLineInfo(
+    CkText *textPtr,		/* Widget record for text widget. */
+    CkTextIndex *indexPtr,	/* Index of character whose bounding
 				 * box is desired. */
-    int *xPtr, *yPtr;		/* Filled with line's upper-left
+    int *xPtr, int *yPtr,	/* Filled with line's upper-left
 				 * coordinate. */
-    int *widthPtr, *heightPtr;	/* Filled in with line's dimensions. */
-    int *basePtr;		/* Filled in with the baseline position,
+    int *widthPtr,		/* Filled in with line's dimensions. */
+    int *heightPtr,
+    int *basePtr)		/* Filled in with the baseline position,
 				 * measured as an offset down from *yPtr. */
 {
     DInfo *dInfoPtr = textPtr->dInfoPtr;
@@ -3152,23 +3152,22 @@ CkTextDLineInfo(textPtr, indexPtr, xPtr, yPtr, widthPtr, heightPtr, basePtr)
  */
 
 int
-CkTextCharLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
-	noCharsYet, wrapMode, chunkPtr)
-    CkText *textPtr;		/* Text widget being layed out. */
-    CkTextIndex *indexPtr;	/* Index of first character to lay out
+CkTextCharLayoutProc(
+    CkText *textPtr,		/* Text widget being layed out. */
+    CkTextIndex *indexPtr,	/* Index of first character to lay out
 				 * (corresponds to segPtr and offset). */
-    CkTextSegment *segPtr;	/* Segment being layed out. */
-    int offset;			/* Offset within segment of first character
+    CkTextSegment *segPtr,	/* Segment being layed out. */
+    int offset,			/* Offset within segment of first character
 				 * to consider. */
-    int maxX;			/* Chunk must not occupy pixels at this
+    int maxX,			/* Chunk must not occupy pixels at this
 				 * position or higher. */
-    int maxChars;		/* Chunk must not include more than this
+    int maxChars,		/* Chunk must not include more than this
 				 * many characters. */
-    int noCharsYet;		/* Non-zero means no characters have been
+    int noCharsYet,		/* Non-zero means no characters have been
 				 * assigned to this display line yet. */
-    Ck_Uid wrapMode;		/* How to handle line wrapping: ckTextCharUid,
+    Ck_Uid wrapMode,		/* How to handle line wrapping: ckTextCharUid,
 				 * ckTextNoneUid, or ckTextWordUid. */
-    CkTextDispChunk *chunkPtr;	/* Structure to fill in with information
+    CkTextDispChunk *chunkPtr)	/* Structure to fill in with information
 				 * about this chunk.  The x field has already
 				 * been set by the caller. */
 {
@@ -3286,18 +3285,18 @@ CkTextCharLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
  */
 
 static void
-CharDisplayProc(chunkPtr, x, y, height, baseline, window, screenY)
-    CkTextDispChunk *chunkPtr;		/* Chunk that is to be drawn. */
-    int x;				/* X-position in dst at which to
+CharDisplayProc(
+    CkTextDispChunk *chunkPtr,		/* Chunk that is to be drawn. */
+    int x,				/* X-position in dst at which to
 					 * draw this chunk (may differ from
 					 * the x-position in the chunk because
 					 * of scrolling). */
-    int y;				/* Y-position at which to draw this
+    int y,				/* Y-position at which to draw this
 					 * chunk in dst. */
-    int height;				/* Total height of line. */
-    int baseline;			/* Offset of baseline from y. */
-    WINDOW *window;
-    int screenY;			/* Y-coordinate in text window that
+    int height,				/* Total height of line. */
+    int baseline,			/* Offset of baseline from y. */
+    WINDOW *window,
+    int screenY)			/* Y-coordinate in text window that
 					 * corresponds to y. */
 {
     CharInfo *ciPtr = (CharInfo *) chunkPtr->clientData;
@@ -3347,10 +3346,10 @@ CharDisplayProc(chunkPtr, x, y, height, baseline, window, screenY)
  */
 
 static void
-CharUndisplayProc(textPtr, chunkPtr)
-    CkText *textPtr;			/* Overall information about text
+CharUndisplayProc(
+    CkText *textPtr,			/* Overall information about text
 					 * widget. */
-    CkTextDispChunk *chunkPtr;		/* Chunk that is about to be freed. */
+    CkTextDispChunk *chunkPtr)		/* Chunk that is about to be freed. */
 {
     CharInfo *ciPtr = (CharInfo *) chunkPtr->clientData;
 
@@ -3376,9 +3375,9 @@ CharUndisplayProc(textPtr, chunkPtr)
  */
 
 static int
-CharMeasureProc(chunkPtr, x)
-    CkTextDispChunk *chunkPtr;		/* Chunk containing desired coord. */
-    int x;				/* X-coordinate, in same coordinate
+CharMeasureProc(
+    CkTextDispChunk *chunkPtr,		/* Chunk containing desired coord. */
+    int x)				/* X-coordinate, in same coordinate
 					 * system as chunkPtr->x. */
 {
     CharInfo *ciPtr = (CharInfo *) chunkPtr->clientData;
@@ -3414,23 +3413,22 @@ CharMeasureProc(chunkPtr, x)
  */
 
 static void
-CharBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
-	widthPtr, heightPtr)
-    CkTextDispChunk *chunkPtr;		/* Chunk containing desired char. */
-    int index;				/* Index of desired character within
+CharBboxProc(
+    CkTextDispChunk *chunkPtr,		/* Chunk containing desired char. */
+    int index,				/* Index of desired character within
 					 * the chunk. */
-    int y;				/* Topmost pixel in area allocated
+    int y,				/* Topmost pixel in area allocated
 					 * for this line. */
-    int lineHeight;			/* Height of line, in pixels. */
-    int baseline;			/* Location of line's baseline, in
+    int lineHeight,			/* Height of line, in pixels. */
+    int baseline,			/* Location of line's baseline, in
 					 * pixels measured down from y. */
-    int *xPtr, *yPtr;			/* Gets filled in with coords of
+    int *xPtr, int *yPtr,		/* Gets filled in with coords of
 					 * character's upper-left pixel.
 					 * X-coord is in same coordinate
 					 * system as chunkPtr->x. */
-    int *widthPtr;			/* Gets filled in with width of
+    int *widthPtr,			/* Gets filled in with width of
 					 * character, in pixels. */
-    int *heightPtr;			/* Gets filled in with height of
+    int *heightPtr)			/* Gets filled in with height of
 					 * character, in pixels. */
 {
     CharInfo *ciPtr = (CharInfo *) chunkPtr->clientData;
@@ -3492,15 +3490,15 @@ CharBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
  */
 
 static void
-AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr)
-    CkText *textPtr;			/* Information about the text widget as
+AdjustForTab(
+    CkText *textPtr,			/* Information about the text widget as
 					 * a whole. */
-    CkTextTabArray *tabArrayPtr;	/* Information about the tab stops
+    CkTextTabArray *tabArrayPtr,	/* Information about the tab stops
 					 * that apply to this line.  May be
 					 * NULL to indicate default tabbing
 					 * (every 8 chars). */
-    int index;				/* Index of current tab stop. */
-    CkTextDispChunk *chunkPtr;		/* Chunk whose last character is
+    int index,				/* Index of current tab stop. */
+    CkTextDispChunk *chunkPtr)		/* Chunk whose last character is
 					 * the tab;  the following chunks
 					 * contain information to be shifted
 					 * right. */
@@ -3680,17 +3678,17 @@ AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr)
  */
 
 static int
-SizeOfTab(textPtr, tabArrayPtr, index, x, maxX)
-    CkText *textPtr;			/* Information about the text widget as
+SizeOfTab(
+    CkText *textPtr,			/* Information about the text widget as
 					 * a whole. */
-    CkTextTabArray *tabArrayPtr;	/* Information about the tab stops
+    CkTextTabArray *tabArrayPtr,	/* Information about the tab stops
 					 * that apply to this line.  NULL
 					 * means use default tabbing (every
 					 * 8 chars.) */
-    int index;				/* Index of current tab stop. */
-    int x;				/* Current x-location in line. Only
+    int index,				/* Index of current tab stop. */
+    int x,				/* Current x-location in line. Only
 					 * used if tabArrayPtr == NULL. */
-    int maxX;				/* X-location of pixel just past the
+    int maxX)				/* X-location of pixel just past the
 					 * right edge of the line. */
 {
     int tabX, prev, result, spaceWidth, dummy;

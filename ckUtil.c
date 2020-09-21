@@ -351,10 +351,10 @@ static char mapChars[] = {
  */
 
 int
-CkCopyAndGlobalEval(interp, script)
-    Tcl_Interp *interp;			/* Interpreter in which to evaluate
+CkCopyAndGlobalEval(
+    Tcl_Interp *interp,			/* Interpreter in which to evaluate
 					 * script. */
-    char *script;			/* Script to evaluate. */
+    char *script)			/* Script to evaluate. */
 {
     Tcl_DString buffer;
     int code;
@@ -392,13 +392,13 @@ CkCopyAndGlobalEval(interp, script)
  */
 
 int
-Ck_GetScrollInfo(interp, argc, argv, dblPtr, intPtr)
-    Tcl_Interp *interp;			/* Used for error reporting. */
-    int argc;				/* # arguments for command. */
-    char **argv;			/* Arguments for command. */
-    double *dblPtr;			/* Filled in with argument "moveto"
+Ck_GetScrollInfo(
+    Tcl_Interp *interp,			/* Used for error reporting. */
+    int argc,				/* # arguments for command. */
+    char **argv,			/* Arguments for command. */
+    double *dblPtr,			/* Filled in with argument "moveto"
 					 * option, if any. */
-    int *intPtr;			/* Filled in with number of pages
+    int *intPtr)			/* Filled in with number of pages
 					 * or lines to scroll, if any. */
 {
     int c;
@@ -455,9 +455,9 @@ Ck_GetScrollInfo(interp, argc, argv, dblPtr, intPtr)
  */
 
 int
-Ck_SetEncoding(interp, name)
-    Tcl_Interp *interp;
-    char *name;
+Ck_SetEncoding(
+    Tcl_Interp *interp,
+    char *name)
 {
     int i;
 
@@ -479,8 +479,7 @@ Ck_SetEncoding(interp, name)
  */
 
 int
-Ck_GetEncoding(interp)
-    Tcl_Interp *interp;
+Ck_GetEncoding(Tcl_Interp *interp)
 {
     Tcl_SetResult(interp, EncodingTable[Encoding].name, TCL_STATIC);
     return TCL_OK;
@@ -497,9 +496,7 @@ Ck_GetEncoding(interp)
  */
 
 static int
-MakeUCRepl(uch, buf)
-    unsigned int uch;
-    char *buf;
+MakeUCRepl(unsigned int uch, char *buf)
 {
     unsigned int i, need;
 
@@ -566,20 +563,19 @@ MakeUCRepl(uch, buf)
  */
 
 int
-CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
-	tabOrigin, flags, nextXPtr, nextCPtr)
-    CkMainInfo *mainPtr;	/* Needed for encoding. */
-    char *source;		/* Characters to be displayed.  Need not
+CkMeasureChars(
+    CkMainInfo *mainPtr,	/* Needed for encoding. */
+    char *source,		/* Characters to be displayed.  Need not
 				 * be NULL-terminated. */
-    int maxChars;		/* Maximum # of characters to consider from
+    int maxChars,		/* Maximum # of characters to consider from
 				 * source. */
-    int startX;			/* X-position at which first character will
+    int startX,			/* X-position at which first character will
 				 * be drawn. */
-    int maxX;			/* Don't consider any character that would
+    int maxX,			/* Don't consider any character that would
 				 * cross this x-position. */
-    int tabOrigin;		/* X-location that serves as "origin" for
+    int tabOrigin,		/* X-location that serves as "origin" for
 				 * tab stops. */
-    int flags;			/* Various flag bits OR-ed together.
+    int flags,			/* Various flag bits OR-ed together.
 				 * CK_WHOLE_WORDS means stop on a word boundary
 				 * (just before a space character) if
 				 * possible.  CK_AT_LEAST_ONE means always
@@ -592,9 +588,9 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
 				 * they don't terminate the line.
 				 * CK_IGNORE_TABS means give all tabs zero
 				 * width. */
-    int *nextXPtr;		/* Return x-position of terminating
+    int *nextXPtr,		/* Return x-position of terminating
 				 * character here. */
-    int *nextCPtr;		/* Return byte position of terminating
+    int *nextCPtr)		/* Return byte position of terminating
 				   character in source. */
 {
     char *p;			/* Current character. */
@@ -757,16 +753,16 @@ CkMeasureChars(mainPtr, source, maxChars, startX, maxX,
  */
 
 void
-CkDisplayChars(mainPtr, window, string, numChars, x, y, tabOrigin, flags)
-    CkMainInfo *mainPtr;	/* Needed for encoding. */
-    WINDOW *window;		/* Curses window. */
-    char *string;		/* Characters to be displayed. */
-    int numChars;		/* Number of characters to display from
+CkDisplayChars(
+    CkMainInfo *mainPtr,	/* Needed for encoding. */
+    WINDOW *window,		/* Curses window. */
+    char *string,		/* Characters to be displayed. */
+    int numChars,		/* Number of characters to display from
 				 * string. */
-    int x, y;			/* Coordinates at which to draw string. */
-    int tabOrigin;		/* X-location that serves as "origin" for
+    int x, int y,		/* Coordinates at which to draw string. */
+    int tabOrigin,		/* X-location that serves as "origin" for
 				 * tab stops. */
-    int flags;			/* Flags to control display.  Only
+    int flags)			/* Flags to control display.  Only
 				 * CK_NEWLINES_NOT_SPECIAL, CK_IGNORE_TABS
 				 * and CK_FILL_UNTIL_EOL are supported right
 				 * now.  See CkMeasureChars for information
@@ -922,22 +918,21 @@ replaceChar:
  */
 
 void
-CkUnderlineChars(mainPtr, window, string, numChars, x, y, tabOrigin,
-	flags, first, last)
-    CkMainInfo *mainPtr;	/* Needed for encoding. */
-    WINDOW *window;		/* Curses window. */
-    char *string;		/* Characters to be displayed. */
-    int numChars;		/* Number of characters to display from
+CkUnderlineChars(
+    CkMainInfo *mainPtr,	/* Needed for encoding. */
+    WINDOW *window,		/* Curses window. */
+    char *string,		/* Characters to be displayed. */
+    int numChars,		/* Number of characters to display from
 				 * string. */
-    int x, y;			/* Coordinates at which to draw string. */
-    int tabOrigin;		/* X-location that serves as "origin" for
+    int x, int y,		/* Coordinates at which to draw string. */
+    int tabOrigin,		/* X-location that serves as "origin" for
 				 * tab stops. */
-    int flags;			/* Flags to control display.  Only
+    int flags,			/* Flags to control display.  Only
 				 * CK_NEWLINES_NOT_SPECIAL, CK_IGNORE_TABS
 				 * and CK_FILL_UNTIL_EOL are supported right
 				 * now.  See CkMeasureChars for information
 				 * about it. */
-    int first, last;            /* Range: First and last characters to
+    int first, int last)        /* Range: First and last characters to
 				 * display. */
 {
     char *p;			/* Current character being scanned. */

@@ -42,12 +42,12 @@ static void       WaitWindowProc(ClientData clientData,
  */
 
 int
-Ck_DestroyCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_DestroyCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -82,12 +82,12 @@ Ck_DestroyCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_ExitCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_ExitCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     extern CkMainInfo *ckMainInfo;
     int index = 1, noclear = 0, value = 0;
@@ -138,12 +138,12 @@ Ck_ExitCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_LowerCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_LowerCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *winPtr, *other;
@@ -190,12 +190,12 @@ Ck_LowerCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_RaiseCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_RaiseCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *winPtr, *other;
@@ -242,12 +242,12 @@ Ck_RaiseCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_BellCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_BellCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     beep();
     doupdate();
@@ -272,12 +272,12 @@ Ck_BellCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_UpdateCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_UpdateCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int flags;
@@ -338,12 +338,12 @@ Ck_UpdateCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_CursesCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_CursesCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkMainInfo *mainPtr = winPtr->mainPtr;
@@ -528,12 +528,12 @@ Ck_CursesCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_WinfoCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_WinfoCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int length;
@@ -715,11 +715,11 @@ Ck_WinfoCmd(clientData, interp, argc, argv)
  */
 
 int
-Ck_BindCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+Ck_BindCmd(
+    ClientData clientData,	/* Main window associated with interpreter. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainWin = (CkWindow *) clientData;
     CkWindow *winPtr;
@@ -791,9 +791,9 @@ Ck_BindCmd(clientData, interp, argc, argv)
  */
 
 void
-CkBindEventProc(winPtr, eventPtr)
-    CkWindow *winPtr;			/* Pointer to info about window. */
-    CkEvent *eventPtr;			/* Information about event. */
+CkBindEventProc(
+    CkWindow *winPtr,			/* Pointer to info about window. */
+    CkEvent *eventPtr)			/* Information about event. */
 {
 #define MAX_OBJS 20
     ClientData objects[MAX_OBJS], *objPtr;
@@ -874,11 +874,11 @@ CkBindEventProc(winPtr, eventPtr)
  */
 
 int
-Ck_BindtagsCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+Ck_BindtagsCmd(
+    ClientData clientData,	/* Main window associated with interpreter. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainWin = (CkWindow *) clientData;
     CkWindow *winPtr, *winPtr2;
@@ -966,8 +966,8 @@ Ck_BindtagsCmd(clientData, interp, argc, argv)
  */
 
 void
-CkFreeBindingTags(winPtr)
-    CkWindow *winPtr;		/* Window whose tags are to be released. */
+CkFreeBindingTags(
+    CkWindow *winPtr)		/* Window whose tags are to be released. */
 {
     int i;
     char *p;
@@ -1006,12 +1006,12 @@ CkFreeBindingTags(winPtr)
  */
 
 int
-Ck_TkwaitCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_TkwaitCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int c, done;
@@ -1089,12 +1089,12 @@ Ck_TkwaitCmd(clientData, interp, argc, argv)
 }
 
 static char *
-WaitVariableProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;	/* Pointer to integer to set to 1. */
-    Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
-    int flags;			/* Information about what happened. */
+WaitVariableProc(
+    ClientData clientData,	/* Pointer to integer to set to 1. */
+    Tcl_Interp *interp,		/* Interpreter containing variable. */
+    char *name1,		/* Name of variable. */
+    char *name2,		/* Second part of variable name. */
+    int flags)			/* Information about what happened. */
 {
     int *donePtr = (int *) clientData;
 
@@ -1103,9 +1103,9 @@ WaitVariableProc(clientData, interp, name1, name2, flags)
 }
 
 static void
-WaitVisibilityProc(clientData, eventPtr)
-    ClientData clientData;	/* Pointer to integer to set to 1. */
-    CkEvent *eventPtr;		/* Information about event (not used). */
+WaitVisibilityProc(
+    ClientData clientData,	/* Pointer to integer to set to 1. */
+    CkEvent *eventPtr)		/* Information about event (not used). */
 {
     int *donePtr = (int *) clientData;
 
@@ -1113,9 +1113,9 @@ WaitVisibilityProc(clientData, eventPtr)
 }
 
 static void
-WaitWindowProc(clientData, eventPtr)
-    ClientData clientData;	/* Pointer to integer to set to 1. */
-    CkEvent *eventPtr;		/* Information about event. */
+WaitWindowProc(
+    ClientData clientData,	/* Pointer to integer to set to 1. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     int *donePtr = (int *) clientData;
 

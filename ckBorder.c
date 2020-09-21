@@ -31,10 +31,10 @@ static int initialized = 0;               /* gCharTable initialized. */
  */
 
 int
-Ck_GetGChar(interp, name, gchar)
-    Tcl_Interp *interp;
-    char *name;
-    long *gchar;
+Ck_GetGChar(
+    Tcl_Interp *interp,
+    char *name,
+    long *gchar)
 {
     Tcl_HashEntry *hPtr;
 
@@ -119,10 +119,10 @@ Ck_GetGChar(interp, name, gchar)
  */
 
 int
-Ck_SetGChar(interp, name, gchar)
-    Tcl_Interp *interp;
-    char *name;
-    long gchar;
+Ck_SetGChar(
+    Tcl_Interp *interp,
+    char *name,
+    long gchar)
 {
     Tcl_HashEntry *hPtr;
 
@@ -148,9 +148,9 @@ Ck_SetGChar(interp, name, gchar)
  */
 
 CkBorder *
-Ck_GetBorder(interp, string)
-    Tcl_Interp *interp;
-    char *string;
+Ck_GetBorder(
+    Tcl_Interp *interp,
+    char *string)
 {
     int i, largc;
     long bchar[8];
@@ -208,8 +208,7 @@ Ck_GetBorder(interp, string)
  */
 
 void
-Ck_FreeBorder(borderPtr)
-    CkBorder *borderPtr;
+Ck_FreeBorder(CkBorder *borderPtr)
 {
     ckfree(borderPtr->name);
     ckfree((char *) borderPtr);
@@ -226,8 +225,7 @@ Ck_FreeBorder(borderPtr)
  */
 
 char *
-Ck_NameOfBorder(borderPtr)
-    CkBorder *borderPtr;
+Ck_NameOfBorder(CkBorder *borderPtr)
 {
     return borderPtr->name;
 }
@@ -243,10 +241,10 @@ Ck_NameOfBorder(borderPtr)
  */
 
 void
-Ck_DrawBorder(winPtr, borderPtr, x, y, width, height)
-    CkWindow *winPtr;
-    CkBorder *borderPtr;
-    int x, y, width, height;
+Ck_DrawBorder(
+    CkWindow *winPtr,
+    CkBorder *borderPtr,
+    int x, int y, int width, int height)
 {
     int i, *gchar;
     WINDOW *w;

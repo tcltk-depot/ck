@@ -33,12 +33,12 @@
  */
 
 int
-Ck_FocusCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_FocusCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkWindow *newPtr, *focusWinPtr;

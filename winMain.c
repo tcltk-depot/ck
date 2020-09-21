@@ -45,11 +45,11 @@ static void		CwshPanic(TCL_VARARGS(char *,format);
  */
 
 int APIENTRY
-WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
-    HINSTANCE hInstance;
-    HINSTANCE hPrevInstance;
-    LPSTR lpszCmdLine;
-    int nCmdShow;
+WinMain(
+    HINSTANCE hInstance,
+    HINSTANCE hPrevInstance,
+    LPSTR lpszCmdLine,
+    int nCmdShow)
 {
     char **argv, *p;
     int argc;
@@ -123,8 +123,7 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
  */
 
 int
-Tcl_AppInit(interp)
-    Tcl_Interp *interp;		/* Interpreter for application. */
+Tcl_AppInit(Tcl_Interp *interp)		/* Interpreter for application. */
 {
     if (Tcl_Init(interp) == TCL_ERROR) {
 	goto error;
@@ -203,9 +202,9 @@ CwshPanic TCL_VARARGS_DEF(char *,arg1)
  */
 
 static void
-setargv(argcPtr, argvPtr)
-    int *argcPtr;		/* Filled with number of argument strings. */
-    char ***argvPtr;		/* Filled with argument strings (malloc'd). */
+setargv(
+    int *argcPtr,		/* Filled with number of argument strings. */
+    char ***argvPtr)		/* Filled with argument strings (malloc'd). */
 {
     char *cmdLine, *p, *arg, *argSpace;
     char **argv;

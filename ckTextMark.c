@@ -89,11 +89,11 @@ Ck_SegType ckTextLeftMarkType = {
  */
 
 int
-CkTextMarkCmd(textPtr, interp, argc, argv)
-    CkText *textPtr;		/* Information about text widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+CkTextMarkCmd(
+    CkText *textPtr,		/* Information about text widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "mark". */
 {
@@ -213,10 +213,10 @@ CkTextMarkCmd(textPtr, interp, argc, argv)
  */
 
 CkTextSegment *
-CkTextSetMark(textPtr, name, indexPtr)
-    CkText *textPtr;		/* Text widget in which to create mark. */
-    char *name;			/* Name of mark to set. */
-    CkTextIndex *indexPtr;	/* Where to set mark. */
+CkTextSetMark(
+    CkText *textPtr,		/* Text widget in which to create mark. */
+    char *name,			/* Name of mark to set. */
+    CkTextIndex *indexPtr)	/* Where to set mark. */
 {
     Tcl_HashEntry *hPtr;
     CkTextSegment *markPtr;
@@ -290,10 +290,10 @@ CkTextSetMark(textPtr, name, indexPtr)
  */
 
 void
-CkTextMarkSegToIndex(textPtr, markPtr, indexPtr)
-    CkText *textPtr;		/* Text widget containing mark. */
-    CkTextSegment *markPtr;	/* Mark segment. */
-    CkTextIndex *indexPtr;	/* Index information gets stored here.  */
+CkTextMarkSegToIndex(
+    CkText *textPtr,		/* Text widget containing mark. */
+    CkTextSegment *markPtr,	/* Mark segment. */
+    CkTextIndex *indexPtr)	/* Index information gets stored here.  */
 {
     CkTextSegment *segPtr;
 
@@ -328,10 +328,10 @@ CkTextMarkSegToIndex(textPtr, markPtr, indexPtr)
  */
 
 int
-CkTextMarkNameToIndex(textPtr, name, indexPtr)
-    CkText *textPtr;		/* Text widget containing mark. */
-    char *name;			/* Name of mark. */
-    CkTextIndex *indexPtr;	/* Index information gets stored here. */
+CkTextMarkNameToIndex(
+    CkText *textPtr,		/* Text widget containing mark. */
+    char *name,			/* Name of mark. */
+    CkTextIndex *indexPtr)	/* Index information gets stored here. */
 {
     Tcl_HashEntry *hPtr;
 
@@ -362,12 +362,11 @@ CkTextMarkNameToIndex(textPtr, name, indexPtr)
  *--------------------------------------------------------------
  */
 
-	/* ARGSUSED */
 static int
-MarkDeleteProc(segPtr, linePtr, treeGone)
-    CkTextSegment *segPtr;		/* Segment being deleted. */
-    CkTextLine *linePtr;		/* Line containing segment. */
-    int treeGone;			/* Non-zero means the entire tree is
+MarkDeleteProc(
+    CkTextSegment *segPtr,		/* Segment being deleted. */
+    CkTextLine *linePtr,		/* Line containing segment. */
+    int treeGone)			/* Non-zero means the entire tree is
 					 * being deleted, so everything must
 					 * get cleaned up. */
 {
@@ -392,9 +391,9 @@ MarkDeleteProc(segPtr, linePtr, treeGone)
  */
 
 static CkTextSegment *
-MarkCleanupProc(markPtr, linePtr)
-    CkTextSegment *markPtr;		/* Mark segment that's being moved. */
-    CkTextLine *linePtr;		/* Line that now contains segment. */
+MarkCleanupProc(
+    CkTextSegment *markPtr,		/* Mark segment that's being moved. */
+    CkTextLine *linePtr)		/* Line that now contains segment. */
 {
     markPtr->body.mark.linePtr = linePtr;
     return markPtr;
@@ -419,23 +418,21 @@ MarkCleanupProc(markPtr, linePtr)
  *--------------------------------------------------------------
  */
 
-	/*ARGSUSED*/
 static int
-MarkLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
-	noCharsYet, wrapMode, chunkPtr)
-    CkText *textPtr;		/* Text widget being layed out. */
-    CkTextIndex *indexPtr;	/* Identifies first character in chunk. */
-    CkTextSegment *segPtr;	/* Segment corresponding to indexPtr. */
-    int offset;			/* Offset within segPtr corresponding to
+MarkLayoutProc(
+    CkText *textPtr,		/* Text widget being layed out. */
+    CkTextIndex *indexPtr,	/* Identifies first character in chunk. */
+    CkTextSegment *segPtr,	/* Segment corresponding to indexPtr. */
+    int offset,			/* Offset within segPtr corresponding to
 				 * indexPtr (always 0). */
-    int maxX;			/* Chunk must not occupy pixels at this
+    int maxX,			/* Chunk must not occupy pixels at this
 				 * position or higher. */
-    int maxChars;		/* Chunk must not include more than this
+    int maxChars,		/* Chunk must not include more than this
 				 * many characters. */
-    int noCharsYet;		/* Non-zero means no characters have been
+    int noCharsYet,		/* Non-zero means no characters have been
 				 * assigned to this line yet. */
-    Ck_Uid wrapMode;		/* Not used. */
-    CkTextDispChunk *chunkPtr;	/* Structure to fill in with information
+    Ck_Uid wrapMode,		/* Not used. */
+    CkTextDispChunk *chunkPtr)	/* Structure to fill in with information
 				 * about this chunk.  The x field has already
 				 * been set by the caller. */
 {
@@ -479,21 +476,20 @@ MarkLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
  *--------------------------------------------------------------
  */
 
-	/* ARGSUSED */
 void
-CkTextInsertDisplayProc(chunkPtr, x, y, height, baseline, window, screenY)
-    CkTextDispChunk *chunkPtr;		/* Chunk that is to be drawn. */
-    int x;				/* X-position in dst at which to
+CkTextInsertDisplayProc(
+    CkTextDispChunk *chunkPtr,		/* Chunk that is to be drawn. */
+    int x,				/* X-position in dst at which to
 					 * draw this chunk (may differ from
 					 * the x-position in the chunk because
 					 * of scrolling). */
-    int y;				/* Y-position at which to draw this
+    int y,				/* Y-position at which to draw this
 					 * chunk in dst (x-position is in
 					 * the chunk itself). */
-    int height;				/* Total height of line. */
-    int baseline;			/* Offset of baseline from y. */
-    WINDOW *window;                     /* Curses window. */
-    int screenY;			/* Y-coordinate in text window that
+    int height,				/* Total height of line. */
+    int baseline,			/* Offset of baseline from y. */
+    WINDOW *window,                     /* Curses window. */
+    int screenY)			/* Y-coordinate in text window that
 					 * corresponds to y. */
 {
     CkText *textPtr = (CkText *) chunkPtr->clientData;
@@ -520,12 +516,11 @@ CkTextInsertDisplayProc(chunkPtr, x, y, height, baseline, window, screenY)
  *--------------------------------------------------------------
  */
 
-	/* ARGSUSED */
 static void
-InsertUndisplayProc(textPtr, chunkPtr)
-    CkText *textPtr;			/* Overall information about text
+InsertUndisplayProc(
+    CkText *textPtr,			/* Overall information about text
 					 * widget. */
-    CkTextDispChunk *chunkPtr;		/* Chunk that is about to be freed. */
+    CkTextDispChunk *chunkPtr)		/* Chunk that is about to be freed. */
 {
     return;
 }
@@ -549,15 +544,15 @@ InsertUndisplayProc(textPtr, chunkPtr)
  */
 
 static void
-MarkCheckProc(markPtr, linePtr)
-    CkTextSegment *markPtr;		/* Segment to check. */
-    CkTextLine *linePtr;		/* Line containing segment. */
+MarkCheckProc(
+    CkTextSegment *markPtr,		/* Segment to check. */
+    CkTextLine *linePtr)		/* Line containing segment. */
 {
     Tcl_HashSearch search;
     Tcl_HashEntry *hPtr;
 
     if (markPtr->body.mark.linePtr != linePtr) {
-	panic("MarkCheckProc: markPtr->body.mark.linePtr bogus");
+	Tcl_Panic("MarkCheckProc: markPtr->body.mark.linePtr bogus");
     }
 
     /*
@@ -569,7 +564,7 @@ MarkCheckProc(markPtr, linePtr)
 	    &search); hPtr != markPtr->body.mark.hPtr;
 	    hPtr = Tcl_NextHashEntry(&search)) {
 	if (hPtr == NULL) {
-	    panic("MarkCheckProc couldn't find hash table entry for mark");
+	    Tcl_Panic("MarkCheckProc couldn't find hash table entry for mark");
 	}
     }
 }

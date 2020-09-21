@@ -349,12 +349,12 @@ static int		GetNodeYCoord(Tree *treePtr,
  */
 
 int
-Ck_TreeCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
+Ck_TreeCmd(
+    ClientData clientData,	/* Main window associated with
 				 * interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Tree *treePtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -445,11 +445,11 @@ Ck_TreeCmd(clientData, interp, argc, argv)
  */
 
 static int
-TreeWidgetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Information about button widget. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+TreeWidgetCmd(
+    ClientData clientData,	/* Information about button widget. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     Tree *treePtr = (Tree *) clientData;
     int result = TCL_OK, redraw = 0, recompute = 0;
@@ -908,8 +908,7 @@ error:
  */
 
 static void
-DestroyTree(clientData)
-    ClientData clientData;	/* Info about tree widget. */
+DestroyTree(ClientData clientData)	/* Info about tree widget. */
 {
     Tree *treePtr = (Tree *) clientData;
     Tcl_HashEntry *hPtr;
@@ -964,13 +963,13 @@ DestroyTree(clientData)
  */
 
 static int
-ConfigureTree(interp, treePtr, argc, argv, flags)
-    Tcl_Interp *interp;		/* Used for error reporting. */
-    Tree *treePtr;		/* Information about widget;  may or may
+ConfigureTree(
+    Tcl_Interp *interp,		/* Used for error reporting. */
+    Tree *treePtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Ck_ConfigureWidget. */
+    int argc,			/* Number of valid entries in argv. */
+    char **argv,		/* Arguments. */
+    int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int result, width, height;
 
@@ -1004,8 +1003,7 @@ ConfigureTree(interp, treePtr, argc, argv, flags)
  */
 
 static void
-TreeEventuallyRedraw(treePtr)
-    Tree *treePtr;
+TreeEventuallyRedraw(Tree *treePtr)
 {
     if ((treePtr->winPtr->flags & CK_MAPPED)
 	&& !(treePtr->flags & REDRAW_PENDING)) {
@@ -1028,9 +1026,9 @@ TreeEventuallyRedraw(treePtr)
  */
 
 static void
-DeleteNode(treePtr, nodePtr)
-    Tree *treePtr;
-    Node *nodePtr;
+DeleteNode(
+    Tree *treePtr,
+    Node *nodePtr)
 {
     Node *childPtr, *thisPtr, *prevPtr;
     Tcl_HashEntry *hPtr;
@@ -1078,8 +1076,7 @@ DeleteNode(treePtr, nodePtr)
 
 
 static void
-DeleteActiveTag(treePtr)
-    Tree *treePtr;
+DeleteActiveTag(Tree *treePtr)
 {
     int i;
     Node *nodePtr = treePtr->activeNode;
@@ -1114,8 +1111,7 @@ DeleteActiveTag(treePtr)
  */
 
 static void
-DisplayTree(clientData)
-    ClientData clientData;	/* Information about widget. */
+DisplayTree(ClientData clientData)	/* Information about widget. */
 {
     Tree *treePtr = (Tree *) clientData;
     CkWindow *winPtr = treePtr->winPtr;
@@ -1285,9 +1281,9 @@ DisplayTree(clientData)
  */
 
 static void
-TreeEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about window. */
-    CkEvent *eventPtr;		/* Information about event. */
+TreeEventProc(
+    ClientData clientData,	/* Information about window. */
+    CkEvent *eventPtr)		/* Information about event. */
 {
     Tree *treePtr = (Tree *) clientData;
 
@@ -1331,8 +1327,8 @@ TreeEventProc(clientData, eventPtr)
  */
 
 static void
-TreeCmdDeletedProc(clientData)
-    ClientData clientData;	/* Pointer to widget record for widget. */
+TreeCmdDeletedProc(
+    ClientData clientData)	/* Pointer to widget record for widget. */
 {
     Tree *treePtr = (Tree *) clientData;
     CkWindow *winPtr = treePtr->winPtr;
@@ -1364,8 +1360,7 @@ TreeCmdDeletedProc(clientData)
  */
 
 static void
-RecomputeVisibleNodes(treePtr)
-    Tree *treePtr;
+RecomputeVisibleNodes(Tree *treePtr)
 {
     int count = 0, top = -1;
     Node *nodePtr, *nextPtr = NULL;
@@ -1425,9 +1420,9 @@ RecomputeVisibleNodes(treePtr)
  */
 
 static void
-ChangeTreeView(treePtr, index)
-    Tree *treePtr;			/* Information about widget. */
-    int index;				/* Index of element in treePtr
+ChangeTreeView(
+    Tree *treePtr,			/* Information about widget. */
+    int index)				/* Index of element in treePtr
 					 * that should now appear at the
 					 * top of the tree. */
 {
@@ -1487,10 +1482,10 @@ ChangeTreeView(treePtr, index)
  */
 
 static int
-GetNodeYCoord(treePtr, thisPtr, yPtr)
-    Tree *treePtr;			/* Information about widget. */
-    Node *thisPtr;
-    int *yPtr;
+GetNodeYCoord(
+    Tree *treePtr,			/* Information about widget. */
+    Node *thisPtr,
+    int *yPtr)
 {
     int count;
     Node *nodePtr, *nextPtr = NULL;
@@ -1543,14 +1538,14 @@ GetNodeYCoord(treePtr, thisPtr, yPtr)
  */
 
 static int
-TreeTagsParseProc(clientData, interp, winPtr, value, widgRec, offset)
-    ClientData clientData;		/* Not used.*/
-    Tcl_Interp *interp;			/* Used for reporting errors. */
-    CkWindow *winPtr;			/* Window containing tree widget. */
-    char *value;			/* Value of option (list of tag
+TreeTagsParseProc(
+    ClientData clientData,		/* Not used.*/
+    Tcl_Interp *interp,			/* Used for reporting errors. */
+    CkWindow *winPtr,			/* Window containing tree widget. */
+    char *value,			/* Value of option (list of tag
 					 * names). */
-    char *widgRec;			/* Pointer to record for item. */
-    int offset;				/* Offset into item (ignored). */
+    char *widgRec,			/* Pointer to record for item. */
+    int offset)				/* Offset into item (ignored). */
 {
     Node *nodePtr = (Node *) widgRec, *activeNode = NULL;
     int argc, i, hideChildren = 0, redraw = 0, recompute = 0;
@@ -1644,12 +1639,12 @@ TreeTagsParseProc(clientData, interp, winPtr, value, widgRec, offset)
  */
 
 static char *
-TreeTagsPrintProc(clientData, winPtr, widgRec, offset, freeProcPtr)
-    ClientData clientData;		/* Ignored. */
-    CkWindow *winPtr;			/* Window containing tree widget. */
-    char *widgRec;			/* Pointer to record for item. */
-    int offset;				/* Ignored. */
-    Tcl_FreeProc **freeProcPtr;		/* Pointer to variable to fill in with
+TreeTagsPrintProc(
+    ClientData clientData,		/* Ignored. */
+    CkWindow *winPtr,			/* Window containing tree widget. */
+    char *widgRec,			/* Pointer to record for item. */
+    int offset,				/* Ignored. */
+    Tcl_FreeProc **freeProcPtr)		/* Pointer to variable to fill in with
 					 * information about how to reclaim
 					 * storage for return string. */
 {
@@ -1693,11 +1688,11 @@ TreeTagsPrintProc(clientData, winPtr, widgRec, offset, freeProcPtr)
  */
 
 static Node *
-StartTagSearch(treePtr, tag, searchPtr)
-    Tree *treePtr;			/* Tree whose nodes are to be
+StartTagSearch(
+    Tree *treePtr,			/* Tree whose nodes are to be
 					 * searched. */
-    char *tag;				/* String giving tag value. */
-    TagSearch *searchPtr;		/* Record describing tag search;
+    char *tag,				/* String giving tag value. */
+    TagSearch *searchPtr)		/* Record describing tag search;
 					 * will be initialized here. */
 {
     long id;
@@ -1789,8 +1784,7 @@ StartTagSearch(treePtr, tag, searchPtr)
  */
 
 static Node *
-NextNode(searchPtr)
-    TagSearch *searchPtr;		/* Record describing search in
+NextNode(TagSearch *searchPtr)		/* Record describing search in
 					 * progress. */
 {
     Node *nodePtr;
@@ -1859,11 +1853,11 @@ NextNode(searchPtr)
  */
 
 static void
-DoNode(interp, nodePtr, tag)
-    Tcl_Interp *interp;			/* Interpreter in which to (possibly)
+DoNode(
+    Tcl_Interp *interp,			/* Interpreter in which to (possibly)
 					 * record node id. */
-    Node *nodePtr;			/* Node to (possibly) modify. */
-    Ck_Uid tag;				/* Tag to add to those already
+    Node *nodePtr,			/* Node to (possibly) modify. */
+    Ck_Uid tag)				/* Tag to add to those already
 					 * present for node, or NULL. */
 {
     Ck_Uid *tagPtr;
@@ -1950,22 +1944,22 @@ DoNode(interp, nodePtr, tag)
  */
 
 static int
-FindNodes(interp, treePtr, argc, argv, newTag, cmdName, option)
-    Tcl_Interp *interp;			/* Interpreter for error reporting. */
-    Tree *treePtr;			/* Tree whose nodes are to be
+FindNodes(
+    Tcl_Interp *interp,			/* Interpreter for error reporting. */
+    Tree *treePtr,			/* Tree whose nodes are to be
 					 * searched. */
-    int argc;				/* Number of entries in argv.  Must be
+    int argc,				/* Number of entries in argv.  Must be
 					 * greater than zero. */
-    char **argv;			/* Arguments that describe what items
+    char **argv,			/* Arguments that describe what items
 					 * to search for (see user doc on
 					 * "find" and "addtag" options). */
-    char *newTag;			/* If non-NULL, gives new tag to set
+    char *newTag,			/* If non-NULL, gives new tag to set
 					 * on all found items;  if NULL, then
 					 * ids of found items are returned
 					 * in interp's result. */
-    char *cmdName;			/* Name of original Tcl command, for
+    char *cmdName,			/* Name of original Tcl command, for
 					 * use in error messages. */
-    char *option;			/* For error messages:  gives option
+    char *option)			/* For error messages:  gives option
 					 * from Tcl command and other stuff
 					 * up to what's in argc/argv. */
 {
@@ -2146,8 +2140,7 @@ FindNodes(interp, treePtr, argc, argv, newTag, cmdName, option)
  */
 
 static void
-TreeUpdateVScrollbar(treePtr)
-    Tree *treePtr;		/* Information about widget. */
+TreeUpdateVScrollbar(Tree *treePtr)	/* Information about widget. */
 {
     char string[100];
     double first, last;
