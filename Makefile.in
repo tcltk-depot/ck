@@ -96,7 +96,7 @@ CURSES_LIB_SWITCHES =	@CURSESLIBSW@
 # and the math library (in that order).  The "LIBS" part will be
 # replaced (or has already been replaced) with relevant libraries as
 # determined by the configure script.
-LIBS = @LIBS@ $(CURSES_LIB_SWITCHES) @DL_LIBS@ @MATH_LIBS@ -lc
+LIBS = @LIBS@ $(CURSES_LIB_SWITCHES) @DL_LIBS@ @MATH_LIBS@
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:

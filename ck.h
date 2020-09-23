@@ -556,7 +556,7 @@ EXTERN void	CkDisplayChars(CkMainInfo *mainPtr,
 		    WINDOW *window, char *string,
 		    int numChars, int x, int y, int tabOrigin, int flags);
 EXTERN void	CkEventDeadWindow(CkWindow *winPtr);
-#ifdef USE_NCURSES
+#if defined(USE_NCURSES) || defined(_WIN32)
 EXTERN void	CkFocusRestore(ClientData clientData);
 #endif
 EXTERN void	CkFreeBindingTags(CkWindow *winPtr);

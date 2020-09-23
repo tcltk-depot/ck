@@ -723,6 +723,8 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_tcl
+with_cursesinc
+with_curseslib
 enable_shared
 '
       ac_precious_vars='build_alias
@@ -1359,6 +1361,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-tcl=DIR          use Tcl 8.X binaries from DIR
+  --with-cursesinc=DIR    use curses includes from DIR
+  --with-curseslib=VAL    use curses library VAL
 
 Some influential environment variables:
   CC          C compiler command
@@ -4489,38 +4493,53 @@ fi
 #		/usr/local/ncurses
 #---------------------------------------------------------------------
 
-echo checking for curses/ncurses header files
 CURSESINCLUDES=nope
 CURSESLIBSW=nope
 USE_NCURSES=0
 USE_NCURSESW=0
 NOGPM=0
 
-VAL=`pkg-config --cflags ncursesw 2>/dev/null`
-if test -n "$VAL" ; then
-    USE_NCURSESW=1
-    USE_NCURSES=1
-    CURSESINCLUDES=$VAL
-    CURSESLIBSW=`pkg-config --libs ncursesw`
-    NOGPM=1
-else
-    VAL=`pkg-config --cflags ncurses 2>/dev/null`
-    if test -n "$VAL" ; then
-        USE_NCURSES=1
-        CURSESINCLUDES=$VAL
-        CURSESLIBSW=`pkg-config --libs ncurses`
-    fi
+
+# Check whether --with-cursesinc was given.
+if test "${with_cursesinc+set}" = set; then
+  withval=$with_cursesinc; CURSESINCLUDES="-I$withval"
 fi
 
-if test $USE_NCURSES -eq 0 ; then
-    dirs="../ncurses/include /usr/include/ncursesw /usr/include /usr/include/ncurses /opt/ncurses/include /usr/local/include /usr/local/include/ncurses"
-    for i in $dirs ; do
-        if test -r $i/ncurses.h; then
-            { $as_echo "$as_me:$LINENO: checking ncurses headers" >&5
+
+# Check whether --with-curseslib was given.
+if test "${with_curseslib+set}" = set; then
+  withval=$with_curseslib; CURSESLIBSW=$withval
+fi
+
+
+if test "$CURSESINCLUDES" = "nope" -a "$CURSESLIBSW" = "nope"; then
+    echo checking for curses/ncurses header files
+
+    VAL=`pkg-config --cflags ncursesw 2>/dev/null`
+    if test -n "$VAL" ; then
+        USE_NCURSESW=1
+        USE_NCURSES=1
+        CURSESINCLUDES=$VAL
+        CURSESLIBSW=`pkg-config --libs ncursesw`
+        NOGPM=1
+    else
+        VAL=`pkg-config --cflags ncurses 2>/dev/null`
+        if test -n "$VAL" ; then
+            USE_NCURSES=1
+            CURSESINCLUDES=$VAL
+            CURSESLIBSW=`pkg-config --libs ncurses`
+        fi
+    fi
+
+    if test $USE_NCURSES -eq 0 ; then
+        dirs="../ncurses/include /usr/include/ncursesw /usr/include /usr/include/ncurses /opt/ncurses/include /usr/local/include /usr/local/include/ncurses"
+        for i in $dirs ; do
+            if test -r $i/ncurses.h; then
+                { $as_echo "$as_me:$LINENO: checking ncurses headers" >&5
 $as_echo_n "checking ncurses headers... " >&6; }
-            tk_oldCFlags=$CFLAGS
-            CFLAGS="$CFLAGS -I$i"
-            cat >conftest.$ac_ext <<_ACEOF
+                tk_oldCFlags=$CFLAGS
+                CFLAGS="$CFLAGS -I$i"
+                cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -4555,7 +4574,7 @@ $as_echo "$ac_try_echo") >&5
        } && test -s conftest.$ac_objext; then
   { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-                CURSESINCLUDES="-I$i"
+                    CURSESINCLUDES="-I$i"
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -4565,18 +4584,18 @@ $as_echo "no" >&6; }
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-            CFLAGS=$tk_oldCFlags
-            if test "$CURSESINCLUDES" != nope; then
-	        USE_NCURSES=1
-	        break
+                CFLAGS=$tk_oldCFlags
+                if test "$CURSESINCLUDES" != "nope"; then
+                    USE_NCURSES=1
+                    break
+                fi
             fi
-        fi
-        if test -r $i/curses.h; then
-            { $as_echo "$as_me:$LINENO: checking curses headers" >&5
+            if test -r $i/curses.h; then
+                { $as_echo "$as_me:$LINENO: checking curses headers" >&5
 $as_echo_n "checking curses headers... " >&6; }
-            tk_oldCFlags=$CFLAGS
-            CFLAGS="$CFLAGS -I$i"
-            cat >conftest.$ac_ext <<_ACEOF
+                tk_oldCFlags=$CFLAGS
+                CFLAGS="$CFLAGS -I$i"
+                cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -4611,7 +4630,7 @@ $as_echo "$ac_try_echo") >&5
        } && test -s conftest.$ac_objext; then
   { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-                CURSESINCLUDES="-I$i"
+                    CURSESINCLUDES="-I$i"
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -4621,14 +4640,16 @@ $as_echo "no" >&6; }
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-            CFLAGS=$tk_oldCFlags
-            if test "$CURSESINCLUDES" != nope; then
-	        break
+                CFLAGS=$tk_oldCFlags
+                if test "$CURSESINCLUDES" != "nope"; then
+                    break
+                fi
             fi
-        fi
-    done
+        done
+    fi
 fi
-if test "$CURSESINCLUDES" = nope; then
+
+if test "$CURSESINCLUDES" = "nope"; then
     echo "Warning:  couldn't find any curses header file."
     CURSESINCLUDES="# no header file found"
 else
@@ -4639,7 +4660,7 @@ else
     fi
 fi
 
-if test "$CURSESLIBSW" = nope ; then
+if test "$CURSESLIBSW" = "nope" ; then
     echo checking for curses/ncurses library files
     dirs="../ncurses/lib /usr/lib /usr/lib64 /usr/lib/ncurses /usr/lib64/ncurses /opt/ncurses/lib /usr/local/lib /usr/local/ncurses/lib"
     for i in $dirs ; do
@@ -4708,7 +4729,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
-	        if test "$CURSESLIBSW" != nope; then
+	        if test "$CURSESLIBSW" != "nope"; then
 	            break
 	        fi
             fi
@@ -4779,7 +4800,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
-	        if test "$CURSESLIBSW" != nope; then
+	        if test "$CURSESLIBSW" != "nope"; then
 	            break
 	        fi
 	        tk_oldCFlags=$CFLAGS
@@ -4843,7 +4864,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
-	        if test "$CURSESLIBSW" != nope; then
+	        if test "$CURSESLIBSW" != "nope"; then
 	            break
 	        fi
             fi
@@ -4851,7 +4872,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
     done
 fi
 
-if test "$CURSESLIBSW" = nope ; then
+if test "$CURSESLIBSW" = "nope" ; then
     echo "Warning:  couldn't find the curses library archive.  Using -lcurses."
     CURSESLIBSW="-lcurses -ltermcap"
 else

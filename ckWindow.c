@@ -22,7 +22,7 @@
 
 CkMainInfo *ckMainInfo = NULL;
 
-#ifdef __WIN32__
+#ifdef _WIN32
 
 /*
  * Curses input event handling information.
@@ -153,7 +153,7 @@ static int      GetsCmd(ClientData clientData,
  */
 
 CkCmd redirCommands[] = {
-#ifndef __WIN32__
+#ifndef _WIN32
     {"exec",    ExecCmd},
 #endif
     {"puts",    PutsCmd},
@@ -468,7 +468,7 @@ Ck_CreateMainWindow(
     ckDisabledUid = Ck_GetUid("disabled");
     ckActiveUid = Ck_GetUid("active");
 
-#ifdef __WIN32__
+#ifdef _WIN32
     {
 	char enc[32], *envcp = getenv("CK_USE_ENCODING");
 	unsigned int cp = GetConsoleCP();
@@ -478,10 +478,12 @@ Ck_CreateMainWindow(
 	    SetConsoleCP(cp);
 	    cp = GetConsoleCP();
 	}
-	if (GetConsoleOutputCP() != cp) {
+	if (GetConsoleOutputCP() != cp)
 	    SetConsoleOutputCP(cp);
-	}
-	sprintf(enc, "cp%d", cp);
+	if (cp == 65001)
+	    strcpy(enc, "utf-8");
+	else
+	    sprintf(enc, "cp%d", cp);
 	mainPtr->isoEncoding = Tcl_GetEncoding(NULL, enc);
     }
 #else
@@ -517,7 +519,7 @@ Ck_CreateMainWindow(
 #endif
 #endif
 
-#ifndef __WIN32__
+#ifndef _WIN32
     /*
      * Fix for problem when X server left linux console
      * in non-blocking mode
@@ -587,7 +589,7 @@ Ck_CreateMainWindow(
 #endif
 #endif	/* NCURSES_MOUSE_VERSION */
 
-#ifdef __WIN32__
+#ifdef _WIN32
     mouse_set(BUTTON1_PRESSED | BUTTON1_RELEASED |
 	      BUTTON2_PRESSED | BUTTON2_RELEASED |
 	      BUTTON3_PRESSED | BUTTON3_RELEASED);
@@ -640,13 +642,11 @@ Ck_CreateMainWindow(
     }
 #endif	/* HAVE_GPM */
 
-#ifdef __WIN32__
+#ifdef _WIN32
     /* PDCurses specific !!! */
     inputInfo.mainPtr = mainPtr;
     inputInfo.stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
     typeahead(-1);
-    SetConsoleMode(inputInfo.stdinHandle,
-		   ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
     InputSetup(&inputInfo);
 #else
     Tcl_CreateFileHandler(0,
@@ -983,7 +983,9 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
     MEVENT mEvent;
 #endif
 
+#if defined(USE_NCURSES) || defined(_WIN32)
     Tcl_CancelIdleCall(CkFocusRestore, (ClientData) winPtr);
+#endif
     if (winPtr->flags & CK_ALREADY_DEAD)
 	return;
     winPtr->flags |= CK_ALREADY_DEAD;
@@ -1045,7 +1047,7 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
 #endif	/* NCURSES_MOUSE_VERSION */
 
 	    if (mainPtr->flags & CK_HAS_MOUSE) {
-#ifdef __WIN32__
+#ifdef _WIN32
 		mouse_set(0);
 #endif
 		if (mainPtr->flags & CK_MOUSE_XTERM) {
@@ -2047,6 +2049,9 @@ static void
 UpdateHWCursor(CkMainInfo *mainPtr)
 {
     int x, y;
+#ifdef _WIN32
+    int tx, ty;
+#endif
     CkWindow *wPtr, *stopAtWin, *winPtr = mainPtr->focusPtr;
 
     if (winPtr == NULL || winPtr->window == NULL ||
@@ -2089,6 +2094,12 @@ invisible:
 	    y >= wPtr->y && y < wPtr->y + wPtr->height)
 	    goto invisible;
     curs_set(1);
+#ifdef _WIN32
+    tx = ty = 0;
+    if (wPtr != NULL && wPtr->window != NULL)
+	getbegyx(wPtr->window, ty, tx);
+    move(y + ty, x + tx);
+#endif
     wnoutrefresh(mainPtr->focusPtr->window);
 }
 
@@ -2359,7 +2370,7 @@ ExecCmd(
 	sigproc = signal(SIGINT, SIG_IGN);
 #endif
 #endif
-#ifndef __WIN32__
+#ifndef _WIN32
 	if (clrCmd != NULL && clrCmd != (char *) -1) {
 	    write(1, clrCmd, strlen(clrCmd));
 	}
@@ -2568,7 +2579,7 @@ GetsCmd(
     return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
 }
 
-#ifdef __WIN32__
+#ifdef _WIN32
 
 /*
  *----------------------------------------------------------------------
@@ -2605,7 +2616,11 @@ InputSetup(InputInfo *inputInfo)
     if (inputInfo->hwnd == NULL) {
         Tcl_Panic("cannot create curses input window");
     }
+#ifdef _WIN64
+    SetWindowLongPtr(inputInfo->hwnd, GWLP_USERDATA, (LONG_PTR) inputInfo);
+#else
     SetWindowLong(inputInfo->hwnd, GWL_USERDATA, (LONG) inputInfo);
+#endif
     inputInfo->thread = CreateThread(NULL, 4096,
 				     (LPTHREAD_START_ROUTINE) InputThread,
 				     (void *) inputInfo, 0, &id);
@@ -2654,7 +2669,11 @@ InputHandler(
     WPARAM wParam,
     LPARAM lParam)
 {
+#ifdef _WIN64
+    InputInfo *inputInfo = (InputInfo *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#else
     InputInfo *inputInfo = (InputInfo *) GetWindowLong(hwnd, GWL_USERDATA);
+#endif
 
     if (message != WM_USER + 42) {
         return DefWindowProc(hwnd, message, wParam, lParam);

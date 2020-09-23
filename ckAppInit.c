@@ -12,7 +12,9 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
+#ifndef _WIN32
 #undef USE_TCL_STUBS
+#endif
 #include "ck.h"
 
 
