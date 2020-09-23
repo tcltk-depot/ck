@@ -1577,7 +1577,7 @@ CkTermHasKey(
     Tcl_Interp *interp,		/* Interpreter used for result. */
     char *name)			/* Name of a keysym. */
 {
-#ifndef __WIN32__
+#ifndef _WIN32
     Tcl_HashEntry *hPtr;
     char *tiname, *tivalue;
     extern char *tigetstr();
@@ -1592,7 +1592,7 @@ CkTermHasKey(
 	Tcl_SetResult(interp, "1", TCL_STATIC);
 	return TCL_OK;
     }
-#ifdef __WIN32__
+#ifdef _WIN32
     Tcl_SetResult(interp, "1", TCL_STATIC);
     return TCL_OK;
 #else

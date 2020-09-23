@@ -18,7 +18,7 @@
 #include "ck.h"
 #include "default.h"
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #define DestroyMenu CkDestroyMenu
 #endif
 

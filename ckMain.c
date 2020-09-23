@@ -70,14 +70,10 @@ Ck_Main(
     Tcl_Channel errChannel = NULL;
 
     if (Tcl_InitStubs(interp, "8.6", 0) == NULL) {
-	if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
-	    abort();
-	} else {
-	    Tcl_Panic("%s", Tcl_GetString(Tcl_GetObjResult(interp)));
-	}
+	Tcl_Panic("%s", Tcl_GetString(Tcl_GetObjResult(interp)));
     }
 
-#ifndef __WIN32__
+#ifndef _WIN32
     if (!isatty(0) || !isatty(1)) {
 	errChannel = Tcl_GetStdChannel(TCL_STDERR);
 	if (errChannel)

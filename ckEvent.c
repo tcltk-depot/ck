@@ -32,7 +32,7 @@ typedef struct {
 } CkQEvt;
 
 static int	Ck_HandleQEvent(Tcl_Event *evPtr, int flags);
-#ifdef USE_NCURSES
+#if defined(USE_NCURSES) || defined(_WIN32)
 static void	TerminalResized(CkWindow *parentPtr, int flag);
 #endif
 
@@ -487,7 +487,7 @@ CkEventDeadWindow(
     }
 }
 
-#ifdef USE_NCURSES
+#if defined(USE_NCURSES) || defined(_WIN32)
 /*
  *--------------------------------------------------------------
  *
@@ -564,7 +564,7 @@ TerminalResized(
 }
 #endif
 
-#ifdef USE_NCURSES
+#if defined(USE_NCURSES) || defined(_WIN32)
 /*
  *--------------------------------------------------------------
  *
@@ -615,7 +615,9 @@ CkHandleInput(
     CkMainInfo *mainPtr = (CkMainInfo *) clientData;
     int code;
     static int buttonpressed = 0;
+#ifndef _WIN32
     static int errCount = 0;
+#endif
     int ch, ucp = 0;
     char ucbuf[16];
     Tcl_UniChar uch = 0;
@@ -641,9 +643,12 @@ CkHandleInput(
 
     code = getch();
 
-#ifdef USE_NCURSES
+#if defined(USE_NCURSES) || defined(_WIN32)
     if (code == KEY_RESIZE) {
 doResize:
+#ifdef _WIN32
+	resize_term(0, 0);
+#endif
 	/* Terminal resized, must resize all toplevels, too. */
 	if (mainPtr->maxWidth != COLS || mainPtr->maxHeight != LINES) {
 	    mainPtr->maxWidth = COLS;
@@ -662,6 +667,10 @@ doResize:
     }
 #endif
 
+#ifdef _WIN32
+    if (code == ERR)
+	return;
+#else
     if (code == ERR) {
 	if (++errCount > 100) {
 	    Tcl_Eval(mainPtr->interp, "exit 99");
@@ -670,14 +679,14 @@ doResize:
 	return;
     }
     errCount = 0;
+#endif
+
     if (mainPtr->isoEncoding == NULL && code >= 0xc0 && code < 0x100) {
 	int need = 2;
 
-	if (code >= 0xfc)
-	    need = 6;
-	else if (code >= 0xf8)
-	    need = 5;
-	else if (code >= 0xf0)
+	if (code >= 0xf8)
+	    goto done_uc;
+	if (code >= 0xf0)
 	    need = 4;
 	else if (code >= 0xe0)
 	    need = 3;
@@ -695,6 +704,7 @@ doResize:
 	nodelay(curscr, TRUE);
 	if (code >= 0x100 && code != ERR)
 	    ungetch(code);
+done_uc:
 	ucbuf[ucp] = '\0';
 #if TCL_UTF_MAX == 3
 	if ((ucp > 3) && ((ucbuf[0] & 0xff) < 0xf8)) {
@@ -827,7 +837,7 @@ mouseEventNC:
     }
 #endif
 
-#ifdef __WIN32__
+#ifdef _WIN32
     if ((mainPtr->flags & CK_HAS_MOUSE) && code == KEY_MOUSE) {
 	int i;
 
@@ -859,7 +869,7 @@ mouseEvt:
      * Only a single button down/up event is generated.
      */
 
-#ifndef __WIN32__
+#ifndef _WIN32
     if ((mainPtr->flags & CK_MOUSE_XTERM) && (code == 0x1b || code == 0x9b)) {
 	int code2;
 

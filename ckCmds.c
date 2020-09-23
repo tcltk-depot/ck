@@ -490,7 +490,7 @@ Ck_CursesCmd(
 		" ", argv[1], "\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-#ifndef __WIN32__
+#ifndef _WIN32
 	curs_set(1);
 	endwin();
 #ifdef SIGTSTP

@@ -330,6 +330,18 @@ static char mapChars[] = {
     'b', 't', 'n', 0, 'f', 'r', 0
 };
 
+#ifdef _WIN32
+static int
+wcwidth(int wc)
+{
+    if (wc == 0)
+	return 0;
+    if (wc > 0xffff)
+	return -1;
+    return iswprint((wint_t) wc) ? 1 : -1;
+}
+#endif
+
 
 /*
  *----------------------------------------------------------------------
@@ -757,7 +769,11 @@ CkMeasureChars(
 		}
 	    }
 	} else {
+#ifdef _WIN32
+	    int len = wcwidth(uch);
+#else
 	    int len = wcwidth((wint_t) uch);
+#endif
 
 	    if (len < 0) {
 		newX += MakeUCRepl(uch, NULL);
@@ -959,7 +975,11 @@ replaceChar:
 	    }
 	    curX += len;
 	} else {
+#ifdef _WIN32
+	    len = wcwidth(uch);
+#else
 	    len = wcwidth((wint_t) uch);
+#endif
 	    if (len < 0 || (unsigned int) uch < 0x20) {
 		len = MakeUCRepl(uch, replace);
 		if (len + curX > maxX) {
@@ -969,7 +989,7 @@ replaceChar:
 		}
 		waddnstr(window, replace, len);
 	    } else {
-#ifdef USE_NCURSESW
+#if defined(USE_NCURSESW) || defined(_WIN32)
 		wchar_t w[2];
 
 		w[0] = uch;
@@ -1138,7 +1158,11 @@ replaceChar:
 	    if (count < first)
 		wmove(window, y, curX);
 	} else {
+#ifdef _WIN32
+	    len = wcwidth(uch);
+#else
 	    len = wcwidth((wint_t) uch);
+#endif
 	    if (len < 0 || (unsigned int) uch < 0x20) {
 		len = MakeUCRepl(uch, replace);
 		if (len + curX > maxX) {
@@ -1149,7 +1173,7 @@ replaceChar:
 		if (count >= first)
 		    waddnstr(window, replace, len);
 	    } else {
-#ifdef USE_NCURSESW
+#if defined(USE_NCURSESW) || defined(_WIN32)
 		wchar_t w[2];
 
 		w[0] = uch;
