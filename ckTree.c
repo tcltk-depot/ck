@@ -632,7 +632,7 @@ TreeWidgetCmd(
 
 	new = (Node *) ckalloc (sizeof (Node));
 	new->id = treePtr->idCount++;
-	new->level = nodePtr == NULL ? 0 : nodePtr->level + 1;
+	new->level = (nodePtr == NULL) ? 0 : nodePtr->level + 1;
 	new->tree = treePtr;
 	new->parent = nodePtr;
 	new->next = NULL;
@@ -1241,18 +1241,21 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 		treePtr->selectAttr);
 	    mustRestore = 1;
 	}
-	CkDisplayChars(winPtr->mainPtr, window,
-	    nodePtr->text, strlen(nodePtr->text),
-	    x, y, 0,
-	    CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS);
+	if (nodePtr->text != NULL)
+	    CkDisplayChars(winPtr->mainPtr, window,
+		nodePtr->text, strlen(nodePtr->text),
+		x, y, 0,
+		CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS);
 	if (mustRestore)
 	    Ck_SetWindowAttr(winPtr, treePtr->normalFg, treePtr->normalBg,
 		treePtr->normalAttr);
 	Ck_ClearToEol(winPtr, -1, -1);
 
 	i = nodePtr->level * 2;
-	treePtr->leadingString[i] = nodePtr->next != NULL ? lvline : ' ';
-	treePtr->leadingString[i + 1] = ' ';
+	if (treePtr->leadingString != NULL) {
+	    treePtr->leadingString[i] = (nodePtr->next != NULL) ? lvline : ' ';
+	    treePtr->leadingString[i + 1] = ' ';
+	}
 
 	nodePtr = nextPtr;
 	y++;

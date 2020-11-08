@@ -1018,7 +1018,7 @@ CkHandleGPMInput(
     GPM_DRAWPOINTER(&gpmEvent);
     type = gpmEvent.type & (GPM_DOWN | GPM_UP);
     if (type == GPM_DOWN || type == GPM_UP) {
-	event.mouse.type = type == GPM_DOWN ? CK_EV_MOUSE_DOWN :
+	event.mouse.type = (type == GPM_DOWN) ? CK_EV_MOUSE_DOWN :
 	    CK_EV_MOUSE_UP;
 	if (gpmEvent.buttons & GPM_B_LEFT)
 	    event.mouse.button = 1;

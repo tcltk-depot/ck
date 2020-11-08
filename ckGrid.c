@@ -556,7 +556,7 @@ Ck_GridCmd(
 		if (argc == 5) {
 		    char buffer[200];
 
-		    size = con->used <= index ?  0 : con->minsize[index];
+		    size = (con->used <= index) ?  0 : con->minsize[index];
 		    sprintf(buffer, "%d", size);
 		    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 		} else if (Ck_GetCoord(interp, master, argv[i + 1], &size)
@@ -578,7 +578,7 @@ Ck_GridCmd(
 		if (argc == 5) {
 		    char buffer[200];
 
-		    weight = con->used <= index ?  0 : con->weight[index];
+		    weight = (con->used <= index) ?  0 : con->weight[index];
 		    sprintf(buffer, "%.2f", weight);
 		    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 		} else if (Tcl_GetDouble(interp, argv[i+1], &weight)

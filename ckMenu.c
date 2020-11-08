@@ -1336,8 +1336,8 @@ DisplayMenu(ClientData clientData)	/* Information about widget. */
     if (menuPtr->winPtr == NULL || !(winPtr->flags & CK_MAPPED))
 	return;
 
-    x = cursorX = menuPtr->borderPtr != NULL ? 1 : 0;
-    y = cursorY = menuPtr->borderPtr != NULL ? 1 : 0;
+    x = cursorX = (menuPtr->borderPtr != NULL) ? 1 : 0;
+    y = cursorY = (menuPtr->borderPtr != NULL) ? 1 : 0;
 
     /*
      * Loop through all of the entries, drawing them one at a time.
@@ -1364,15 +1364,15 @@ DisplayMenu(ClientData clientData)	/* Information about widget. */
 	 * Colors.
 	 */
 
-        nBg = mePtr->normalBg < 0 ? menuPtr->normalBg : mePtr->normalBg;
-        aBg = mePtr->activeBg < 0 ? menuPtr->activeBg : mePtr->activeBg;
-        dBg = mePtr->disabledBg < 0 ? menuPtr->disabledBg : mePtr->disabledBg;
-        nFg = mePtr->normalFg < 0 ? menuPtr->normalFg : mePtr->normalFg;
-        aFg = mePtr->activeFg < 0 ? menuPtr->activeFg : mePtr->activeFg;
-        dFg = mePtr->disabledFg < 0 ? menuPtr->disabledFg : mePtr->disabledFg;
-        nAt = mePtr->normalAttr < 0 ? menuPtr->normalAttr : mePtr->normalAttr;
-        aAt = mePtr->activeAttr < 0 ? menuPtr->activeAttr : mePtr->activeAttr;
-        dAt = mePtr->disabledAttr < 0 ? menuPtr->disabledAttr :
+        nBg = (mePtr->normalBg < 0) ? menuPtr->normalBg : mePtr->normalBg;
+        aBg = (mePtr->activeBg < 0) ? menuPtr->activeBg : mePtr->activeBg;
+        dBg = (mePtr->disabledBg < 0) ? menuPtr->disabledBg : mePtr->disabledBg;
+        nFg = (mePtr->normalFg < 0) ? menuPtr->normalFg : mePtr->normalFg;
+        aFg = (mePtr->activeFg < 0) ? menuPtr->activeFg : mePtr->activeFg;
+        dFg = (mePtr->disabledFg < 0) ? menuPtr->disabledFg : mePtr->disabledFg;
+        nAt = (mePtr->normalAttr < 0) ? menuPtr->normalAttr : mePtr->normalAttr;
+        aAt = (mePtr->activeAttr < 0) ? menuPtr->activeAttr : mePtr->activeAttr;
+        dAt = (mePtr->disabledAttr < 0) ? menuPtr->disabledAttr :
             mePtr->disabledAttr;
 
 	if (mePtr->state == ckActiveUid) {
@@ -1392,9 +1392,9 @@ DisplayMenu(ClientData clientData)	/* Information about widget. */
 		leftEdge, y, leftEdge,
 		CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS);
 	    if (mePtr->underline >= 0 && mePtr->state == ckNormalUid) {
-		Ck_SetWindowAttr(winPtr, mePtr->underlineFg < 0 ?
+		Ck_SetWindowAttr(winPtr, (mePtr->underlineFg < 0) ?
 		    menuPtr->underlineFg : mePtr->underlineFg, bg,
-		    mePtr->underlineAttr < 0 ? menuPtr->underlineAttr :
+		    (mePtr->underlineAttr < 0) ? menuPtr->underlineAttr :
 		    mePtr->underlineAttr);
 		CkUnderlineChars(winPtr->mainPtr, winPtr->window, mePtr->label,
 		    mePtr->labelLength, leftEdge, y, leftEdge,
@@ -1429,15 +1429,15 @@ DisplayMenu(ClientData clientData)	/* Information about widget. */
 	    mePtr->type == RADIO_BUTTON_ENTRY)) {
 	    wmove(winPtr->window, y, x);
 	    Ck_SetWindowAttr(winPtr, nFg, nBg, nAt);
-	    waddstr(winPtr->window, mePtr->type == CHECK_BUTTON_ENTRY ?
+	    waddstr(winPtr->window, (mePtr->type == CHECK_BUTTON_ENTRY) ?
 		"[ ]" : "( )");
 	    if (mePtr->flags & ENTRY_SELECTED) {
 		long gchar;
 
 		Ck_GetGChar(menuPtr->interp,
-		    mePtr->type == CHECK_BUTTON_ENTRY ? "diamond" : "bullet",
+		    (mePtr->type == CHECK_BUTTON_ENTRY) ? "diamond" : "bullet",
 		    &gchar);
-		Ck_SetWindowAttr(winPtr, mePtr->indicatorFg < 0 ?
+		Ck_SetWindowAttr(winPtr, (mePtr->indicatorFg < 0) ?
 		    menuPtr->indicatorFg : mePtr->indicatorFg, nBg, nAt);
 		mvwaddch(winPtr->window, y, x + 1, gchar);
 	    }
@@ -1508,7 +1508,7 @@ GetMenuIndex(
 
     if (((string[0] == 'l') && (strcmp(string, "last") == 0))
 	    || ((string[0] == 'e') && (strcmp(string, "end") == 0))) {
-	*indexPtr = menuPtr->numEntries - ((lastOK) ? 0 : 1);
+	*indexPtr = menuPtr->numEntries - (lastOK ? 0 : 1);
 	return TCL_OK;
     }
 

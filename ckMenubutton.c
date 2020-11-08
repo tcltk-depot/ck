@@ -748,7 +748,7 @@ ComputeMenuButtonGeometry(
     int width, height, dummy;
     CkWindow *winPtr = mbPtr->winPtr;
 
-    mbPtr->numChars = mbPtr->text == NULL ? 0 : strlen(mbPtr->text);
+    mbPtr->numChars = (mbPtr->text == NULL) ? 0 : strlen(mbPtr->text);
     if (mbPtr->height > 0)
         height = mbPtr->height;
     else
@@ -756,7 +756,8 @@ ComputeMenuButtonGeometry(
     if (mbPtr->width > 0)
         width = mbPtr->width;
     else
-	CkMeasureChars(winPtr->mainPtr, mbPtr->text == NULL ? "" : mbPtr->text,
+	CkMeasureChars(winPtr->mainPtr,
+	    (mbPtr->text == NULL) ? "" : mbPtr->text,
 	    mbPtr->numChars, 0, 100000, 0,
 	    CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS,
 	    &width, &dummy);
