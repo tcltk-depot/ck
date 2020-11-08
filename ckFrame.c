@@ -165,7 +165,7 @@ Ck_FrameCmd(
     if (className == NULL) {
         className = Ck_GetOption(new, "class", "Class");
         if (className == NULL) {
-            className = (toplevel) ? "Toplevel" : "Frame";
+            className = toplevel ? "Toplevel" : "Frame";
         }
     }
     Ck_SetClass(new, className);

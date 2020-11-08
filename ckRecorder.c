@@ -106,7 +106,7 @@ RecorderInput(
 	    }
 	    if (argv[2] != NULL) {
 		argv[0] = "<Key>";
-		argv[1] = eventPtr->key.winPtr == NULL ? "" :
+		argv[1] = (eventPtr->key.winPtr == NULL) ? "" :
 		    eventPtr->key.winPtr->pathName;
 		result = Tcl_Merge(3, argv);
 printPctSNL:
@@ -121,7 +121,7 @@ printPctSNL:
 	    barCode = CkGetBarcodeData(recPtr->mainPtr->mainPtr);
 	    if (barCode != NULL) {
 		argv[0] = "<BarCode>";
-		argv[1] = eventPtr->key.winPtr == NULL ? "" :
+		argv[1] = (eventPtr->key.winPtr == NULL) ? "" :
 		    eventPtr->key.winPtr->pathName;
 		argv[2] = barCode;
 		result = Tcl_Merge(3, argv);
@@ -134,9 +134,9 @@ printPctSNL:
 	    {
 	        char bbuf[16], xbuf[16], ybuf[16], rxbuf[16], rybuf[16];
 
-	        argv[0] = type == CK_EV_MOUSE_DOWN ?
+	        argv[0] = (type == CK_EV_MOUSE_DOWN) ?
 		    "<ButtonPress>" : "<ButtonRelease>";
-		argv[1] = eventPtr->mouse.winPtr == NULL ? "" :
+		argv[1] = (eventPtr->mouse.winPtr == NULL) ? "" :
 		    eventPtr->mouse.winPtr->pathName;
 		sprintf(bbuf, "%d", eventPtr->mouse.button);
 		argv[2] = bbuf;
@@ -189,7 +189,7 @@ DStringGets(
         code = Tcl_Gets(chan, dsPtr);
 	length = Tcl_DStringLength(dsPtr);
 	if (code == -1)
-	    return length == 0 ? TCL_ERROR : TCL_OK;
+	    return (length == 0) ? TCL_ERROR : TCL_OK;
 	if (length > 0) {
 	    p = Tcl_DStringValue(dsPtr) + length - 1;
 	    if (*p != '\\')

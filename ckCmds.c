@@ -431,7 +431,7 @@ Ck_CursesCmd(
 
 	    if (Tcl_GetInt(interp, argv[2], &delay) != TCL_OK)
 		return TCL_ERROR;
-	    mainPtr->refreshDelay = delay < 0 ? 0 : delay;
+	    mainPtr->refreshDelay = (delay < 0) ? 0 : delay;
 	    return TCL_OK;
 	} else {
 	    Tcl_AppendResult(interp, "wrong # args: must be \"", argv[0],

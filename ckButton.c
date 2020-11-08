@@ -767,7 +767,7 @@ ConfigureButton(
 	value = Tcl_GetVar(interp, butPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
 	    Tcl_SetVar(interp, butPtr->textVarName,
-		    butPtr->text != NULL ? butPtr->text : "",
+		    (butPtr->text != NULL) ? butPtr->text : "",
 		    TCL_GLOBAL_ONLY);
 	} else {
 	    if (butPtr->text != NULL) {
@@ -852,7 +852,7 @@ DisplayButton(ClientData clientData)	/* Information about widget. */
 
     switch (butPtr->anchor) {
 	case CK_ANCHOR_NW: case CK_ANCHOR_W: case CK_ANCHOR_SW:
-	    x = butPtr->type >= TYPE_CHECK_BUTTON ? 4 : 0;
+	    x = (butPtr->type >= TYPE_CHECK_BUTTON) ? 4 : 0;
 	    break;
 	case CK_ANCHOR_N: case CK_ANCHOR_CENTER: case CK_ANCHOR_S:
 	    x = (winPtr->width - textWidth) / 2;
@@ -901,7 +901,7 @@ DisplayButton(ClientData clientData)	/* Information about widget. */
     if (butPtr->type >= TYPE_CHECK_BUTTON) {
 	long gchar;
 
-        mvwaddstr(winPtr->window, y, 0, butPtr->type == TYPE_CHECK_BUTTON ?
+        mvwaddstr(winPtr->window, y, 0, (butPtr->type == TYPE_CHECK_BUTTON) ?
             "[ ]" : "( )");
 	Ck_SetWindowAttr(winPtr, butPtr->selectFg, bg, attr);
         if (!(butPtr->flags & SELECTED)) {
@@ -987,7 +987,7 @@ ComputeButtonGeometry(
     int width, height, dummy;
     CkWindow *winPtr = butPtr->winPtr;
 
-    butPtr->textLength = butPtr->text == NULL ? 0 : strlen(butPtr->text);
+    butPtr->textLength = (butPtr->text == NULL) ? 0 : strlen(butPtr->text);
     if (butPtr->height > 0)
         height = butPtr->height;
     else
@@ -996,7 +996,7 @@ ComputeButtonGeometry(
         width = butPtr->width;
     else
 	CkMeasureChars(winPtr->mainPtr,
-	    butPtr->text == NULL ? "" : butPtr->text,
+	    (butPtr->text == NULL) ? "" : butPtr->text,
 	    butPtr->textLength, 0, 100000, 0,
 	    CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS,
 	    &width, &dummy);
@@ -1161,7 +1161,7 @@ ButtonTextVarProc(
     if (flags & TCL_TRACE_UNSETS) {
 	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
 	    Tcl_SetVar2(interp, name1, name2,
-		    butPtr->text != NULL ? butPtr->text : "",
+		    (butPtr->text != NULL) ? butPtr->text : "",
 		    flags & TCL_GLOBAL_ONLY);
 	    Tcl_TraceVar2(interp, name1, name2,
 		    TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
