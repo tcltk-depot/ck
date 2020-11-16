@@ -205,6 +205,11 @@ proc ckTextUpDownLine {w n} {
     set new [$w index [expr {$line + $n}].$ckPriv(char)]
     if {[$w compare $new == end] || [$w compare $new == "insert linestart"]} {
 	set new $i
+    } else {
+	scan [$w get $new] "%c" char
+	if {($char & 0xfffffc00) == 0xdc00} {
+	    set new [$w index "$new + 1c"]
+	}
     }
     set ckPriv(prevPos) $new
     return $new

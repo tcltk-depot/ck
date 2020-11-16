@@ -460,7 +460,7 @@ TextWidgetCmd(
 			(char *) NULL);
 		segPtr->body.chars[last] = savedChar;
 	    }
-	    CkTextIndexForwChars(&index1, last-offset, &index1);
+	    CkTextIndexForwBytes(&index1, last-offset, &index1);
 	}
     } else if ((c == 'i') && (strncmp(argv[1], "index", length) == 0)
 	    && (length >= 3)) {
@@ -501,7 +501,7 @@ TextWidgetCmd(
 	    for (j = 3;  j < argc; j += 2) {
 		InsertChars(textPtr, &index1, argv[j]);
 		if (argc > (j+1)) {
-		    CkTextIndexForwChars(&index1, (int) strlen(argv[j]),
+		    CkTextIndexForwBytes(&index1, (int) strlen(argv[j]),
 			    &index2);
 		    oldTagArrayPtr = CkBTreeGetTags(&index1, &numTags);
 		    if (oldTagArrayPtr != NULL) {
