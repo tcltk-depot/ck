@@ -15,6 +15,11 @@
 #	an icon and a list of buttons.
 #	See the user documentation for details on what ck_messageBox does.
 
+option add *Dialog.border \
+    {ulcorner hline urcorner vline lrcorner hline llcorner vline} \
+    widgetDefault
+option add *Dialog*Message.aspect 1000 widgetDefault
+
 proc ck_messageBox args {
     global ckPriv
     set w ckPrivMsgBox
@@ -101,8 +106,7 @@ proc ck_messageBox args {
     # 3. Create the top-level window and divide it into top
     # and bottom parts.
     catch {destroy $w}
-    toplevel $w -class Dialog \
-        -border { ulcorner hline urcorner vline lrcorner hline llcorner vline }
+    toplevel $w -class Dialog
     place $w -relx 0.5 -rely 0.5 -anchor center
     label $w.title -text $data(-title)
     pack $w.title -side top -fill x
@@ -113,7 +117,7 @@ proc ck_messageBox args {
     # 4. Fill the top part with bitmap and message (use the option
     # database for -wraplength so that it can be overridden by
     # the caller).
-    message $w.top.msg -text $data(-message) -aspect 1000
+    message $w.top.msg -text $data(-message)
     pack $w.top.msg -side right -expand 1 -fill both -padx 1 -pady 1
     # 5. Create a row of buttons at the bottom of the dialog.
     set i 0
@@ -147,6 +151,7 @@ proc ck_messageBox args {
     }
     # 7. Claim the focus.
     set oldFocus [focus]
+    update idletasks
     if {$data(-default) ne ""} {
 	focus $w.bot.$data(-default)
     } else {
