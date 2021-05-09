@@ -82,7 +82,7 @@ proc ck_messageBox args {
     if {$data(-default) ne ""} {
 	set valid 0
 	foreach btn $buttons {
-	    if {[lindex $btn 0] eq $data(-default)]} {
+	    if {[lindex $btn 0] eq $data(-default)} {
 		set valid 1
 		break
 	    }
