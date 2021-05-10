@@ -69,6 +69,7 @@ proc ckFDialog {type args} {
     place forget $w
     place $w -relx 0.5 -rely 0.5 -anchor center
     set oldFocus [focus]
+    update idletasks
     focus $data(ent)
     $data(ent) delete 0 end
     $data(ent) insert 0 $data(selectFile)

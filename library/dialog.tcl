@@ -52,6 +52,7 @@ proc ck_dialog {w title text args} {
 	incr i
     }
     focus $w.b.b0
+    update idletasks
     tkwait window $w
     return $ckPriv(button)
 }

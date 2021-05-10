@@ -39,6 +39,7 @@ proc ck_chooseColor args {
     # Set the focus.
 
     set oldFocus [focus]
+    update idletasks
     focus $w.bot.ok
 
     # Wait for the user to respond, then restore the focus and
