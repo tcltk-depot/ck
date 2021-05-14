@@ -590,6 +590,7 @@ Ck_CreateMainWindow(
 #endif	/* NCURSES_MOUSE_VERSION */
 
 #ifdef _WIN32
+    mouseinterval(10);
     mouse_set(BUTTON1_PRESSED | BUTTON1_RELEASED |
 	      BUTTON2_PRESSED | BUTTON2_RELEASED |
 	      BUTTON3_PRESSED | BUTTON3_RELEASED);
