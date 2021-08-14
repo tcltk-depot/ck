@@ -891,13 +891,6 @@ CkDisplayChars(
      */
 
     getmaxyx(window, dummy, maxX);
-    nc = NumUtfChars(string, numChars);
-    if (nc > maxX)
-	numChars = UtfAtIndex(string, maxX) - string;
-    else
-	numChars = nc;
-    if (numChars > maxX)
-        numChars = maxX;
     p = string;
     if (x < 0) {
 	x = -x;
@@ -906,6 +899,13 @@ CkDisplayChars(
 	numChars -= x;
 	x = 0;
     }
+    nc = NumUtfChars(p, numChars);
+    if (nc > maxX)
+	numChars = UtfAtIndex(p, maxX) - p;
+    else
+	numChars = nc;
+    if (numChars > maxX)
+        numChars = maxX;
     wmove(window, y, x);
     startX = curX = x;
     for (; numChars > 0; numChars--, p += nc) {
@@ -1002,6 +1002,15 @@ replaceChar:
 	    curX += len;
 	}
 	startX = curX;
+	if (flags & CK_STOP_AT_EOL) {
+	    int mX, cX;
+
+	    getmaxyx(window, dummy, mX);
+	    getyx(window, dummy, cX);
+	    if (cX >= mX || cX < curX) {
+		break;
+	    }
+	}
     }
     if (flags & CK_FILL_UNTIL_EOL) {
 	while (startX < maxX) {
@@ -1190,6 +1199,15 @@ replaceChar:
 		wmove(window, y, curX);
 	}
 	startX = curX;
+	if (flags & CK_STOP_AT_EOL) {
+	    int mX, cX;
+
+	    getmaxyx(window, dummy, mX);
+	    getyx(window, dummy, cX);
+	    if (cX >= mX || cX < curX) {
+		break;
+	    }
+	}
     }
 }
 
