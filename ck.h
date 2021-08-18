@@ -412,7 +412,6 @@ typedef enum {
 #define CK_NEWLINES_NOT_SPECIAL  8
 #define CK_IGNORE_TABS          16
 #define CK_FILL_UNTIL_EOL	32
-#define CK_STOP_AT_EOL		64
 
 /*
  * Priority levels to pass to Ck_AddOption:

@@ -26,12 +26,12 @@
 #define GCHAR   5
 
 struct charType {
-    char type;          /* Type of char, see definitions above. */
-    char width;         /* Width if replaced by backslash sequence. */
+    char type;		/* Type of char, see definitions above. */
+    char width;		/* Width if replaced by backslash sequence. */
 };
 
 struct charEncoding {
-    char *name;         /* Name for this encoding table. */
+    char *name;			/* Name for this encoding table. */
     struct charType ct[256];    /* Encoding table. */
 };
 
@@ -789,7 +789,7 @@ CkDisplayChars(
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[16];
-    int rem, dummy, maxX, nc = 0;
+    int rem, dummy, maxX, nc = 0, i;
 
     /*
      * Scan the string one character at a time and display the
@@ -798,22 +798,15 @@ CkDisplayChars(
 
     getmaxyx(window, dummy, maxX);
     p = string;
-    if (x < 0) {
-	x = -x;
-	x = Tcl_UtfAtIndex(p, x) - p;
-	p += x;
-	numChars -= x;
-	x = 0;
-    }
     nc = Tcl_NumUtfChars(p, numChars);
-    if (nc > maxX)
-	numChars = Tcl_UtfAtIndex(p, maxX) - p;
+    if (nc > maxX - x)
+	numChars = Tcl_UtfAtIndex(p, maxX - x) - p;
     else
 	numChars = nc;
-    if (numChars > maxX)
-        numChars = maxX;
-    wmove(window, y, x);
+    if (numChars > maxX - x)
+	numChars = maxX - x;
     startX = curX = x;
+    wmove(window, y, (x > 0) ? x : 0);
     for (; numChars > 0; numChars--, p += nc) {
 	Tcl_UniChar uch;
 	int len;
@@ -831,9 +824,8 @@ CkDisplayChars(
 			  NULL, buf, sizeof (buf), &srcRead,
 			  &dstWrote, &dstChars);
 	    c = buf[0] & 0xff;
-	    if (dstWrote != 1 || (c == '?' && uch != '?')) {
+	    if (dstWrote != 1 || (c == '?' && uch != '?'))
 		c = '\0';
-	    }
 	} else {
 	    c = uch & 0xff;
 	}
@@ -841,14 +833,14 @@ CkDisplayChars(
 	    if (!(flags & CK_IGNORE_TABS)) {
 		curX += 8;
 		rem = (curX - tabOrigin) % 8;
-		if (rem < 0) {
+		if (rem < 0)
 		    rem += 8;
-		}
 		curX -= rem;
-	    }
-	    while (startX < curX) {
-	    	waddch(window, ' ');
-	    	startX++;
+		while (startX < curX) {
+		    if (startX >= 0)
+			waddch(window, ' ');
+		    startX++;
+		}
 	    }
 	    continue;
 	} else if ((unsigned int) uch < 0x100 && CHARTYPE(c).type == GCHAR) {
@@ -856,13 +848,14 @@ CkDisplayChars(
 
 	    if (Ck_GetGChar(NULL, gcharTab[c - 0x81], &gchar) != TCL_OK)
 		goto replaceChar;
-	    waddch(window, gchar);
+	    if (curX >= 0)
+		waddch(window, gchar);
 	    curX++;
 	} else if ((unsigned int) uch < 0x100 &&
 		   CHARTYPE(c).type == NEWLINE &&
 		   !(flags & CK_NEWLINES_NOT_SPECIAL)) {
 	    y++;
-	    wmove(window, y, x);
+	    wmove(window, y, (x > 0) ? x : 0);
 	    curX = x;
 	} else if (mainPtr->isoEncoding) {
 	    if ((unsigned int) uch < 0x20 ||
@@ -875,10 +868,14 @@ replaceChar:
 		    if (len < 0)
 			len = 0;
 		}
-		waddnstr(window, replace, len);
+		for (i = 0; i < len; i++) {
+		    if (curX + i >= 0)
+			waddch(window, replace[i]);
+		}
 	    } else {
 		len = 1;
-		waddch(window, c);
+		if (curX >= 0)
+		    waddch(window, c);
 	    }
 	    curX += len;
 	} else {
@@ -894,35 +891,33 @@ replaceChar:
 		    if (len < 0)
 			len = 0;
 		}
-		waddnstr(window, replace, len);
+		for (i = 0; i < len; i++) {
+		    if (curX + i >= 0)
+			waddch(window, replace[i]);
+		}
 	    } else {
 #if defined(USE_NCURSESW) || defined(_WIN32)
 		wchar_t w[2];
 
 		w[0] = uch;
 		w[1] = 0;
-		waddnwstr(window, w, 1);
+		if (curX >= 0)
+		    waddnwstr(window, w, 1);
 #else
-		waddnstr(window, p, nc);
+		for (i = 0; i < nc; i++) {
+		    if (curX + i >= 0)
+			waddch(window, p[i])
 #endif
 	    }
 	    curX += len;
 	}
 	startX = curX;
-	if (flags & CK_STOP_AT_EOL) {
-	    int mX, cX;
-
-	    getmaxyx(window, dummy, mX);
-	    getyx(window, dummy, cX);
-	    if (cX >= mX || cX < curX) {
-		break;
-	    }
-	}
     }
     if (flags & CK_FILL_UNTIL_EOL) {
 	while (startX < maxX) {
-	   waddch(window, ' ');
-	   startX++;
+	    if (startX >= 0)
+		waddch(window, ' ');
+	    startX++;
 	}
     }
 }
@@ -961,7 +956,7 @@ CkUnderlineChars(
 				 * and CK_FILL_UNTIL_EOL are supported right
 				 * now.  See CkMeasureChars for information
 				 * about it. */
-    int first, int last)        /* Range: First and last characters to
+    int first, int last)	/* Range: First and last characters to
 				 * display. */
 {
     char *p;			/* Current character being scanned. */
@@ -969,7 +964,7 @@ CkUnderlineChars(
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[10];
-    int rem, dummy, maxX, nc = 0;
+    int rem, dummy, maxX, nc = 0, i;
 
     /*
      * Scan the string one character at a time and display the
@@ -978,25 +973,16 @@ CkUnderlineChars(
 
     count = 0;
     getmaxyx(window, dummy, maxX);
-    maxX -= x;
-    nc = Tcl_NumUtfChars(string, numChars);
-    if (nc > maxX)
-	numChars = Tcl_UtfAtIndex(string, maxX) - string;
+    p = string;
+    nc = Tcl_NumUtfChars(p, numChars);
+    if (nc > maxX - x)
+	numChars = Tcl_UtfAtIndex(p, maxX - x) - p;
     else
 	numChars = nc;
-    if (numChars > maxX)
-        numChars = maxX;
-    p = string;
-    if (x < 0) {
-	x = -x;
-	x = Tcl_UtfAtIndex(p, x) - p;
-	p += x;
-	numChars -= x;
-	count -= x;
-	x = 0;
-    }
-    wmove(window, y, x);
+    if (numChars > maxX - x)
+	numChars = maxX - x;
     startX = curX = x;
+    wmove(window, y, (x > 0) ? x : 0);
     for (; numChars > 0 && count <= last; numChars -= nc, count++, p += nc) {
 	Tcl_UniChar uch;
 	int len;
@@ -1028,13 +1014,15 @@ CkUnderlineChars(
 		    rem += 8;
 		}
 		curX -= rem;
-	    }
-	    while (startX < curX) {
-		startX++;
-		if (count >= first)
-		    waddch(window, ' ');
-		else
-		    wmove(window, y, startX);
+		while (startX < curX) {
+		    startX++;
+		    if (startX >= 0) {
+			if (count >= first)
+			    waddch(window, ' ');
+			else
+			    wmove(window, y, startX);
+		    }
+		}
 	    }
 	    continue;
 	} else if ((unsigned int) uch < 0x100 && CHARTYPE(c).type == GCHAR) {
@@ -1042,16 +1030,16 @@ CkUnderlineChars(
 
 	    if (Ck_GetGChar(NULL, gcharTab[c - 0x81], &gchar) != TCL_OK)
 		goto replaceChar;
-	    if (count >= first)
+	    if ((count >= first) && (curX >= 0))
 		waddch(window, gchar);
 	    else
-		wmove(window, y, startX);
+		wmove(window, y, (curX + 1 > 0) ? (curX + 1) : 0);
 	    curX++;
 	} else if ((unsigned int) uch < 0x100 &&
 		   CHARTYPE(c).type == NEWLINE &&
 		   !(flags & CK_NEWLINES_NOT_SPECIAL)) {
 	    y++;
-	    wmove(window, y, x);
+	    wmove(window, y, (x > 0) ? x : 0);
 	    curX = x;
 	} else if (mainPtr->isoEncoding) {
 	    if ((unsigned int) uch < 0x20 ||
@@ -1064,16 +1052,18 @@ replaceChar:
 		    if (len < 0)
 			len = 0;
 		}
-		if (count >= first)
-		    waddnstr(window, replace, len);
+		for (i = 0; i < len; i++) {
+		    if ((count + i >= first) && (curX + i >= 0))
+			waddch(window, replace[i]);
+		}
 	    } else {
 		len = 1;
-		if (count >= first)
+		if ((count >= first) && (curX >= 0))
 		    waddch(window, c);
 	    }
 	    curX += len;
 	    if (count < first)
-		wmove(window, y, curX);
+		wmove(window, y, (curX > 0) ? curX : 0);
 	} else {
 #ifdef _WIN32
 	    len = wcwidth(uch);
@@ -1087,35 +1077,30 @@ replaceChar:
 		    if (len < 0)
 			len = 0;
 		}
-		if (count >= first)
-		    waddnstr(window, replace, len);
+		for (i = 0; i < len; i++) {
+		    if ((count + i >= first) && (curX + i >= 0))
+			waddch(window, replace[i]);
+		}
 	    } else {
 #if defined(USE_NCURSESW) || defined(_WIN32)
 		wchar_t w[2];
 
 		w[0] = uch;
 		w[1] = 0;
-		if (count >= first)
+		if ((count >= first) && (curX >= 0))
 		    waddnwstr(window, w, 1);
 #else
-		if (count >= first)
-		    waddnstr(window, p, nc);
+		for (i = 0; i < nc; i++) {
+		    if ((count + i >= first) && (curX + i >= 0)) {
+			waddch(window, p[i]);
+		}
 #endif
 	    }
 	    curX += len;
-	    if (count < first)
+	    if ((count < first) && (curX >= 0))
 		wmove(window, y, curX);
 	}
 	startX = curX;
-	if (flags & CK_STOP_AT_EOL) {
-	    int mX, cX;
-
-	    getmaxyx(window, dummy, mX);
-	    getyx(window, dummy, cX);
-	    if (cX >= mX || cX < curX) {
-		break;
-	    }
-	}
     }
 }
 

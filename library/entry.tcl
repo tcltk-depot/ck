@@ -86,6 +86,65 @@ bind Entry <Control-k> {
 bind Entry <Control-t> {
     ckEntryTranspose %W
 }
+bind Entry <FocusIn> {
+    set ckPriv(entryInSel) ""
+    %W selection clear
+}
+bind Entry <FocusOut> {
+    if {[info exists ckPriv(entryInSel)] && ($ckPriv(entryInSel) eq "%W")} {
+	set ckPriv(entryInSel) ""
+	%W selection clear
+    }
+}
+bind Entry <Control-q> {
+    set ckPriv(entryInSel) %W
+    %W selection clear
+    %W selection from insert
+    %W selection adjust insert
+}
+bind Entry <Control-w> {ckEntryCutSel %W}
+bind Entry <Control-y> {ckEntryPasteSel %W}
+
+# ckEntryCutSel
+# Cut selection to buffer if any.
+#
+# Arguments:
+# w -           The entry window.
+
+proc ckEntryCutSel {w} {
+    global ckPriv
+    
+    catch {
+	if {[$w selection present]} {
+	    set ckPriv(entryInSel) ""
+	    set ckPriv(textSelection) [string range [$w get] \
+		    [$w index sel.first] [$w index sel.last]]
+	    $w delete sel.first sel.last
+	}
+	ckEntrySeeInsert $w
+    }
+}
+
+# ckEntryPasteSel --
+# Paste selection buffer if any.
+#
+# Arguments:
+# w -		The text window in which to paste
+
+proc ckEntryPasteSel {w} {
+    global ckPriv
+
+    set ckPriv(entryInSel) ""
+    if {![info exists ckPriv(textSelection)]} {
+	return
+    }
+    if {[string length $ckPriv(textSelection)] == 0} {
+	return
+    }
+    catch {$w delete sel.first sel.last}
+    $w insert insert $ckPriv(textSelection)
+    ckEntrySeeInsert $w
+}
 
 # ckEntryKeySelect --
 # This procedure is invoked when stroking out selections using the
@@ -183,8 +242,14 @@ proc ckEntrySeeInsert w {
 # pos -		The desired new position for the cursor in the window.
 
 proc ckEntrySetCursor {w pos} {
+    global ckPriv
+
     $w icursor $pos
-    $w selection clear
+    if {[info exists ckPriv(entryInSel)] && ($ckPriv(entryInSel) eq $w)} {
+	$w selection adjust insert
+    } else {
+	$w selection clear
+    }
     ckEntrySeeInsert $w
 }
 

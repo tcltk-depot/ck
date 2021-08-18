@@ -323,7 +323,7 @@ CkTextGetIndex(
 
     /*
      *---------------------------------------------------------------------
-     * Stage 1: check to see if the index consists of nothing but a mar
+     * Stage 1: check to see if the index consists of nothing but a mark
      * name.  We do this check now even though it's also done later, in
      * order to allow mark names that include funny characters such as
      * spaces or "+1c".

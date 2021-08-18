@@ -3323,8 +3323,7 @@ CharDisplayProc(
 	    sValuePtr->attr);
 	CkDisplayChars(ciPtr->winPtr->mainPtr, window, ciPtr->chars,
 	    ciPtr->numChars, x,
-	    screenY + baseline, x - chunkPtr->x,
-	    CK_IGNORE_TABS | CK_STOP_AT_EOL);
+	    screenY + baseline, x - chunkPtr->x, CK_IGNORE_TABS);
     }
 }
 
