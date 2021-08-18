@@ -133,9 +133,66 @@ bind Text <Control-h> {
 	%W see insert
     }
 }
-bind Text <FocusIn> {%W see insert}
+bind Text <FocusIn> {
+    %W see insert
+    set ckPriv(textInSel) ""
+}
+bind Text <FocusOut> {
+    if {[info exists ckPriv(textInSel)] && ($ckPriv(textInSel) eq "%W")} {
+	set ckPriv(textInSel) ""
+	%W tag delete sel 1.0 end
+    }
+}
+bind Text <Control-q> {
+    set ckPriv(textInSel) %W
+    %W tag delete sel 1.0 end
+    %W tag add sel insert {insert + 1c}
+}
+bind Text <Control-w> {ckTextCutSel %W}
+bind Text <Control-y> {ckTextPasteSel %W}
 
 set ckPriv(prevPos) {}
+
+# ckTextCutSel
+# Cut selection to buffer if any.
+#
+# Arguments:
+# w -           The text window.
+
+proc ckTextCutSel {w} {
+    global ckPriv
+    
+    catch {
+	if {[$w compare sel.first <= insert]
+	    && [$w compare sel.last >= insert]} {
+	    set ckPriv(textInSel) ""
+	    set ckPriv(textSelection) [$w get sel.first sel.last]
+	    $w delete sel.first sel.last
+	}
+    }
+}
+
+# ckTextPasteSel --
+# Paste selection buffer if any.
+#
+# Arguments:
+# w -		The text window in which to paste
+
+proc ckTextPasteSel {w} {
+    global ckPriv
+
+    set ckPriv(textInSel) ""
+    if {![info exists ckPriv(textSelection)]} {
+	return
+    }
+    if {([string length $ckPriv(textSelection)] == 0) ||
+	([$w cget -state] eq "disabled")} {
+	return
+    }
+    catch {$w delete sel.first sel.last}
+    $w insert insert $ckPriv(textSelection)
+    $w see insert
+}
 
 # ckTextSetCursor
 # Move the insertion cursor to a given position in a text.  Also
@@ -154,7 +211,18 @@ proc ckTextSetCursor {w pos} {
         set pos {end - 1 chars}
     }
     $w mark set insert $pos
-    $w tag remove sel 1.0 end
+    if {![info exists ckPriv(textInSel)] || $ckPriv(textInSel) ne $w} {
+	$w tag remove sel 1.0 end
+    } else {
+	if {[$w compare insert < sel.first]} {
+	    set first insert
+	    set last sel.first
+	} else {
+	    set first sel.first
+	    set last {insert + 1c}
+	}
+	$w tag add sel $first $last
+    }
     $w see insert
 }
 

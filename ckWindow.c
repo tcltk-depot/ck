@@ -2282,6 +2282,9 @@ Ck_ClearToBot(
     if (window == NULL)
 	return;
 
+    if (y >= winPtr->height)
+	return;
+
     wmove(window, y, x);
     for (; x < winPtr->width; x++)
 	waddch(window, ' ');

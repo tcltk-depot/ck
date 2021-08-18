@@ -108,7 +108,7 @@ typedef struct {
  * is always easy to grab with the mouse).
  */
 
-#define MIN_SLIDER_LENGTH	1
+#define MIN_SLIDER_LENGTH	2
 
 /*
  * Information used for argv parsing.
