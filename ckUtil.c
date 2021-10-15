@@ -14,9 +14,7 @@
 
 #include <wchar.h>
 #ifdef __APPLE__
-#ifdef USE_NCURSES
 #define USE_NCURSESW
-#endif
 #endif
 
 #define REPLACE 1
@@ -907,6 +905,7 @@ replaceChar:
 		for (i = 0; i < nc; i++) {
 		    if (curX + i >= 0)
 			waddch(window, p[i])
+		}
 #endif
 	    }
 	    curX += len;
@@ -1091,7 +1090,7 @@ replaceChar:
 		    waddnwstr(window, w, 1);
 #else
 		for (i = 0; i < nc; i++) {
-		    if ((count + i >= first) && (curX + i >= 0)) {
+		    if ((count + i >= first) && (curX + i >= 0))
 			waddch(window, p[i]);
 		}
 #endif

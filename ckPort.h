@@ -21,6 +21,9 @@
 #   include <windows.h>
 #else
 #   define _XOPEN_SOURCE
+#   ifdef __APPLE__
+#	define _XOPEN_SOURCE_EXTENDED
+#   endif
 #endif
 
 #include <stdio.h>
