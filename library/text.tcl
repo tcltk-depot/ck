@@ -213,7 +213,7 @@ proc ckTextSetCursor {w pos} {
     $w mark set insert $pos
     if {![info exists ckPriv(textInSel)] || $ckPriv(textInSel) ne $w} {
 	$w tag remove sel 1.0 end
-    } else {
+    } elseif {[$w tag ranges sel] ne ""} {
 	if {[$w compare insert < sel.first]} {
 	    set first insert
 	    set last sel.first
