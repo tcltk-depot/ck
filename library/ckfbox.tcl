@@ -151,7 +151,7 @@ proc ckFDialog_Create {w} {
     pack $f1.lab -side left -padx 4 -fill both
     pack $f1.menu -expand yes -fill both -padx 1
     frame $w.sep0 -border hline -height 1
-    set data(list) [listbox $w.list -selectmode browse -height 8]
+    set data(list) [listbox $w.list -selectmode browse -height 12 -width 50]
     bindtags $data(list) [list Listbox $data(list) $w all]
     bind $data(list) <Button-1> [list ckFDialog_ListBrowse $w]
     bind $data(list) <KeyPress> [list ckFDialog_ListBrowse $w]
