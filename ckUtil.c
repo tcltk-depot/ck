@@ -336,6 +336,8 @@ wcwidth(int wc)
 	return 0;
     if (wc > 0xffff)
 	return -1;
+    if (wc >= 0x2500 && wc <= 0x25ff)	/* Unicode box drawing chars. */
+	return 1;
     return iswprint((wint_t) wc) ? 1 : -1;
 }
 #endif
