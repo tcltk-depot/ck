@@ -19,7 +19,7 @@ proc ckCommand {{w .ckCommand}} {
     }
     toplevel $w -class CommandDialog \
         -border { ulcorner hline urcorner vline lrcorner hline llcorner vline }
-    place $w -relx 0.5 -rely 0.5 -relwidth 0.5 -relheight 0.5 -anchor center
+    place $w -relx 0.5 -rely 0.5 -relwidth 0.7 -relheight 0.7 -anchor center
 
     label $w.title -text "Command dialog"
     place $w.title -y 0 -relx 0.5 -bordermode ignore -anchor center

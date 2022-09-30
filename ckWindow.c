@@ -473,7 +473,12 @@ Ck_CreateMainWindow(
 	char enc[32], *envcp = getenv("CK_USE_ENCODING");
 	unsigned int cp = GetConsoleCP();
 
-	if (envcp && strncmp(envcp, "cp", 2) == 0) {
+	if (envcp == NULL) {
+	    /* Try to enable UTF-8 on console. */
+	    SetConsoleCP(65001);
+	    cp = GetConsoleCP();
+	}
+	if (envcp != NULL && strncmp(envcp, "cp", 2) == 0) {
 	    cp = atoi(envcp + 2);
 	    SetConsoleCP(cp);
 	    cp = GetConsoleCP();
