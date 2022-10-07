@@ -365,7 +365,7 @@ typedef struct CkWindow {
 
 typedef struct {
     char *name;			/* Name of border, malloc'ed. */
-    int gchar[9];		/* ACS chars making up border. */
+    long gchar[9];		/* ACS chars making up border. */
 } CkBorder;
 
 /*

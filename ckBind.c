@@ -1580,7 +1580,6 @@ CkTermHasKey(
 #ifndef _WIN32
     Tcl_HashEntry *hPtr;
     char *tiname, *tivalue;
-    extern char *tigetstr();
 #endif
     char buf[8];
 
