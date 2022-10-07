@@ -16,8 +16,8 @@
  * Variables used in this module.
  */
 
-static Tcl_HashTable gCharTable;          /* Maps gChar names to values. */
-static int initialized = 0;               /* gCharTable initialized. */
+static Tcl_HashTable gCharTable;	/* Maps gChar names to values. */
+static int initialized = 0;		/* gCharTable initialized. */
 
 
 /*
@@ -41,6 +41,133 @@ Ck_GetGChar(
     if (!initialized) {
 	int new;
 
+#ifdef USE_NCURSES
+	/*
+	 * Problem: varying ABIs between ncurses versions on LP64.
+	 * Sometimes acs_map is an unsigned long array, sometimes
+	 * an unsigned int. Instead of using the ACS_* macros,
+	 * we build the map from the tigetstr("acsc") information.
+	 */
+	unsigned int local_map[128];
+	char *acsc = tigetstr("acsc");
+	int i;
+
+	for (i = 0; i < 128; i++)
+	    local_map[i] = 0;
+
+	local_map[(int)'l'] = '+';  /* upper left corner */
+	local_map[(int)'m'] = '+';  /* lower left corner */
+	local_map[(int)'k'] = '+';  /* upper right corner */
+	local_map[(int)'j'] = '+';  /* lower right corner */
+	local_map[(int)'u'] = '+';  /* tee pointing left */
+	local_map[(int)'t'] = '+';  /* tee pointing right */
+	local_map[(int)'v'] = '+';  /* tee pointing up */
+	local_map[(int)'w'] = '+';  /* tee pointing down */
+	local_map[(int)'q'] = '-';  /* horizontal line */
+	local_map[(int)'x'] = '|';  /* vertical line */
+	local_map[(int)'n'] = '+';  /* large plus or crossover */
+	local_map[(int)'o'] = '~';  /* scan line 1 */
+	local_map[(int)'s'] = '_';  /* scan line 9 */
+	local_map[(int)'`'] = '+';  /* diamond */
+	local_map[(int)'a'] = ':';  /* checker board (stipple) */
+	local_map[(int)'f'] = '\''; /* degree symbol */
+	local_map[(int)'g'] = '#';  /* plus/minus */
+	local_map[(int)'~'] = 'o';  /* bullet */
+	local_map[(int)','] = '<';  /* arrow pointing left */
+	local_map[(int)'+'] = '>';  /* arrow pointing right */
+	local_map[(int)'.'] = 'v';  /* arrow pointing down */
+	local_map[(int)'-'] = '^';  /* arrow pointing up */
+	local_map[(int)'h'] = '#';  /* board of squares */
+	local_map[(int)'i'] = '#';  /* lantern symbol */
+	local_map[(int)'0'] = '#';  /* solid square block */
+	local_map[(int)'p'] = '-';  /* scan line 3 */
+	local_map[(int)'r'] = '-';  /* scan line 7 */
+	local_map[(int)'y'] = '<';  /* less-than-or-equal-to */
+	local_map[(int)'z'] = '>';  /* greater-than-or-equal-to */
+	local_map[(int)'{'] = '*';  /* greek pi */
+	local_map[(int)'|'] = '!';  /* not-equal */
+	local_map[(int)'}'] = 'f';  /* pound-sterling symbol */
+	local_map[(int)'L'] = '+';  /* upper left corner */
+	local_map[(int)'M'] = '+';  /* lower left corner */
+	local_map[(int)'K'] = '+';  /* upper right corner */
+	local_map[(int)'J'] = '+';  /* lower right corner */
+	local_map[(int)'T'] = '+';  /* tee pointing left */
+	local_map[(int)'U'] = '+';  /* tee pointing right */
+	local_map[(int)'V'] = '+';  /* tee pointing up */
+	local_map[(int)'W'] = '+';  /* tee pointing down */
+	local_map[(int)'Q'] = '-';  /* horizontal line */
+	local_map[(int)'X'] = '|';  /* vertical line */
+	local_map[(int)'N'] = '+';  /* large plus or crossover */
+	local_map[(int)'C'] = '+';  /* upper left corner */
+	local_map[(int)'D'] = '+';  /* lower left corner */
+	local_map[(int)'B'] = '+';  /* upper right corner */
+	local_map[(int)'A'] = '+';  /* lower right corner */
+	local_map[(int)'G'] = '+';  /* tee pointing left */
+	local_map[(int)'F'] = '+';  /* tee pointing right */
+	local_map[(int)'H'] = '+';  /* tee pointing up */
+	local_map[(int)'I'] = '+';  /* tee pointing down */
+	local_map[(int)'R'] = '-';  /* horizontal line */
+	local_map[(int)'Y'] = '|';  /* vertical line */
+	local_map[(int)'E'] = '+';  /* large plus or crossover */
+
+	for (i = 0; acsc[i] != 0; i += 2) {
+	    if (acsc[i] < 0 || acsc[i] >= 128)
+		continue;
+	    local_map[(int)acsc[i]] = (acsc[i+1] & 0xFF) | A_ALTCHARSET;
+	}
+
+	Tcl_InitHashTable(&gCharTable, TCL_STRING_KEYS);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "ulcorner", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'l']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "urcorner", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'k']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "llcorner", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'m']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "lrcorner", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'j']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "rtee", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'u']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "ltee", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'t']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "btee", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'v']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "ttee", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'w']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "hline", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'q']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "vline", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'x']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "plus", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'n']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "s1", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'o']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "s9", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'s']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "diamond", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'`']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "ckboard", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'a']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "degree", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'f']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "plminus", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'g']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "bullet", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'~']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "larrow", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)',']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "rarrow", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'+']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "darrow", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'.']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "uarrow", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'-']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "board", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'h']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "lantern", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'i']);
+	hPtr = Tcl_CreateHashEntry(&gCharTable, "block", &new);
+	Tcl_SetHashValue(hPtr, (ClientData) local_map[(int)'0']);
+#else
 	Tcl_InitHashTable(&gCharTable, TCL_STRING_KEYS);
 	hPtr = Tcl_CreateHashEntry(&gCharTable, "ulcorner", &new);
 	Tcl_SetHashValue(hPtr, (ClientData) ACS_ULCORNER);
@@ -92,7 +219,7 @@ Ck_GetGChar(
 	Tcl_SetHashValue(hPtr, (ClientData) ACS_LANTERN);
 	hPtr = Tcl_CreateHashEntry(&gCharTable, "block", &new);
 	Tcl_SetHashValue(hPtr, (ClientData) ACS_BLOCK);
-
+#endif
 	initialized = 1;
     }
 
@@ -246,7 +373,8 @@ Ck_DrawBorder(
     CkBorder *borderPtr,
     int x, int y, int width, int height)
 {
-    int i, *gchar;
+    int i;
+    long *gchar;
     WINDOW *w;
 
     if (winPtr->window == NULL)
@@ -268,9 +396,9 @@ Ck_DrawBorder(
     if (width == 2) {
 	mvwaddch(w, y, x, gchar[0]);
 	mvwaddch(w, y, x + 1, gchar[2]);
-        for (i = y + 1; i < height - 1 + y; i++)
+	for (i = y + 1; i < height - 1 + y; i++)
 	    mvwaddch(w, i, x, gchar[7]);
-        for (i = y + 1; i < height - 1 + y; i++)
+	for (i = y + 1; i < height - 1 + y; i++)
 	    mvwaddch(w, i, x + 1, gchar[3]);
 	mvwaddch(w, height - 1 + y, x, gchar[6]);
 	mvwaddch(w, height - 1 + y, x + 1, gchar[4]);
@@ -279,9 +407,9 @@ Ck_DrawBorder(
     if (height == 2) {
 	mvwaddch(w, y, x, gchar[0]);
 	mvwaddch(w, y + 1, x, gchar[6]);
-        for (i = x + 1; i < width - 1 + x; i++)
+	for (i = x + 1; i < width - 1 + x; i++)
 	    mvwaddch(w, y, i, gchar[1]);
-        for (i = x + 1; i < width - 1 + x; i++)
+	for (i = x + 1; i < width - 1 + x; i++)
 	    mvwaddch(w, y + 1, i, gchar[5]);
 	mvwaddch(w, y, width - 1 + x, gchar[2]);
 	mvwaddch(w, y + 1, width - 1 + x, gchar[4]);
@@ -292,7 +420,7 @@ Ck_DrawBorder(
 	mvwaddch(w, y, i, gchar[1]);
     mvwaddch(w, y, width - 1 + x, gchar[2]);
     for (i = y + 1; i < height - 1 + y; i++)
-        mvwaddch(w, i, width - 1 + x, gchar[3]);
+	mvwaddch(w, i, width - 1 + x, gchar[3]);
     mvwaddch(w, height - 1 + y, width - 1 + x, gchar[4]);
     for (i = x + 1; i < width - 1 + x; i++)
 	mvwaddch(w, height - 1 + y, i, gchar[5]);

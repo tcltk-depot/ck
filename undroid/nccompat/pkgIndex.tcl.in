@@ -1,0 +1,6 @@
+#
+# Tcl package index file
+#
+package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [subst {
+    load [list [file join $dir @PKG_LIB_FILE@]] @PACKAGE_NAME@
+}]
