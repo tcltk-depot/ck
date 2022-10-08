@@ -416,7 +416,7 @@ Ck_CreateMainWindow(
 #endif
 #endif
 #ifdef NCURSES_MOUSE_VERSION
-    MEVENT mEvent;
+    MEVENT mEvent[2];
     mmask_t mMask;
 #endif
     char *term;
@@ -587,7 +587,7 @@ Ck_CreateMainWindow(
 		      BUTTON2_PRESSED | BUTTON2_RELEASED |
 		      BUTTON3_PRESSED | BUTTON3_RELEASED, NULL);
 #if 0
-    mainPtr->flags |= (getmouse(&mEvent) != ERR) ? CK_HAS_MOUSE : 0;
+    mainPtr->flags |= (getmouse(mEvent) != ERR) ? CK_HAS_MOUSE : 0;
 #else
     /* has_mouse() isn't always available */
     mainPtr->flags |= (mMask ? CK_HAS_MOUSE : 0);
@@ -986,7 +986,7 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
     CkWindowEvent event;
     Tcl_HashEntry *hPtr;
 #ifdef NCURSES_MOUSE_VERSION
-    MEVENT mEvent;
+    MEVENT mEvent[2];
 #endif
 
 #if defined(USE_NCURSES) || defined(_WIN32)
@@ -1049,7 +1049,7 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
 
 #ifdef NCURSES_MOUSE_VERSION
 	    mousemask(0, NULL);
-	    mainPtr->flags &= ((getmouse(&mEvent) != ERR) ? ~CK_HAS_MOUSE : ~0);
+	    mainPtr->flags &= ((getmouse(mEvent) != ERR) ? ~CK_HAS_MOUSE : ~0);
 #endif	/* NCURSES_MOUSE_VERSION */
 
 	    if (mainPtr->flags & CK_HAS_MOUSE) {

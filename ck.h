@@ -62,6 +62,10 @@
 
 #ifdef USE_NCURSES
 #include <ncurses.h>
+#undef mvwaddch
+#undef mvwaddstr
+#undef waddch
+#undef wattrset
 #else
 #include <curses.h>
 #endif
