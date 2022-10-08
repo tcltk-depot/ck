@@ -807,28 +807,28 @@ decDone:
      */
 
     if (code == KEY_MOUSE) {
-        MEVENT mEvent;
+        MEVENT mEvent[2];
 	int i;
 
 	if (mainPtr->flags & CK_MOUSE_XTERM) {
 	    goto getMouse;
 	}
 
-        if (getmouse(&mEvent) == ERR)
+        if (getmouse(mEvent) == ERR)
 	    return;
 
 	for (i = 1; i <= 3; i++) {
-	    if (BUTTON_PRESS(mEvent.bstate, i)) {
+	    if (BUTTON_PRESS(mEvent[0].bstate, i)) {
 		event.mouse.type = CK_EV_MOUSE_DOWN;
 		goto mouseEventNC;
-	    } else if (BUTTON_RELEASE(mEvent.bstate, i)) {
+	    } else if (BUTTON_RELEASE(mEvent[0].bstate, i)) {
 		event.mouse.type = CK_EV_MOUSE_UP;
 mouseEventNC:
 	        event.mouse.button = i;
-		event.mouse.rootx = mEvent.x;
-		event.mouse.rooty = mEvent.y;
-		event.mouse.x = mEvent.x;
-		event.mouse.y = mEvent.y;
+		event.mouse.rootx = mEvent[0].x;
+		event.mouse.rooty = mEvent[0].y;
+		event.mouse.x = mEvent[0].x;
+		event.mouse.y = mEvent[0].y;
 		event.mouse.winPtr = Ck_GetWindowXY(mainPtr, &event.mouse.x,
 		    &event.mouse.y, 1);
 		goto mkEvent;

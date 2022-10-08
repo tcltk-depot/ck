@@ -22,6 +22,8 @@ int __keypad(void) { return -1; }
 int __meta(void) { return -1; }
 int __mouseinterval(void) { return -1; }
 int __mousemask(void) { return 0; }
+int __mvwaddch(void) { return -1; }
+int __mvwaddstr(void) { return -1; }
 int __mvwin(void) { return -1; }
 void *__newwin(void) { return 0; }
 int __nodelay(void) { return -1; }
@@ -37,6 +39,7 @@ int __ungetch(void) { return -1; }
 int __waddch(void) { return -1; }
 int __waddnstr(void) { return -1; }
 int __waddnwstr(void) { return -1; }
+int __wattrset(void) { return -1; }
 int __wclear(void) { return -1; }
 int __wgetch(void) { return -1; }
 int __wmove(void) { return -1; }
@@ -59,6 +62,8 @@ int keypad(void) __attribute__((weak, alias("__keypad")));
 int meta(void) __attribute__((weak, alias("__meta")));
 int mouseinterval(void) __attribute__((weak, alias("__mouseinterval")));
 int mousemask(void) __attribute__((weak, alias("__mousemask")));
+int mvwadch(void) __attribute__((weak, alias("__mvwaddch")));
+int mvwaddstr(void) __attribute__((weak, alias("__mvwaddstr")));
 int mvwin(void) __attribute__((weak, alias("__mvwin")));
 void *newwin(void) __attribute__((weak, alias("__newwin")));
 int nodelay(void) __attribute__((weak, alias("__nodelay")));
@@ -74,6 +79,7 @@ int ungetch(void) __attribute__((weak, alias("__ungetch")));
 int waddch(void) __attribute__((weak, alias("__waddch")));
 int waddnstr(void) __attribute__((weak, alias("__waddnstr")));
 int waddnwstr(void) __attribute__((weak, alias("__waddnwstr")));
+int wattrset(void) __attribute__((weak, alias("__wattrset")));
 int wclear(void) __attribute__((weak, alias("__wclear")));
 int wgetch(void) __attribute__((weak, alias("__wgetch")));
 int wmove(void) __attribute__((weak, alias("__wmove")));

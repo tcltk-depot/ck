@@ -1,6 +1,2 @@
-package ifneeded Ck @CK_VERSION@ [subst {
-    if {\$::tcl_platform(os) eq "Linux"} {
-	package require nccompat
-    }
-    load [list [file join $dir @CK_LIB_FILE@]] Ck
-}]
+package ifneeded Ck @CK_VERSION@ \
+    [list load [file join $dir @CK_LIB_FILE@] Ck]
