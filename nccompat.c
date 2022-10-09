@@ -7,45 +7,45 @@
 #include <dlfcn.h>
 #include "tcl.h"
 
-void __baudrate(void) {}
-int __beep(void) { return -1; }
-int __curs_set(void) { return -1; }
-int __delwin(void) { return -1; }
-int __doupdate(void) { return -1; }
-int __endwin(void) { return -1; }
-int __getmouse(void) { return -1; }
-int __has_colors(void) { return 0; }
-int __idlok(void) { return -1; }
-int __init_pair(void) { return -1; }
-void *__initscr(void) { return 0; }
-int __keypad(void) { return -1; }
-int __meta(void) { return -1; }
-int __mouseinterval(void) { return -1; }
-int __mousemask(void) { return 0; }
-int __mvwaddch(void) { return -1; }
-int __mvwaddstr(void) { return -1; }
-int __mvwin(void) { return -1; }
-void *__newwin(void) { return 0; }
-int __nodelay(void) { return -1; }
-int __noecho(void) { return -1; }
-int __nonl(void) { return -1; }
-int __raw(void) { return -1; }
-int __resizeterm(void) { return -1; }
-int __scr_dump(void) { return -1; }
-int __scrollok(void) { return -1; }
-int __start_color(void) { return -1; }
-void *__tigetstr(void) { return 0; }
-int __ungetch(void) { return -1; }
-int __waddch(void) { return -1; }
-int __waddnstr(void) { return -1; }
-int __waddnwstr(void) { return -1; }
-int __wattrset(void) { return -1; }
-int __wclear(void) { return -1; }
-int __wgetch(void) { return -1; }
-int __wmove(void) { return -1; }
-int __wnoutrefresh(void) { return -1; }
-int __wrefresh(void) { return -1; }
-int __wtouchln(void) { return -1; }
+static void __baudrate(void) {}
+static int __beep(void) { return -1; }
+static int __curs_set(void) { return -1; }
+static int __delwin(void) { return -1; }
+static int __doupdate(void) { return -1; }
+static int __endwin(void) { return -1; }
+static int __getmouse(void) { return -1; }
+static int __has_colors(void) { return 0; }
+static int __idlok(void) { return -1; }
+static int __init_pair(void) { return -1; }
+static void *__initscr(void) { return 0; }
+static int __keypad(void) { return -1; }
+static int __meta(void) { return -1; }
+static int __mouseinterval(void) { return -1; }
+static int __mousemask(void) { return 0; }
+static int __mvwaddch(void) { return -1; }
+static int __mvwaddstr(void) { return -1; }
+static int __mvwin(void) { return -1; }
+static void *__newwin(void) { return 0; }
+static int __nodelay(void) { return -1; }
+static int __noecho(void) { return -1; }
+static int __nonl(void) { return -1; }
+static int __raw(void) { return -1; }
+static int __resizeterm(void) { return -1; }
+static int __scr_dump(void) { return -1; }
+static int __scrollok(void) { return -1; }
+static int __start_color(void) { return -1; }
+static void *__tigetstr(void) { return 0; }
+static int __ungetch(void) { return -1; }
+static int __waddch(void) { return -1; }
+static int __waddnstr(void) { return -1; }
+static int __waddnwstr(void) { return -1; }
+static int __wattrset(void) { return -1; }
+static int __wclear(void) { return -1; }
+static int __wgetch(void) { return -1; }
+static int __wmove(void) { return -1; }
+static int __wnoutrefresh(void) { return -1; }
+static int __wrefresh(void) { return -1; }
+static int __wtouchln(void) { return -1; }
 
 void baudrate(void) __attribute__((weak, alias("__baudrate")));
 int beep(void) __attribute__((weak, alias("__beep")));
