@@ -84,7 +84,7 @@ CkCmd commands[] = {
     {"bell",		Ck_BellCmd},
     {"bind",		Ck_BindCmd},
     {"bindtags",	Ck_BindtagsCmd},
-    {"curses",          Ck_CursesCmd},
+    {"curses",		Ck_CursesCmd},
     {"destroy",		Ck_DestroyCmd},
     {"exit",		Ck_ExitCmd},
     {"focus",		Ck_FocusCmd},
@@ -347,7 +347,7 @@ NameWindow(
 CkWindow *
 Ck_MainWindow(
     Tcl_Interp *interp)		/* Interpreter that embodies application,
-    				 * also used for error reporting. */
+				 * also used for error reporting. */
 {
     if (ckMainInfo == NULL || ckMainInfo->interp != interp) {
 	if (interp != NULL)
@@ -426,7 +426,7 @@ Ck_CreateMainWindow(
      * For now, only one main window may exists for the application.
      */
     if (ckMainInfo != NULL)
-        return NULL;
+	return NULL;
 
     /*
      * Create the basic CkWindow structure.
@@ -553,8 +553,8 @@ Ck_CreateMainWindow(
 #endif
 
     if (initscr() == (WINDOW *) ERR) {
-    	ckfree((char *) winPtr);
-    	return NULL;
+	ckfree((char *) winPtr);
+	return NULL;
     }
 #ifdef SIGTSTP
     /* This is essential for ncurses-1.9.4 */
@@ -572,6 +572,9 @@ Ck_CreateMainWindow(
     nodelay(stdscr, TRUE);
     meta(stdscr, TRUE);
     nonl();
+#ifdef USE_NCURSES
+    ESCDELAY = 300;
+#endif
     mainPtr->maxWidth = COLS;
     mainPtr->maxHeight = LINES;
     winPtr->width = mainPtr->maxWidth;
@@ -689,12 +692,12 @@ Ck_CreateMainWindow(
      * Redirect some critical Tcl commands to our own procedures
      */
     for (cmdPtr = redirCommands; cmdPtr->name != NULL; cmdPtr++) {
-        RedirInfo *redirInfo;
+	RedirInfo *redirInfo;
 	Tcl_DString cmd;
 
-        redirInfo = (RedirInfo *) ckalloc(sizeof (RedirInfo));
-        redirInfo->mainPtr = mainPtr;
-        Tcl_GetCommandInfo(interp, cmdPtr->name, &redirInfo->cmdInfo);
+	redirInfo = (RedirInfo *) ckalloc(sizeof (RedirInfo));
+	redirInfo->mainPtr = mainPtr;
+	Tcl_GetCommandInfo(interp, cmdPtr->name, &redirInfo->cmdInfo);
 	Tcl_DStringInit(&cmd);
 	Tcl_DStringAppend(&cmd, "::rename ", -1);
 	Tcl_DStringAppend(&cmd, cmdPtr->name, -1);
@@ -702,8 +705,8 @@ Ck_CreateMainWindow(
 	Tcl_DStringAppend(&cmd, cmdPtr->name, -1);
 	Tcl_GlobalEval(interp, Tcl_DStringValue(&cmd));
 	Tcl_DStringFree(&cmd);
-        Tcl_CreateCommand(interp, cmdPtr->name, cmdPtr->cmdProc,
-            (ClientData) redirInfo, (Tcl_CmdDeleteProc *) free);
+	Tcl_CreateCommand(interp, cmdPtr->name, cmdPtr->cmdProc,
+	    (ClientData) redirInfo, (Tcl_CmdDeleteProc *) free);
     }
 
     /*
@@ -757,7 +760,7 @@ Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 init";
 
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
-        return TCL_ERROR;
+	return TCL_ERROR;
 
     /* Interlock: only one interp allowed. */
     if (ckMainInfo != NULL && ckMainInfo->interp != interp) {
@@ -774,12 +777,12 @@ init";
 
     p = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
     if (p == NULL || *p == '\0')
-        p = "Ck";
+	p = "Ck";
     name = strrchr(p, '/');
     if (name != NULL)
-        name++;
+	name++;
     else
-        name = p;
+	name = p;
     class = (char *) ckalloc((unsigned) (strlen(name) + 1));
     strcpy(class, name);
     class[0] = toupper((unsigned char) class[0]);
@@ -788,7 +791,7 @@ init";
 
     code = Tcl_PkgProvide(interp, "Ck", CK_VERSION);
     if (code != TCL_OK)
-        return TCL_ERROR;
+	return TCL_ERROR;
     return Tcl_Eval(interp, initCmd);
 }
 
@@ -821,7 +824,7 @@ Ck_CreateWindow(
     CkWindow *parentPtr,	/* Parent of new window. */
     char *name,			/* Name for new window.  Must be unique
 				 * among parent's children. */
-    int toplevel)               /* If true, create toplevel window. */
+    int toplevel)		/* If true, create toplevel window. */
 {
     CkWindow *winPtr;
 
@@ -884,7 +887,7 @@ Ck_CreateWindowFromPath(
 				 * application of anywin. The parent of
 				 * this window must already exist, but
 				 * the window itself must not exist. */
-    int toplevel)               /* If true, create toplevel window. */
+    int toplevel)		/* If true, create toplevel window. */
 {
 #define FIXED_SPACE 5
     char fixedSpace[FIXED_SPACE+1];
@@ -1022,7 +1025,7 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
     event.winPtr = winPtr;
     Ck_HandleEvent(winPtr->mainPtr, (CkEvent *) &event);
     if (winPtr->tagPtr != NULL) {
-        CkFreeBindingTags(winPtr);
+	CkFreeBindingTags(winPtr);
     }
     UnlinkWindow(winPtr);
     CkEventDeadWindow(winPtr);
@@ -1093,7 +1096,7 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
     } else if (winPtr->mainPtr->focusPtr == winPtr) {
 	winPtr->mainPtr->focusPtr = winPtr->parentPtr;
 	if (winPtr->mainPtr->focusPtr != NULL &&
-            (winPtr->mainPtr->focusPtr->flags & CK_MAPPED)) {
+	    (winPtr->mainPtr->focusPtr->flags & CK_MAPPED)) {
 	    event.type = CK_EV_FOCUSIN;
 	    event.winPtr = winPtr->mainPtr->focusPtr;
 	    Ck_HandleEvent(winPtr->mainPtr, (CkEvent *) &event);
@@ -1306,7 +1309,7 @@ Ck_MoveWindow(
 	return;
 
     for (childPtr = winPtr->childList;
-         childPtr != NULL; childPtr = childPtr->nextPtr)
+	 childPtr != NULL; childPtr = childPtr->nextPtr)
 	if (!(childPtr->flags & CK_TOPLEVEL))
 	    Ck_MoveWindow(childPtr, childPtr->x, childPtr->y);
     Ck_EventuallyRefresh(winPtr);
@@ -1359,9 +1362,9 @@ Ck_ResizeWindow(
 
     parentPtr = winPtr->parentPtr;
     if (!(width == -12345 && height == -12345)) {
-    	winPtr->width = width;
-    	winPtr->height = height;
-    	doResize++;
+	winPtr->width = width;
+	winPtr->height = height;
+	doResize++;
     }
 
     if (!(winPtr->flags & CK_TOPLEVEL)) {
@@ -1409,7 +1412,7 @@ Ck_ResizeWindow(
     if (winPtr->window == NULL) {
 	winPtr->flags |= CK_MAPPED;
     } else {
-        delwin(winPtr->window);
+	delwin(winPtr->window);
     }
     winPtr->window = new;
     if (winPtr->window != NULL) {
@@ -1423,7 +1426,7 @@ Ck_ResizeWindow(
     Ck_ClearToBot(winPtr, 0, 0);
 
     for (childPtr = winPtr->childList;
-         childPtr != NULL; childPtr = childPtr->nextPtr) {
+	 childPtr != NULL; childPtr = childPtr->nextPtr) {
 	if (childPtr->flags & CK_TOPLEVEL)
 	    continue;
 	Ck_ResizeWindow(childPtr, -12345, -12345);
@@ -1467,7 +1470,7 @@ Ck_UnmapWindow(CkWindow *winPtr)	/* Pointer to window to unmap. */
     CkWindowEvent event;
 
     for (childPtr = winPtr->childList;
-         childPtr != NULL; childPtr = childPtr->nextPtr) {
+	 childPtr != NULL; childPtr = childPtr->nextPtr) {
 	if (childPtr->flags & CK_TOPLEVEL)
 	    continue;
 	Ck_UnmapWindow(childPtr);
@@ -1779,7 +1782,7 @@ Ck_RestackWindow(
 	while (winPtr->parentPtr != otherPtr->parentPtr) {
 	    otherPtr = otherPtr->parentPtr;
 	    if (otherPtr == NULL)
-	    	return TCL_ERROR;
+		return TCL_ERROR;
 	}
     }
     if (otherPtr == winPtr)
@@ -1858,14 +1861,14 @@ Ck_SetFocus(CkWindow *winPtr)	/* Window that is to be the new focus. */
     if (oldTop != newTop) {
 	if (oldTop != NULL)
 	    oldTop->focusPtr = oldFocus;
-    	Ck_RestackWindow(newTop, CK_ABOVE, NULL);
-        Ck_EventuallyRefresh(mainPtr->winPtr);
+	Ck_RestackWindow(newTop, CK_ABOVE, NULL);
+	Ck_EventuallyRefresh(mainPtr->winPtr);
     }
     if (winPtr->flags & CK_MAPPED) {
-        event.win.type = CK_EV_FOCUSIN;
-        event.win.winPtr = winPtr;
-        Ck_HandleEvent(mainPtr, &event);
-        Ck_EventuallyRefresh(mainPtr->winPtr);
+	event.win.type = CK_EV_FOCUSIN;
+	event.win.winPtr = winPtr;
+	Ck_HandleEvent(mainPtr, &event);
+	Ck_EventuallyRefresh(mainPtr->winPtr);
     }
 }
 
@@ -1892,7 +1895,7 @@ ChangeToplevelFocus(CkWindow *winPtr)
 	/* Empty loop body. */
     }
     for (oldTop = mainPtr->focusPtr; oldTop != NULL &&
-         !(oldTop->flags & CK_TOPLEVEL); oldTop = oldTop->parentPtr) {
+	 !(oldTop->flags & CK_TOPLEVEL); oldTop = oldTop->parentPtr) {
 	/* Empty loop body. */
     }
     if (winTop != oldTop) {
@@ -1972,7 +1975,7 @@ DoRefresh(ClientData clientData)
 	if (t0 - mainPtr->lastRefresh < mainPtr->refreshDelay) {
 	    mainPtr->refreshTimer = Tcl_CreateTimerHandler(
 		mainPtr->refreshDelay - (int) (t0 - mainPtr->lastRefresh),
-	        DoRefresh, clientData);
+		DoRefresh, clientData);
 	    mainPtr->flags |= CK_REFRESH_TIMER;
 	    return;
 	}
@@ -2027,7 +2030,7 @@ static void
 RefreshThem(CkWindow *winPtr)
 {
     if (winPtr->nextPtr != NULL)
-        RefreshThem(winPtr->nextPtr);
+	RefreshThem(winPtr->nextPtr);
     if (winPtr->flags & CK_TOPLEVEL)
 	return;
     if (winPtr->window != NULL) {
@@ -2035,7 +2038,7 @@ RefreshThem(CkWindow *winPtr)
 	wnoutrefresh(winPtr->window);
     }
     if (winPtr->childList != NULL)
-        RefreshThem(winPtr->childList);
+	RefreshThem(winPtr->childList);
 }
 
 /*
@@ -2061,12 +2064,12 @@ UpdateHWCursor(CkMainInfo *mainPtr)
     CkWindow *wPtr, *stopAtWin, *winPtr = mainPtr->focusPtr;
 
     if (winPtr == NULL || winPtr->window == NULL ||
-        (winPtr->flags & (CK_SHOW_CURSOR | CK_ALREADY_DEAD)) == 0) {
+	(winPtr->flags & (CK_SHOW_CURSOR | CK_ALREADY_DEAD)) == 0) {
 invisible:
 	curs_set(0);
 	if (mainPtr->focusPtr != NULL && mainPtr->focusPtr->window != NULL)
 	    wnoutrefresh(mainPtr->focusPtr->window);
-        return;
+	return;
     }
 
     /*
@@ -2077,17 +2080,17 @@ invisible:
 
     stopAtWin = NULL;
     while (winPtr != NULL) {
-        for (wPtr = winPtr->childList;
-             wPtr != NULL && wPtr != stopAtWin; wPtr = wPtr->nextPtr) {
+	for (wPtr = winPtr->childList;
+	     wPtr != NULL && wPtr != stopAtWin; wPtr = wPtr->nextPtr) {
 	    if ((wPtr->flags & CK_TOPLEVEL) || wPtr->window == NULL)
-	        continue;
-  	    if (x >= wPtr->x && x < wPtr->x + wPtr->width &&
-	        y >= wPtr->y && y < wPtr->y + wPtr->height)
-	        goto invisible;
+		continue;
+	    if (x >= wPtr->x && x < wPtr->x + wPtr->width &&
+		y >= wPtr->y && y < wPtr->y + wPtr->height)
+		goto invisible;
 	}
 	x += winPtr->x;
 	y += winPtr->y;
-        stopAtWin = winPtr;
+	stopAtWin = winPtr;
 	if (winPtr->parentPtr == NULL)
 	    break;
 	winPtr = winPtr->parentPtr;
@@ -2360,15 +2363,15 @@ ExecCmd(
 
     length = strlen(argv[1]);
     if (argc > 1 && length >= 7 && strncmp(argv[1], "-endwin", 7) == 0) {
-        endWin = 1;
+	endWin = 1;
 	if (length >= 8 && strncmp(argv[1], "-endwinc", 8) == 0) {
 	    clrCmd = tigetstr("clear");
 	}
-        savedargv1 = argv[1];
-        argv[1] = argv[0];
-    	curs_set(1);
+	savedargv1 = argv[1];
+	argv[1] = argv[0];
+	curs_set(1);
 	nodelay(stdscr, FALSE);
-        endwin();
+	endwin();
 #ifdef SIGINT
 #ifdef HAVE_SIGACTION
 	newsig.sa_handler = SIG_IGN;
@@ -2386,7 +2389,7 @@ ExecCmd(
 #endif
     }
     result = (*cmdInfo->proc)(cmdInfo->clientData, interp,
-        argc - endWin, argv + endWin);
+		argc - endWin, argv + endWin);
     if (endWin) {
 #ifdef SIGINT
 #ifdef HAVE_SIGACTION
@@ -2395,10 +2398,10 @@ ExecCmd(
 	signal(SIGINT, sigproc);
 #endif
 #endif
-        argv[0] = argv[1];
-        argv[1] = savedargv1;
+	argv[0] = argv[1];
+	argv[1] = savedargv1;
 	nodelay(stdscr, TRUE);
-        Ck_EventuallyRefresh(redirInfo->mainPtr->winPtr);
+	Ck_EventuallyRefresh(redirInfo->mainPtr->winPtr);
     }
     return result;
 }
@@ -2431,20 +2434,20 @@ PutsCmd(
 
     newArgv[0] = argv[0];
     if (argc > 1 && strcmp(argv[1], "-nonewline") == 0) {
-        newArgv[1] = argv[1];
-        index++;
+	newArgv[1] = argv[1];
+	index++;
     }
     if (argc == index + 2) {
-        newArgv[index + 2] = argv[index + 1];
+	newArgv[index + 2] = argv[index + 1];
 toStderr:
-        newArgv[index + 1] = "stderr";
-        return (*cmdInfo->proc)(cmdInfo->clientData, interp,
+	newArgv[index + 1] = "stderr";
+	return (*cmdInfo->proc)(cmdInfo->clientData, interp,
 	    index + 3, newArgv);
     } else if (argc == index + 3 &&
        (strcmp(argv[index + 1], "stdout") == 0 ||
-        strcmp(argv[index + 1], "file1") == 0)) {
-        newArgv[index + 2] = argv[index + 2];
-        goto toStderr;
+	strcmp(argv[index + 1], "file1") == 0)) {
+	newArgv[index + 2] = argv[index + 2];
+	goto toStderr;
     }
     return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
 }
@@ -2474,10 +2477,10 @@ CloseCmd(
 
     if (argc == 2 &&
        (strcmp(argv[1], "stdin") == 0 ||
-        strcmp(argv[1], "file0") == 0 ||
-        strcmp(argv[1], "stdout") == 0 ||
-        strcmp(argv[1], "file1") == 0)) {
-        Tcl_AppendResult(interp, "may not close fileId \"",
+	strcmp(argv[1], "file0") == 0 ||
+	strcmp(argv[1], "stdout") == 0 ||
+	strcmp(argv[1], "file1") == 0)) {
+	Tcl_AppendResult(interp, "may not close fileId \"",
 	     argv[1], "\" while in toolkit", (char *) NULL);
 	return TCL_ERROR;
     }
@@ -2509,10 +2512,10 @@ FlushCmd(
 
     if (argc == 2 &&
        (strcmp(argv[1], "stdin") == 0 ||
-        strcmp(argv[1], "file0") == 0 ||
-        strcmp(argv[1], "stdout") == 0 ||
-        strcmp(argv[1], "file1") == 0)) {
-        Tcl_AppendResult(interp, "may not flush fileId \"",
+	strcmp(argv[1], "file0") == 0 ||
+	strcmp(argv[1], "stdout") == 0 ||
+	strcmp(argv[1], "file1") == 0)) {
+	Tcl_AppendResult(interp, "may not flush fileId \"",
 	     argv[1], "\" while in toolkit", (char *) NULL);
 	return TCL_ERROR;
     }
@@ -2543,12 +2546,12 @@ ReadCmd(
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
 
     if ((argc > 1 &&
-         (strcmp(argv[1], "stdin") == 0 ||
-          strcmp(argv[1], "file0") == 0)) ||
-        (argc > 2 &&
-         (strcmp(argv[2], "stdin") == 0 ||
-          strcmp(argv[2], "file0") == 0))) {
-        Tcl_AppendResult(interp, "may not read from fileId \"",
+	(strcmp(argv[1], "stdin") == 0 ||
+	 strcmp(argv[1], "file0") == 0)) ||
+	(argc > 2 &&
+	 (strcmp(argv[2], "stdin") == 0 ||
+	  strcmp(argv[2], "file0") == 0))) {
+	Tcl_AppendResult(interp, "may not read from fileId \"",
 	     argv[1], "\" while in toolkit", (char *) NULL);
 	return TCL_ERROR;
     }
@@ -2580,8 +2583,8 @@ GetsCmd(
 
     if (argc >= 2 &&
        (strcmp(argv[1], "stdin") == 0 ||
-        strcmp(argv[1], "file0") == 0)) {
-        Tcl_AppendResult(interp, "may not gets from fileId \"",
+	strcmp(argv[1], "file0") == 0)) {
+	Tcl_AppendResult(interp, "may not gets from fileId \"",
 	     argv[1], "\" while in toolkit", (char *) NULL);
 	return TCL_ERROR;
     }
@@ -2623,7 +2626,7 @@ InputSetup(InputInfo *inputInfo)
 			 0, 0, NULL, NULL, class.hInstance, NULL);
     }
     if (inputInfo->hwnd == NULL) {
-        Tcl_Panic("cannot create curses input window");
+	Tcl_Panic("cannot create curses input window");
     }
 #ifdef _WIN64
     SetWindowLongPtr(inputInfo->hwnd, GWLP_USERDATA, (LONG_PTR) inputInfo);
@@ -2642,10 +2645,10 @@ InputExit(ClientData clientData)
     InputInfo *inputInfo = (InputInfo *) clientData;
 
     if (inputInfo->hwnd != NULL) {
-        HWND hwnd = inputInfo->hwnd;
+	HWND hwnd = inputInfo->hwnd;
 
 	inputInfo->hwnd = NULL;
-        DestroyWindow(hwnd);
+	DestroyWindow(hwnd);
     }
     if (inputInfo->thread != INVALID_HANDLE_VALUE) {
 	WaitForSingleObject(inputInfo->thread, 1000);
@@ -2685,7 +2688,7 @@ InputHandler(
 #endif
 
     if (message != WM_USER + 42) {
-        return DefWindowProc(hwnd, message, wParam, lParam);
+	return DefWindowProc(hwnd, message, wParam, lParam);
     }
     Tcl_DoWhenIdle(InputHandler2, (ClientData) inputInfo);
     return 0;
