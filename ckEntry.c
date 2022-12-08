@@ -44,16 +44,16 @@ typedef struct {
      * Information used when displaying widget:
      */
 
-    int normalBg;               /* Normal background color. */
-    int normalFg;               /* Normal foreground color. */
-    int normalAttr;             /* Normal video attributes. */
-    int selBg;                  /* Select background color. */
-    int selFg;                  /* Select foreground color. */
-    int selAttr;                /* Select video attributes. */
+    int normalBg;		/* Normal background color. */
+    int normalFg;		/* Normal foreground color. */
+    int normalAttr;		/* Normal video attributes. */
+    int selBg;			/* Select background color. */
+    int selFg;			/* Select foreground color. */
+    int selAttr;		/* Select video attributes. */
     Ck_Justify justify;		/* Justification to use for text within
 				 * window. */
-    int leftX;                  /* X position at which leftIndex is drawn
-                                 * (varies depending on justify). */
+    int leftX;			/* X position at which leftIndex is drawn
+				 * (varies depending on justify). */
     int leftIndex;		/* Index of left-most character visible in
 				 * window. */
     int tabOrigin;		/* Origin for tabs (left edge of string[0]). */
@@ -65,19 +65,19 @@ typedef struct {
     char *displayString;	/* If non-NULL, points to string with same
 				 * length as string but whose characters
 				 * are all equal to showChar.  Malloc'ed. */
-    int prefWidth;              /* Preferred width for window. */
+    int prefWidth;		/* Preferred width for window. */
 
     /*
      * Information about what's selected, if any.
      */
 
-    int selectFirst;            /* Index of first selected character (-1 means
-                                 * nothing selected. */
-    int selectLast;             /* Index of last selected character (-1 means
-                                 * nothing selected. */
-    int selectAnchor;           /* Fixed end of selection (i.e. "select to"
-                                 * operation will use this as one end of the
-                                 * selection). */
+    int selectFirst;		/* Index of first selected character (-1 means
+				 * nothing selected. */
+    int selectLast;		/* Index of last selected character (-1 means
+				 * nothing selected. */
+    int selectAnchor;		/* Fixed end of selection (i.e. "select to"
+				 * operation will use this as one end of the
+				 * selection). */
 
     /*
      * Miscellaneous information:
@@ -115,7 +115,7 @@ typedef struct {
 
 static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_ATTR, "-attributes", "attributes", "Attributes",
-        DEF_ENTRY_ATTR, Ck_Offset(Entry, normalAttr), 0},
+	DEF_ENTRY_ATTR, Ck_Offset(Entry, normalAttr), 0},
     {CK_CONFIG_COLOR, "-background", "background", "Background",
 	DEF_ENTRY_BG_COLOR, Ck_Offset(Entry, normalBg),
 	CK_CONFIG_COLOR_ONLY},
@@ -131,11 +131,11 @@ static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_JUSTIFY, "-justify", "justify", "Justify",
 	DEF_ENTRY_JUSTIFY, Ck_Offset(Entry, justify), 0},
     {CK_CONFIG_ATTR, "-selectattributes", "selectAttributes",
-        "SelectAttributes", DEF_ENTRY_SELECT_ATTR_COLOR,
-        Ck_Offset(Entry, selAttr), CK_CONFIG_COLOR_ONLY},
+	"SelectAttributes", DEF_ENTRY_SELECT_ATTR_COLOR,
+	Ck_Offset(Entry, selAttr), CK_CONFIG_COLOR_ONLY},
     {CK_CONFIG_ATTR, "-selectattributes", "selectAttributes",
-        "SelectAttributes", DEF_ENTRY_SELECT_ATTR_MONO,
-        Ck_Offset(Entry, selAttr), CK_CONFIG_MONO_ONLY},
+	"SelectAttributes", DEF_ENTRY_SELECT_ATTR_MONO,
+	Ck_Offset(Entry, selAttr), CK_CONFIG_MONO_ONLY},
     {CK_CONFIG_COLOR, "-selectbackground", "selectBackground", "Foreground",
 	DEF_ENTRY_SELECT_BG_COLOR, Ck_Offset(Entry, selBg),
 	CK_CONFIG_COLOR_ONLY},
@@ -151,7 +151,7 @@ static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_STRING, "-show", "show", "Show",
 	DEF_ENTRY_SHOW, Ck_Offset(Entry, showChar), CK_CONFIG_NULL_OK},
     {CK_CONFIG_UID, "-state", "state", "State",
-        DEF_ENTRY_STATE, Ck_Offset(Entry, state), 0},
+	DEF_ENTRY_STATE, Ck_Offset(Entry, state), 0},
     {CK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
 	DEF_ENTRY_TAKE_FOCUS, Ck_Offset(Entry, takeFocus), CK_CONFIG_NULL_OK},
     {CK_CONFIG_STRING, "-textvariable", "textVariable", "Variable",
@@ -188,7 +188,7 @@ static void		EntryEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static void		EntryFocusProc(Entry *entryPtr, int gotFocus);
 static void		EventuallyRedraw(Entry *entryPtr);
-static void             EntryCmdDeletedProc(ClientData clientData);
+static void		EntryCmdDeletedProc(ClientData clientData);
 static void		EntrySetValue(Entry *entryPtr, char *value);
 static void		EntrySelectTo(Entry *entryPtr, int index);
 static char *		EntryTextVarProc(ClientData clientData,
@@ -254,7 +254,7 @@ Ck_EntryCmd(
     entryPtr->winPtr = new;
     entryPtr->interp = interp;
     entryPtr->widgetCmd = Tcl_CreateCommand(interp,
-        entryPtr->winPtr->pathName, EntryWidgetCmd,
+	entryPtr->winPtr->pathName, EntryWidgetCmd,
 	    (ClientData) entryPtr, EntryCmdDeletedProc);
     entryPtr->numBytes = 0;
     entryPtr->numChars = 0;
@@ -339,14 +339,13 @@ EntryWidgetCmd(
     length = strlen(argv[1]);
     if ((c == 'c') && (strncmp(argv[1], "cget", length) == 0)
 	&& (length >= 2)) {
-        if (argc != 3) {
-            Tcl_AppendResult(interp, "wrong # args: should be \"",
-                    argv[0], " cget option\"",
-                    (char *) NULL);
-            goto error;
-        }
-        result = Ck_ConfigureValue(interp, entryPtr->winPtr, configSpecs,
-                (char *) entryPtr, argv[2], 0);
+	if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " cget option\"", (char *) NULL);
+	    goto error;
+	}
+	result = Ck_ConfigureValue(interp, entryPtr->winPtr, configSpecs,
+			(char *) entryPtr, argv[2], 0);
     } else if ((c == 'c') && (strncmp(argv[1], "configure", length) == 0)
 	    && (length >= 2)) {
 	if (argc == 2) {
@@ -688,8 +687,8 @@ EntryCmdDeletedProc(
      */
 
     if (winPtr != NULL) {
-        entryPtr->winPtr = NULL;
-        Ck_DestroyWindow(winPtr);
+	entryPtr->winPtr = NULL;
+	Ck_DestroyWindow(winPtr);
     }
 }
 
@@ -833,7 +832,7 @@ DisplayEntry(ClientData clientData)	/* Information about window. */
     }
 
     Ck_SetWindowAttr(winPtr, entryPtr->normalFg, entryPtr->normalBg,
-        entryPtr->normalAttr);
+		entryPtr->normalAttr);
     Ck_ClearToBot(winPtr, 0, 0);
 
     leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
@@ -848,18 +847,18 @@ DisplayEntry(ClientData clientData)	/* Information about window. */
     CkDisplayChars(winPtr->mainPtr, winPtr->window,
 	displayString + leftIndex,
 	strlen(displayString) - leftIndex,
-       	entryPtr->leftX, y, entryPtr->tabOrigin,
+	entryPtr->leftX, y, entryPtr->tabOrigin,
 	CK_NEWLINES_NOT_SPECIAL);
 
     if (entryPtr->selectLast >= entryPtr->leftIndex) {
 	if (entryPtr->selectFirst < entryPtr->leftIndex) {
 	    startX = 0;
-        } else {
+	} else {
 	    CkMeasureChars(winPtr->mainPtr,
 		displayString + leftIndex,
-	        selectFirst - leftIndex, entryPtr->leftX,
-	        winPtr->width, entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL,
-	        &startX, &dummy);
+		selectFirst - leftIndex, entryPtr->leftX,
+		winPtr->width, entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL,
+		&startX, &dummy);
 	}
 	if (startX < winPtr->width) {
 	    Ck_SetWindowAttr(winPtr, entryPtr->selFg, entryPtr->selBg,
@@ -869,26 +868,26 @@ DisplayEntry(ClientData clientData)	/* Information about window. */
 		displayString + selectFirst,
 		selectLast - selectFirst,
 		entryPtr->leftX + startX, y, entryPtr->tabOrigin,
-	        CK_NEWLINES_NOT_SPECIAL);
+		CK_NEWLINES_NOT_SPECIAL);
 	    Ck_SetWindowAttr(winPtr, entryPtr->normalFg, entryPtr->normalBg,
 		entryPtr->normalAttr);
 	}
     }
 
     CkMeasureChars(winPtr->mainPtr, displayString + leftIndex,
-    	insertPos - leftIndex, entryPtr->leftX,
-    	winPtr->width, entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL,
+	insertPos - leftIndex, entryPtr->leftX,
+	winPtr->width, entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL,
 	&startX, &dummy);
 
     if (startX >= 0 && startX < winPtr->width) {
-        wmove(winPtr->window, y, startX);
+	wmove(winPtr->window, y, startX);
 	if (entryPtr->state == ckNormalUid)
 	    Ck_SetHWCursor(winPtr, 1);
 	else
 	    Ck_SetHWCursor(winPtr, 0);
     } else {
 	wmove(winPtr->window, y, 0);
-        Ck_SetHWCursor(winPtr, 0);
+	Ck_SetHWCursor(winPtr, 0);
     }
 
     Ck_EventuallyRefresh(winPtr);
@@ -980,9 +979,9 @@ EntryComputeGeometry(Entry *entryPtr)		/* Widget record for entry. */
 	 * window, then don't let leftIndex be any greater than that.
 	 */
 
-        maxOffScreen = CkMeasureChars(winPtr->mainPtr,
+	maxOffScreen = CkMeasureChars(winPtr->mainPtr,
 	    displayString, strlen(displayString),
-            0, overflow, 0, CK_NEWLINES_NOT_SPECIAL|CK_PARTIAL_OK, &rightX,
+	0, overflow, 0, CK_NEWLINES_NOT_SPECIAL|CK_PARTIAL_OK, &rightX,
 	    &dummy);
 	if (rightX < overflow) {
 	    maxOffScreen += 1;
@@ -1211,7 +1210,7 @@ DeleteChars(
 #endif
 
     delcount = Tcl_UtfAtIndex(entryPtr->string + delpos, count) -
-	   	   (entryPtr->string + delpos);
+			(entryPtr->string + delpos);
 
 #if TCL_UTF_MAX == 3
     if (delcount) {
@@ -1368,11 +1367,11 @@ EntryEventProc(
 	EventuallyRedraw(entryPtr);
 	Tcl_Release((ClientData) entryPtr);
     } else if (eventPtr->type == CK_EV_DESTROY) {
-        if (entryPtr->winPtr != NULL) {
-            entryPtr->winPtr = NULL;
-            Tcl_DeleteCommand(entryPtr->interp,
-                    Tcl_GetCommandName(entryPtr->interp, entryPtr->widgetCmd));
-        }
+	if (entryPtr->winPtr != NULL) {
+	entryPtr->winPtr = NULL;
+	    Tcl_DeleteCommand(entryPtr->interp,
+		Tcl_GetCommandName(entryPtr->interp, entryPtr->widgetCmd));
+	}
 	if (entryPtr->flags & REDRAW_PENDING) {
 	    Tcl_CancelIdleCall(DisplayEntry, (ClientData) entryPtr);
 	}
@@ -1467,35 +1466,38 @@ GetEntryIndex(
 	    goto badIndex;
 	}
     } else if (string[0] == '@') {
-        int x;
+	int x;
 
-        if (Tcl_GetInt(interp, string+1, &x) != TCL_OK) {
-            goto badIndex;
-        }
-        if (x < 0) {
-            x = 0;
-        }
-        if (x >= entryPtr->winPtr->width) {
-            x = entryPtr->winPtr->width - 1;
-            roundUp = 1;
-        }
-        if (entryPtr->numChars == 0) {
-            *indexPtr = 0;
-        } else {
+	if (Tcl_GetInt(interp, string+1, &x) != TCL_OK) {
+	    goto badIndex;
+	}
+	if (x < 0) {
+	    x = 0;
+	}
+	roundUp = 0;
+	if (x >= entryPtr->winPtr->width) {
+	    x = entryPtr->winPtr->width - 1;
+	    roundUp = 1;
+	}
+	if (entryPtr->numChars == 0) {
+	    *indexPtr = 0;
+	} else {
+	    int index, width;
 	    char *string = (entryPtr->displayString == NULL) ?
 		entryPtr->string : entryPtr->displayString;
 
-            *indexPtr = CkMeasureChars(winPtr->mainPtr, string, strlen(string),
-	       	entryPtr->tabOrigin, x,
-                entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL, &dummy, &dummy);
-#if 0
-            *indexPtr = entryPtr->leftX + entryPtr->leftIndex + x;
-#endif
-        }
-	if (roundUp && *indexPtr < entryPtr->numChars)
-	    *indexPtr += 1;
-        if (*indexPtr >= entryPtr->numChars)
-            *indexPtr = entryPtr->numChars;
+	    CkMeasureChars(winPtr->mainPtr, string, strlen(string),
+		entryPtr->tabOrigin, INT_MAX,
+		entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL, &width, &dummy);
+	    index = CkMeasureChars(winPtr->mainPtr, string, strlen(string),
+		entryPtr->tabOrigin, x,
+		entryPtr->tabOrigin, CK_NEWLINES_NOT_SPECIAL, &dummy, &dummy);
+	    if (x < width && index > 0)
+		--index;
+	    *indexPtr = index;
+	}
+	if (*indexPtr > entryPtr->numChars)
+	    *indexPtr = entryPtr->numChars;
     } else {
 	if (Tcl_GetInt(interp, string, indexPtr) != TCL_OK) {
 	    goto badIndex;
@@ -1765,7 +1767,7 @@ EntryUpdateScrollbar(Entry *entryPtr)		/* Information about widget. */
 
 static void
 EntryFocusProc(
-    Entry *entryPtr,     	/* Entry that got or lost focus. */
+    Entry *entryPtr,		/* Entry that got or lost focus. */
     int gotFocus)		/* 1 means window is getting focus, 0 means
 				 * it's losing it. */
 {

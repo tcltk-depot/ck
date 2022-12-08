@@ -35,7 +35,6 @@ static int __scr_dump(void) { return -1; }
 static int __scrollok(void) { return -1; }
 static int __start_color(void) { return -1; }
 static void *__tigetstr(void) { return 0; }
-static int __ungetch(void) { return -1; }
 static int __waddch(void) { return -1; }
 static int __waddnstr(void) { return -1; }
 static int __waddnwstr(void) { return -1; }
@@ -75,7 +74,6 @@ int scr_dump(void) __attribute__((weak, alias("__scr_dump")));
 int scrollok(void) __attribute__((weak, alias("__scrollok")));
 int start_color(void) __attribute__((weak, alias("__start_color")));
 void *tigetstr(void) __attribute__((weak, alias("__tigetstr")));
-int ungetch(void) __attribute__((weak, alias("__ungetch")));
 int waddch(void) __attribute__((weak, alias("__waddch")));
 int waddnstr(void) __attribute__((weak, alias("__waddnstr")));
 int waddnwstr(void) __attribute__((weak, alias("__waddnwstr")));

@@ -106,13 +106,13 @@ static int genericHandlersActive = 0;
 #define DEFAULT_BARCODE_TIMEOUT 1000
 
 typedef struct barcodeData {
-    Tcl_TimerToken timer;/* Barcode packet timer. */
-    int pkttime;	/* Timeout value. */
-    int startChar;	/* Start of barcode packet character. */
-    int endChar;	/* End of barcode packet character. */
-    int delivered;	/* BarCode event has been delivered. */
-    int index;		/* Current index into buffer. */
-    char buffer[256];	/* Here the barcode packet is assembled. */
+    Tcl_TimerToken timer;	/* Barcode packet timer. */
+    int pkttime;		/* Timeout value. */
+    int startChar;		/* Start of barcode packet character. */
+    int endChar;		/* End of barcode packet character. */
+    int delivered;		/* BarCode event has been delivered. */
+    int index;			/* Current index into buffer. */
+    char buffer[256];		/* Here the barcode packet is assembled. */
 } BarcodeData;
 
 /*
@@ -501,8 +501,8 @@ CkEventDeadWindow(
 
 static void
 TerminalResized(
-    CkWindow *parentPtr,        /* Pointer to window. */
-    int flag)                   /* When true, deal with toplevels. */
+    CkWindow *parentPtr,	/* Pointer to window. */
+    int flag)			/* When true, deal with toplevels. */
 {
     CkMainInfo *mainPtr = parentPtr->mainPtr;
     CkWindow *winPtr;
@@ -606,14 +606,14 @@ CkFocusRestore(ClientData clientData)
 void
 CkHandleInput(
     ClientData clientData,      /* Pointer to main info. */
-    int mask)                   /* OR-ed combination of the bits TK_READABLE,
-                                 * TK_WRITABLE, and TK_EXCEPTION, indicating
-                                 * current state of file. */
+    int mask)			/* OR-ed combination of the bits TK_READABLE,
+				 * TK_WRITABLE, and TK_EXCEPTION, indicating
+				 * current state of file. */
 {
     CkEvent event;
     CkQEvt *qev;
     CkMainInfo *mainPtr = (CkMainInfo *) clientData;
-    int code;
+    int code, code2 = ERR;
     static int buttonpressed = 0;
 #ifndef _WIN32
     static int errCount = 0;
@@ -697,13 +697,11 @@ doResize:
 	    if (code == ERR)
 		break;
 	    if (code < 0x80 || code >= 0xc0) {
-		ungetch(code);
+		code2 = code;
 		break;
 	    }
 	}
 	nodelay(curscr, TRUE);
-	if (code >= 0x100 && code != ERR)
-	    ungetch(code);
 done_uc:
 	ucbuf[ucp] = '\0';
 #if TCL_UTF_MAX == 3
@@ -807,14 +805,14 @@ decDone:
      */
 
     if (code == KEY_MOUSE) {
-        MEVENT mEvent[2];
+	MEVENT mEvent[2];
 	int i;
 
 	if (mainPtr->flags & CK_MOUSE_XTERM) {
 	    goto getMouse;
 	}
 
-        if (getmouse(mEvent) == ERR)
+	if (getmouse(mEvent) == ERR)
 	    return;
 
 	for (i = 1; i <= 3; i++) {
@@ -824,7 +822,7 @@ decDone:
 	    } else if (BUTTON_RELEASE(mEvent[0].bstate, i)) {
 		event.mouse.type = CK_EV_MOUSE_UP;
 mouseEventNC:
-	        event.mouse.button = i;
+		event.mouse.button = i;
 		event.mouse.rootx = mEvent[0].x;
 		event.mouse.rooty = mEvent[0].y;
 		event.mouse.x = mEvent[0].x;
@@ -849,7 +847,7 @@ mouseEventNC:
 	    } else if (Mouse_status.button[i] == BUTTON_RELEASED) {
 		event.mouse.type = CK_EV_MOUSE_UP;
 mouseEvt:
-	        event.mouse.button = i + 1;
+		event.mouse.button = i + 1;
 		event.mouse.x = Mouse_status.x;
 		event.mouse.y = Mouse_status.y;
 		event.mouse.winPtr = Ck_GetWindowXY(mainPtr, &event.mouse.x,
@@ -871,15 +869,12 @@ mouseEvt:
 
 #ifndef _WIN32
     if ((mainPtr->flags & CK_MOUSE_XTERM) && (code == 0x1b || code == 0x9b)) {
-	int code2;
-
 	if (code == 0x9b)
 	    goto getM;
 	code2 = getch();
 	if (code2 != ERR) {
 	    if (code2 == '[')
 		goto getM;
-	    ungetch(code2);
 	} else
 	    errCount++;
 	goto keyEvent;
@@ -888,7 +883,6 @@ getM:
 	if (code2 != ERR) {
 	    if (code2 == 'M')
 		goto getMouse;
-	    ungetch(code2);
 	} else
 	    errCount++;
 	goto keyEvent;
@@ -921,7 +915,8 @@ getMouse:
 	    event.mouse.type = CK_EV_MOUSE_DOWN;
 mouseEvent:
 	    event.mouse.winPtr = Ck_GetWindowXY(mainPtr, &event.mouse.x,
-	        &event.mouse.y, 1);
+		    &event.mouse.y, 1);
+	    code2 = ERR;
 	    goto mkEvent;
 	}
 	return;
@@ -952,6 +947,28 @@ mkEvent:
     qev->event = event;
     qev->mainPtr = mainPtr;
     Tcl_QueueEvent(&qev->header, TCL_QUEUE_TAIL);
+
+    if (code == 0x1b) {
+	code2 = getch();
+    }
+    if (code2 != ERR) {
+	event.key.type = CK_EV_KEYPRESS;
+	event.key.winPtr = mainPtr->focusPtr;
+	event.key.keycode = code2;
+	if (event.key.keycode < 0)
+	    event.key.keycode &= 0xff;
+	event.key.uch = code2;
+	event.key.is_uch = 0;
+	if (mainPtr->isoEncoding == NULL &&
+	    (code2 >= 0x20 && code2 < 0x100))
+	    event.key.is_uch = 1;
+	qev = (CkQEvt *) ckalloc(sizeof (CkQEvt));
+	qev->header.proc = Ck_HandleQEvent;
+	qev->header.nextPtr = NULL;
+	qev->event = event;
+	qev->mainPtr = mainPtr;
+	Tcl_QueueEvent(&qev->header, TCL_QUEUE_TAIL);
+    }
 }
 
 static int
@@ -991,9 +1008,9 @@ Ck_HandleQEvent(
 void
 CkHandleGPMInput(
     ClientData clientData,      /* Pointer to main info. */
-    int mask)                   /* OR-ed combination of the bits TK_READABLE,
-                                 * TK_WRITABLE, and TK_EXCEPTION, indicating
-                                 * current state of file. */
+    int mask)			/* OR-ed combination of the bits TK_READABLE,
+				 * TK_WRITABLE, and TK_EXCEPTION, indicating
+				 * current state of file. */
 {
     Gpm_Event gpmEvent;
     CkEvent event;
@@ -1131,10 +1148,10 @@ CkGetBarcodeData(CkMainInfo *mainPtr)
 int
 CkBarcodeCmd(
     ClientData clientData,      /* Main window associated with
-			         * interpreter. */
-    Tcl_Interp *interp,         /* Current interpreter. */
-    int argc,                   /* Number of arguments. */
-    char **argv)                /* Argument strings. */
+				 * interpreter. */
+    Tcl_Interp *interp,		/* Current interpreter. */
+    int argc,			/* Number of arguments. */
+    char **argv)		/* Argument strings. */
 {
     CkMainInfo *mainPtr = ((CkWindow *) (clientData))->mainPtr;
     BarcodeData *bd = (BarcodeData *) mainPtr->barcodeData;
@@ -1184,7 +1201,7 @@ CkBarcodeCmd(
 badArgs:
 	Tcl_AppendResult(interp, "bad or wrong # args: should be \"", argv[0],
 	    " barcode ?off?\" or \"",
-            argv[0], " barcode startChar endChar ?timeout?\"", (char *) NULL);
+	    argv[0], " barcode startChar endChar ?timeout?\"", (char *) NULL);
     }
     return TCL_ERROR;
 }
