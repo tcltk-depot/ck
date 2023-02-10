@@ -3,7 +3,7 @@
  *
  *	This module implements a tree widget.
  *
- * Copyright (c) 1996 Christian Werner
+ * Copyright (c) 1996-2023 Christian Werner
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -17,28 +17,28 @@
  * Widget defaults:
  */
 
-#define DEF_TREE_ACTIVE_ATTR_COLOR "normal"
-#define DEF_TREE_ACTIVE_ATTR_MONO  "reverse"
-#define DEF_TREE_ACTIVE_BG_COLOR   "white"
-#define DEF_TREE_ACTIVE_BG_MONO    "black"
-#define DEF_TREE_ACTIVE_FG_COLOR   "black"
-#define DEF_TREE_ACTIVE_FG_MONO    "white"
-#define DEF_TREE_ATTR_COLOR        "normal"
-#define DEF_TREE_ATTR_MONO         "normal"
-#define DEF_TREE_BG_COLOR          "black"
-#define DEF_TREE_BG_MONO           "black"
-#define DEF_TREE_FG_COLOR          "white"
-#define DEF_TREE_FG_MONO           "white"
-#define DEF_TREE_HEIGHT            "10"
-#define DEF_TREE_SELECT_ATTR_COLOR "bold"
-#define DEF_TREE_SELECT_ATTR_MONO  "bold"
-#define DEF_TREE_SELECT_BG_COLOR   "black"
-#define DEF_TREE_SELECT_BG_MONO    "black"
-#define DEF_TREE_SELECT_FG_COLOR   "white"
-#define DEF_TREE_SELECT_FG_MONO    "white"
-#define DEF_TREE_TAKE_FOCUS        "1"
-#define DEF_TREE_WIDTH             "40"
-#define DEF_TREE_SCROLL_COMMAND    NULL
+#define DEF_TREE_ACTIVE_ATTR_COLOR	"normal"
+#define DEF_TREE_ACTIVE_ATTR_MONO	"reverse"
+#define DEF_TREE_ACTIVE_BG_COLOR	"white"
+#define DEF_TREE_ACTIVE_BG_MONO		"black"
+#define DEF_TREE_ACTIVE_FG_COLOR	"black"
+#define DEF_TREE_ACTIVE_FG_MONO		"white"
+#define DEF_TREE_ATTR_COLOR		"normal"
+#define DEF_TREE_ATTR_MONO		"normal"
+#define DEF_TREE_BG_COLOR		"black"
+#define DEF_TREE_BG_MONO		"black"
+#define DEF_TREE_FG_COLOR		"white"
+#define DEF_TREE_FG_MONO		"white"
+#define DEF_TREE_HEIGHT			"10"
+#define DEF_TREE_SELECT_ATTR_COLOR	"bold"
+#define DEF_TREE_SELECT_ATTR_MONO	"bold"
+#define DEF_TREE_SELECT_BG_COLOR	"black"
+#define DEF_TREE_SELECT_BG_MONO		"black"
+#define DEF_TREE_SELECT_FG_COLOR	"white"
+#define DEF_TREE_SELECT_FG_MONO		"white"
+#define DEF_TREE_TAKE_FOCUS		"1"
+#define DEF_TREE_WIDTH			"40"
+#define DEF_TREE_SCROLL_COMMAND		NULL
 
 /*
  * A node in the tree is represented by this data structure.
@@ -99,7 +99,7 @@ Ck_CustomOption treeTagsOption = {
 
 static Ck_ConfigSpec nodeConfigSpecs[] = {
     {CK_CONFIG_ATTR, "-attributes", (char *) NULL, (char *) NULL,
-        "", Ck_Offset(Node, attr), CK_CONFIG_DONT_SET_DEFAULT },
+	"", Ck_Offset(Node, attr), CK_CONFIG_DONT_SET_DEFAULT },
     {CK_CONFIG_COLOR, "-background", (char *) NULL, (char *) NULL,
 	"", Ck_Offset(Node, bg), CK_CONFIG_DONT_SET_DEFAULT },
     {CK_CONFIG_SYNONYM, "-bg", "background", (char *) NULL,
@@ -126,13 +126,13 @@ typedef struct Tree {
 				 * means that the window has been destroyed
 				 * but the data structures haven't yet been
 				 * cleaned up.*/
-    Tcl_Interp *interp;		/* Interpreter associated with menubutton. */
-    Tcl_Command widgetCmd;	/* Token for menubutton's widget command. */
+    Tcl_Interp *interp;		/* Interpreter associated with tree. */
+    Tcl_Command widgetCmd;	/* Token for tree's widget command. */
 
     long idCount;		/* For unique ids for nodes. */
 
     /*
-     * Information about what's displayed in the menu button:
+     * Information about what's displayed in the tree:
      */
 
     Node *firstChild, *lastChild;
@@ -143,13 +143,13 @@ typedef struct Tree {
      */
 
     int normalFg;		/* Foreground color in normal mode. */
-    int normalBg;               /* Background color in normal mode. */
-    int normalAttr;             /* Attributes in normal mode. */
+    int normalBg;		/* Background color in normal mode. */
+    int normalAttr;		/* Attributes in normal mode. */
     int activeFg;		/* Foreground color in active mode. */
-    int activeBg;               /* Ditto, background color. */
+    int activeBg;		/* Ditto, background color. */
     int activeAttr;		/* Attributes in active mode. */
     int selectFg;		/* Foreground color for selected nodes. */
-    int selectBg;               /* Ditto, background color. */
+    int selectBg;		/* Ditto, background color. */
     int selectAttr;		/* Attributes for selected nodes. */
 
     int width, height;		/* If > 0, these specify dimensions to request
@@ -165,7 +165,7 @@ typedef struct Tree {
 
     int leadingSpace;		/* For displaying: size of leadingString. */
     int *leadingString;		/* Malloc'ed leading vertical lines for
-    				 * displaying. */
+				 * displaying. */
 
     /*
      * Miscellaneous information:
@@ -174,12 +174,12 @@ typedef struct Tree {
     char *takeFocus;		/* Value of -takefocus option;  not used in
 				 * the C code, but used by keyboard traversal
 				 * scripts.  Malloc'ed, but may be NULL. */
-    char *yScrollCmd;           /* Command prefix for communicating with
-                                 * vertical scrollbar.  NULL means no command
-                                 * to issue.  Malloc'ed. */
-    char *xScrollCmd;           /* Command prefix for communicating with
-                                 * horizontal scrollbar.  NULL means no command
-                                 * to issue.  Malloc'ed. */
+    char *yScrollCmd;		/* Command prefix for communicating with
+				 * vertical scrollbar.  NULL means no command
+				 * to issue.  Malloc'ed. */
+    char *xScrollCmd;		/* Command prefix for communicating with
+				 * horizontal scrollbar.  NULL means no command
+				 * to issue.  Malloc'ed. */
     int flags;			/* Various flags;  see below for
 				 * definitions. */
 } Tree;
@@ -192,10 +192,10 @@ typedef struct Tree {
  *				this window.
  * GOT_FOCUS:			Non-zero means this button currently
  *				has the input focus.
- * UPDATE_V_SCROLLBAR:          Non-zero means vertical scrollbar needs
- *                              to be updated.
- * UPDATE_H_SCROLLBAR:          Non-zero means horizontal scrollbar needs
- *                              to be updated.
+ * UPDATE_V_SCROLLBAR:		Non-zero means vertical scrollbar needs
+ *				to be updated.
+ * UPDATE_H_SCROLLBAR:		Non-zero means horizontal scrollbar needs
+ *				to be updated.
  */
 
 #define REDRAW_PENDING		1
@@ -209,11 +209,11 @@ typedef struct Tree {
 
 static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_ATTR, "-activeattributes", "activeAttributes",
-        "ActiveAttributes", DEF_TREE_ACTIVE_ATTR_COLOR,
-        Ck_Offset(Tree, activeAttr), CK_CONFIG_COLOR_ONLY},
+	"ActiveAttributes", DEF_TREE_ACTIVE_ATTR_COLOR,
+	Ck_Offset(Tree, activeAttr), CK_CONFIG_COLOR_ONLY},
     {CK_CONFIG_ATTR, "-activeattributes", "activeAttributes",
-        "ActiveAttributes", DEF_TREE_ACTIVE_ATTR_MONO,
-        Ck_Offset(Tree, activeAttr), CK_CONFIG_MONO_ONLY},
+	"ActiveAttributes", DEF_TREE_ACTIVE_ATTR_MONO,
+	Ck_Offset(Tree, activeAttr), CK_CONFIG_MONO_ONLY},
     {CK_CONFIG_ATTR, "-attributes", "attributes", "Attributes",
 	DEF_TREE_ATTR_COLOR, Ck_Offset(Tree, normalAttr),
 	CK_CONFIG_COLOR_ONLY},
@@ -249,11 +249,11 @@ static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_COORD, "-height", "height", "Height",
 	DEF_TREE_HEIGHT, Ck_Offset(Tree, height), 0},
     {CK_CONFIG_ATTR, "-selectattributes", "selectAttributes",
-        "SelectAttributes", DEF_TREE_SELECT_ATTR_COLOR,
-        Ck_Offset(Tree, selectAttr), CK_CONFIG_COLOR_ONLY},
+	"SelectAttributes", DEF_TREE_SELECT_ATTR_COLOR,
+	Ck_Offset(Tree, selectAttr), CK_CONFIG_COLOR_ONLY},
     {CK_CONFIG_ATTR, "-selectattributes", "selectAttributes",
-        "SelectAttributes", DEF_TREE_SELECT_ATTR_MONO,
-        Ck_Offset(Tree, selectAttr), CK_CONFIG_MONO_ONLY},
+	"SelectAttributes", DEF_TREE_SELECT_ATTR_MONO,
+	Ck_Offset(Tree, selectAttr), CK_CONFIG_MONO_ONLY},
     {CK_CONFIG_COLOR, "-selectbackground", "selectBackground", "Foreground",
 	DEF_TREE_SELECT_BG_COLOR, Ck_Offset(Tree, selectBg),
 	CK_CONFIG_COLOR_ONLY},
@@ -272,11 +272,11 @@ static Ck_ConfigSpec configSpecs[] = {
     {CK_CONFIG_COORD, "-width", "width", "Width",
 	DEF_TREE_WIDTH, Ck_Offset(Tree, width), 0},
     {CK_CONFIG_STRING, "-xscrollcommand", "xScrollCommand", "ScrollCommand",
-        DEF_TREE_SCROLL_COMMAND, Ck_Offset(Tree, xScrollCmd),
-        CK_CONFIG_NULL_OK},
+	DEF_TREE_SCROLL_COMMAND, Ck_Offset(Tree, xScrollCmd),
+	CK_CONFIG_NULL_OK},
     {CK_CONFIG_STRING, "-yscrollcommand", "yScrollCommand", "ScrollCommand",
-        DEF_TREE_SCROLL_COMMAND, Ck_Offset(Tree, yScrollCmd),
-        CK_CONFIG_NULL_OK},
+	DEF_TREE_SCROLL_COMMAND, Ck_Offset(Tree, yScrollCmd),
+	CK_CONFIG_NULL_OK},
     {CK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
 	(char *) NULL, 0, 0}
 };
@@ -375,9 +375,8 @@ Ck_TreeCmd(
      */
 
     new = Ck_CreateWindowFromPath(interp, mainPtr, argv[1], 0);
-    if (new == NULL) {
+    if (new == NULL)
 	return TCL_ERROR;
-    }
 
     /*
      * Initialize the data structure for the button.
@@ -406,8 +405,9 @@ Ck_TreeCmd(
     treePtr->topIndex = 0;
     treePtr->topNode = NULL;
     treePtr->activeNode = NULL;
-    treePtr->leadingSpace = 0;
-    treePtr->leadingString = NULL;
+    treePtr->leadingSpace = 32;
+    treePtr->leadingString =
+	    (int *) ckalloc(treePtr->leadingSpace * sizeof(int));
     treePtr->takeFocus = NULL;
     treePtr->xScrollCmd = NULL;
     treePtr->yScrollCmd = NULL;
@@ -511,16 +511,15 @@ TreeWidgetCmd(
 	result = TCL_OK;
     } else if ((c == 'c') && (strncmp(argv[1], "configure", length) == 0)
 	    && (length >= 2)) {
-	if (argc == 2) {
+	if (argc == 2)
 	    result = Ck_ConfigureInfo(interp, treePtr->winPtr, configSpecs,
 		    (char *) treePtr, (char *) NULL, 0);
-	} else if (argc == 3) {
+	else if (argc == 3)
 	    result = Ck_ConfigureInfo(interp, treePtr->winPtr, configSpecs,
 		    (char *) treePtr, argv[2], 0);
-	} else {
+	else
 	    result = ConfigureTree(interp, treePtr, argc-2, argv+2,
 		    CK_CONFIG_ARGV_ONLY);
-	}
     } else if ((c == 'd') && (strncmp(argv[1], "delete", length) == 0)
 	    && (length >= 2)) {
 	int i;
@@ -552,11 +551,10 @@ TreeWidgetCmd(
 		    (char *) NULL);
 	    goto error;
 	}
-	if (argc == 4) {
+	if (argc == 4)
 	    tag = Ck_GetUid(argv[3]);
-	} else {
+	else
 	    tag = Ck_GetUid(argv[2]);
-	}
 	for (nodePtr = StartTagSearch(treePtr, argv[2], &search);
 		nodePtr != NULL; nodePtr = NextNode(&search)) {
 	    for (i = nodePtr->numTags-1; i >= 0; i--) {
@@ -621,8 +619,8 @@ TreeWidgetCmd(
 
 		hPtr = Tcl_FindHashEntry(&treePtr->nodeTable, (char *) id);
 		if (hPtr == NULL) {
-	    	    Tcl_AppendResult(interp, "no node with id \"", argv[2],
-	    	        "\"", (char *) NULL);
+		    Tcl_AppendResult(interp, "no node with id \"", argv[2],
+			"\"", (char *) NULL);
 		    goto error;
 		}
 		nodePtr = (Node *) Tcl_GetHashValue(hPtr);
@@ -645,13 +643,12 @@ TreeWidgetCmd(
 	new->textWidth = 0;
 	new->flags = SHOWCHILDREN;
 
-	if (new->level * 2 > treePtr->leadingSpace) {
+	if (new->level > treePtr->leadingSpace) {
 	    int *newString;
 
 	    treePtr->leadingSpace = new->level * 8;
 	    newString = (int *) ckalloc(treePtr->leadingSpace * sizeof (int));
-	    if (treePtr->leadingString != NULL)
-	    	ckfree((char *) treePtr->leadingString);
+	    ckfree((char *) treePtr->leadingString);
 	    treePtr->leadingString = newString;
 	}
 
@@ -686,9 +683,8 @@ TreeWidgetCmd(
 	    redraw++;
 	    sprintf(buf, "%ld", new->id);
 	    Tcl_AppendResult(interp, buf, (char *) NULL);
-	} else {
+	} else
 	    ckfree((char *) new);
-	}
     } else if ((c == 'n') && (strncmp(argv[1], "nodecget", length) == 0)
 	    && (length >= 6)) {
 	Node *nodePtr;
@@ -701,11 +697,10 @@ TreeWidgetCmd(
 	    return TCL_ERROR;
 	}
 	nodePtr = StartTagSearch(treePtr, argv[2], &search);
-	if (nodePtr != NULL) {
+	if (nodePtr != NULL)
 	    result = Ck_ConfigureValue(treePtr->interp, treePtr->winPtr,
 		    nodeConfigSpecs, (char *) nodePtr,
 		    argv[3], 0);
-	}
     } else if ((c == 'n') && (strncmp(argv[1], "nodeconfigure", length) == 0)
 	    && (length >= 6)) {
 	Node *nodePtr;
@@ -719,23 +714,22 @@ TreeWidgetCmd(
 	}
 	for (nodePtr = StartTagSearch(treePtr, argv[2], &search);
 		nodePtr != NULL; nodePtr = NextNode(&search)) {
-	    if (argc == 3) {
+	    if (argc == 3)
 		result = Ck_ConfigureInfo(treePtr->interp, treePtr->winPtr,
 			nodeConfigSpecs, (char *) nodePtr,
 			(char *) NULL, 0);
-	    } else if (argc == 4) {
+	    else if (argc == 4)
 		result = Ck_ConfigureInfo(treePtr->interp, treePtr->winPtr,
 			nodeConfigSpecs, (char *) nodePtr,
 			argv[3], 0);
-	    } else {
+	    else {
 		result = Ck_ConfigureWidget(interp, treePtr->winPtr,
 			nodeConfigSpecs, argc - 3, &argv[3],
 			(char *) nodePtr, CK_CONFIG_ARGV_ONLY);
 		redraw++;
 	    }
-	    if ((result != TCL_OK) || (argc < 5)) {
+	    if ((result != TCL_OK) || (argc < 5))
 		break;
-	    }
 	}
     } else if ((c == 'p') && (strncmp(argv[1], "parent", length) == 0)
 	    && (length >= 2)) {
@@ -825,10 +819,9 @@ TreeWidgetCmd(
 		fraction = treePtr->topIndex / (double) treePtr->visibleNodes;
 		fraction2 = (treePtr->topIndex + treePtr->winPtr->height) /
 		    (double) treePtr->visibleNodes;
-		if (fraction2 > 1.0) {
-                    fraction2 = 1.0;
-                }
-                sprintf(buffer, "%g %g", fraction, fraction2);
+		if (fraction2 > 1.0)
+		    fraction2 = 1.0;
+		sprintf(buffer, "%g %g", fraction, fraction2);
 		Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 	    }
 	} else if (argc == 3) {
@@ -845,7 +838,7 @@ TreeWidgetCmd(
 		if (index < treePtr->topIndex ||
 		    index >= treePtr->topIndex + treePtr->winPtr->height)
 		    ChangeTreeView(treePtr,
-		        index - treePtr->winPtr->height / 2);
+			index - treePtr->winPtr->height / 2);
 	    }
 	} else {
 	    type = Ck_GetScrollInfo(interp, argc, argv, &fraction, &count);
@@ -856,13 +849,12 @@ TreeWidgetCmd(
 		    index = (int) (treePtr->visibleNodes * fraction + 0.5);
 		    break;
 		case CK_SCROLL_PAGES:
-                    if (treePtr->visibleNodes > 2) {
-                        index = treePtr->topIndex
-                                + count * (treePtr->winPtr->height - 2);
-                    } else {
-                        index = treePtr->topIndex + count;
-                    }
-                    break;
+		    if (treePtr->visibleNodes > 2)
+			index = treePtr->topIndex
+			      + count * (treePtr->winPtr->height - 2);
+		    else
+			index = treePtr->topIndex + count;
+		    break;
 		case CK_SCROLL_UNITS:
 		    index = treePtr->topIndex + count;
 		    break;
@@ -921,11 +913,7 @@ DestroyTree(ClientData clientData)	/* Info about tree widget. */
      * stuff.
      */
 
-    if (treePtr->leadingString != NULL) {
-	ckfree((char *) treePtr->leadingString);
-	treePtr->leadingString = NULL;
-    }
-
+    ckfree((char *) treePtr->leadingString);
     hPtr = Tcl_FirstHashEntry(&treePtr->nodeTable, &search);
     while (hPtr != NULL) {
 	nodePtr = (Node *) Tcl_GetHashValue(hPtr);
@@ -1042,11 +1030,10 @@ DeleteNode(
 	treePtr->activeNode = NULL;
 
     prevPtr = NULL;
-    if (nodePtr->parent == NULL) {
+    if (nodePtr->parent == NULL)
 	thisPtr = treePtr->firstChild;
-    } else {
+    else
 	thisPtr = nodePtr->parent->firstChild;
-    }
     for (; thisPtr != NULL; prevPtr = thisPtr, thisPtr = thisPtr->next) {
 	if (thisPtr == nodePtr) {
 	    if (prevPtr == NULL) {
@@ -1122,12 +1109,10 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
     WINDOW *window;
 
     treePtr->flags &= ~REDRAW_PENDING;
-    if ((treePtr->winPtr == NULL) || !(winPtr->flags & CK_MAPPED)) {
+    if ((treePtr->winPtr == NULL) || !(winPtr->flags & CK_MAPPED))
 	return;
-    }
-    if (treePtr->flags & UPDATE_V_SCROLLBAR) {
-        TreeUpdateVScrollbar(treePtr);
-    }
+    if (treePtr->flags & UPDATE_V_SCROLLBAR)
+	TreeUpdateVScrollbar(treePtr);
     treePtr->flags &= ~(REDRAW_PENDING|UPDATE_H_SCROLLBAR|UPDATE_V_SCROLLBAR);
 
     if (treePtr->firstChild == NULL) {
@@ -1150,32 +1135,30 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 	treePtr->normalAttr);
 
     nodePtr = treePtr->topNode;
-
-    i = nodePtr->level * 2 - 1;
-    nextPtr = nodePtr->parent;
-    while (i >= 0) {
-        treePtr->leadingString[i] = ' ';
-    	parentPtr = nextPtr->parent;
-    	if (parentPtr != NULL) {
-	    if (parentPtr->lastChild == nextPtr)
-	        treePtr->leadingString[i - 1] = ' ';
-	    else
-	        treePtr->leadingString[i - 1] = lvline;
-	} else if (treePtr->lastChild == nextPtr)
-	    treePtr->leadingString[i - 1] = ' ';
-	else
-	    treePtr->leadingString[i - 1] = lvline;
-	nextPtr = parentPtr;
-	i -= 2;
-    }
-
     window = winPtr->window;
     y = 0;
     while (nodePtr != NULL && y < winPtr->height) {
-    	x = mustRestore = 0;
+	i = nodePtr->level - 1;
+	nextPtr = nodePtr->parent;
+	while (i >= 0) {
+	    parentPtr = nextPtr->parent;
+	    if (parentPtr != NULL) {
+		if (parentPtr->lastChild == nextPtr)
+		    treePtr->leadingString[i] = ' ';
+		else
+		    treePtr->leadingString[i] = lvline;
+	    } else if (treePtr->lastChild == nextPtr)
+		treePtr->leadingString[i] = ' ';
+	    else
+		treePtr->leadingString[i] = lvline;
+	    nextPtr = parentPtr;
+	    i -= 1;
+	}
+
+	x = mustRestore = 0;
 	wmove(window, y, x);
 	if (nodePtr == treePtr->firstChild) {
-    	    waddch(window, (nodePtr == treePtr->lastChild) ? lhline : ulcorner);
+	    waddch(window, (nodePtr == treePtr->lastChild) ? lhline : ulcorner);
 	    x++;
 	} else if (nodePtr == treePtr->lastChild) {
 	    waddch(window, llcorner);
@@ -1184,22 +1167,18 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 	    waddch(window, ltee);
 	    x++;
 	}
-	for (i = 0; i < nodePtr->level * 2 && x < winPtr->width; i++) {
+	for (i = 0; i < nodePtr->level && x < winPtr->width; i++) {
 	    waddch(window, treePtr->leadingString[i]);
 	    x++;
 	}
 	if (nodePtr->parent != NULL) {
 	   if (x < winPtr->width) {
 		if (nodePtr == nodePtr->parent->lastChild)
-	    	    waddch(window, llcorner);
+		    waddch(window, llcorner);
 		else
-	    	    waddch(window, ltee);
+		    waddch(window, ltee);
 		x++;
 	    }
-	}
-	if (x < winPtr->width) {
-	    waddch(window, lhline);
-	    x++;
 	}
 	if (nodePtr->firstChild != NULL && (nodePtr->flags & SHOWCHILDREN)) {
 	    if (x < winPtr->width) {
@@ -1216,13 +1195,11 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 	    if (nextPtr == NULL) {
 		parentPtr = nodePtr->parent;
 		while (nextPtr == NULL) {
-		    if (parentPtr == NULL) {
-		    	break;
-		    }
+		    if (parentPtr == NULL)
+			break;
 		    nextPtr = parentPtr->next;
-		    if (nextPtr == NULL) {
-		    	parentPtr = parentPtr->parent;
-		    }
+		    if (nextPtr == NULL)
+			parentPtr = parentPtr->parent;
 		}
 	    }
 	}
@@ -1251,11 +1228,12 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 		treePtr->normalAttr);
 	Ck_ClearToEol(winPtr, -1, -1);
 
-	i = nodePtr->level * 2;
-	if (treePtr->leadingString != NULL) {
-	    treePtr->leadingString[i] = (nodePtr->next != NULL) ? lvline : ' ';
-	    treePtr->leadingString[i + 1] = ' ';
-	}
+	i = nodePtr->level;
+	if (nodePtr->next != NULL)
+	    treePtr->leadingString[i] = lvline;
+	else
+	    treePtr->leadingString[i] = ' ';
+	treePtr->leadingString[i + 1] = ' ';
 
 	nodePtr = nextPtr;
 	y++;
@@ -1290,24 +1268,23 @@ TreeEventProc(
 {
     Tree *treePtr = (Tree *) clientData;
 
-    if (eventPtr->type == CK_EV_EXPOSE) {
+    if (eventPtr->type == CK_EV_EXPOSE)
 	TreeEventuallyRedraw(treePtr);
-    } else if (eventPtr->type == CK_EV_DESTROY) {
+    else if (eventPtr->type == CK_EV_DESTROY) {
 	if (treePtr->winPtr != NULL) {
 	    treePtr->winPtr = NULL;
 	    Tcl_DeleteCommand(treePtr->interp,
 		    Tcl_GetCommandName(treePtr->interp, treePtr->widgetCmd));
 	}
-	if (treePtr->flags & REDRAW_PENDING) {
+	if (treePtr->flags & REDRAW_PENDING)
 	    Tcl_CancelIdleCall(DisplayTree, (ClientData) treePtr);
-	}
 	Tcl_EventuallyFree((ClientData) treePtr, (Ck_FreeProc *) DestroyTree);
     } else if (eventPtr->type == CK_EV_FOCUSIN) {
-    	treePtr->flags |= GOT_FOCUS;
-    	TreeEventuallyRedraw(treePtr);
+	treePtr->flags |= GOT_FOCUS;
+	TreeEventuallyRedraw(treePtr);
     } else if (eventPtr->type == CK_EV_FOCUSOUT) {
-    	treePtr->flags &= ~GOT_FOCUS;
-    	TreeEventuallyRedraw(treePtr);
+	treePtr->flags &= ~GOT_FOCUS;
+	TreeEventuallyRedraw(treePtr);
     }
 }
 
@@ -1370,15 +1347,15 @@ RecomputeVisibleNodes(Tree *treePtr)
 
     nodePtr = treePtr->firstChild;
     if (nodePtr == NULL)
-    	treePtr->topNode = NULL;
+	treePtr->topNode = NULL;
     while (nodePtr != NULL) {
 	if (nodePtr->parent == NULL)
 	    nextPtr = nodePtr->next;
-    	if (nodePtr == treePtr->topNode)
+	if (nodePtr == treePtr->topNode)
 	    top = count;
-    	if (nodePtr->firstChild != NULL && (nodePtr->flags & SHOWCHILDREN)) {
+	if (nodePtr->firstChild != NULL && (nodePtr->flags & SHOWCHILDREN))
 	    nodePtr = nodePtr->firstChild;
-	} else if (nodePtr->next != NULL)
+	else if (nodePtr->next != NULL)
 	    nodePtr = nodePtr->next;
 	else {
 	    while (nodePtr != NULL) {
@@ -1394,8 +1371,8 @@ RecomputeVisibleNodes(Tree *treePtr)
 	count++;
     }
     if (top < 0) {
-    	treePtr->topNode = treePtr->firstChild;
-    	top = 0;
+	treePtr->topNode = treePtr->firstChild;
+	top = 0;
     }
     if (top != treePtr->topIndex || count != treePtr->visibleNodes)
 	treePtr->flags |= UPDATE_V_SCROLLBAR;
@@ -1450,9 +1427,9 @@ ChangeTreeView(
 	    if (count == index)
 		break;
 	    if (nodePtr->firstChild != NULL &&
-		(nodePtr->flags & SHOWCHILDREN)) {
+		(nodePtr->flags & SHOWCHILDREN))
 		nodePtr = nodePtr->firstChild;
-	    } else if (nodePtr->next != NULL)
+	    else if (nodePtr->next != NULL)
 		nodePtr = nodePtr->next;
 	    else {
 		while (nodePtr != NULL) {
@@ -1502,9 +1479,9 @@ GetNodeYCoord(
 	}
 	if (nodePtr->parent == NULL)
 	    nextPtr = nodePtr->next;
-	if (nodePtr->firstChild != NULL && (nodePtr->flags & SHOWCHILDREN)) {
+	if (nodePtr->firstChild != NULL && (nodePtr->flags & SHOWCHILDREN))
 	    nodePtr = nodePtr->firstChild;
-	} else if (nodePtr->next != NULL)
+	else if (nodePtr->next != NULL)
 	    nodePtr = nodePtr->next;
 	else {
 	    while (nodePtr != NULL) {
@@ -1559,9 +1536,8 @@ TreeTagsParseProc(
      * Break the value up into the individual tag names.
      */
 
-    if (Tcl_SplitList(interp, value, &argc, &argv) != TCL_OK) {
+    if (Tcl_SplitList(interp, value, &argc, &argv) != TCL_OK)
 	return TCL_ERROR;
-    }
 
     /*
      * Check for special tags.
@@ -1580,12 +1556,10 @@ TreeTagsParseProc(
 
     if (nodePtr->tagSpace < argc) {
 	newPtr = (Ck_Uid *) ckalloc((unsigned) (argc * sizeof(Ck_Uid)));
-	for (i = nodePtr->numTags-1; i >= 0; i--) {
+	for (i = nodePtr->numTags-1; i >= 0; i--)
 	    newPtr[i] = nodePtr->tagPtr[i];
-	}
-	if (nodePtr->tagPtr != nodePtr->staticTagSpace) {
+	if (nodePtr->tagPtr != nodePtr->staticTagSpace)
 	    ckfree((char *) nodePtr->tagPtr);
-	}
 	nodePtr->tagPtr = newPtr;
 	nodePtr->tagSpace = argc;
     }
@@ -1754,9 +1728,8 @@ StartTagSearch(
 	for (tagPtr = nodePtr->tagPtr, count = nodePtr->numTags;
 	     count > 0;
 	     tagPtr++, count--) {
-	    if (*tagPtr == uid) {
+	    if (*tagPtr == uid)
 		return nodePtr;
-	    }
 	}
 	hPtr = Tcl_NextHashEntry(&searchPtr->search);
     } while (hPtr != NULL);
@@ -1810,9 +1783,8 @@ NextNode(TagSearch *searchPtr)		/* Record describing search in
      */
 
     uid = searchPtr->tag;
-    if (uid == NULL) {
+    if (uid == NULL)
 	return (Node *) Tcl_GetHashValue(hPtr);
-    }
 
     /*
      * Look for a node with a particular tag.
@@ -1823,9 +1795,8 @@ NextNode(TagSearch *searchPtr)		/* Record describing search in
 	for (tagPtr = nodePtr->tagPtr, count = nodePtr->numTags;
 	     count > 0;
 	     tagPtr++, count--) {
-	    if (*tagPtr == uid) {
+	    if (*tagPtr == uid)
 		return nodePtr;
-	    }
 	}
 	hPtr = Tcl_NextHashEntry(&searchPtr->search);
     } while (hPtr != NULL);
@@ -1896,9 +1867,8 @@ DoNode(
 	newTagPtr = (Ck_Uid *) ckalloc((unsigned)
 		(nodePtr->tagSpace * sizeof (Ck_Uid)));
 	memcpy(newTagPtr, nodePtr->tagPtr, nodePtr->numTags * sizeof (Ck_Uid));
-	if (nodePtr->tagPtr != nodePtr->staticTagSpace) {
+	if (nodePtr->tagPtr != nodePtr->staticTagSpace)
 	    ckfree((char *) nodePtr->tagPtr);
-	}
 	nodePtr->tagPtr = newTagPtr;
 	tagPtr = &nodePtr->tagPtr[nodePtr->numTags];
     }
@@ -1972,11 +1942,10 @@ FindNodes(
     Node *nodePtr;
     Ck_Uid uid;
 
-    if (newTag != NULL) {
+    if (newTag != NULL)
 	uid = Ck_GetUid(newTag);
-    } else {
+    else
 	uid = NULL;
-    }
     c = argv[0][0];
     length = strlen(argv[0]);
     if ((c == 'a') && (strncmp(argv[0], "all", length) == 0)
@@ -1987,9 +1956,8 @@ FindNodes(
 	    return TCL_ERROR;
 	}
 	for (nodePtr = StartTagSearch(treePtr, "all", &search);
-		nodePtr != NULL; nodePtr = NextNode(&search)) {
+		nodePtr != NULL; nodePtr = NextNode(&search))
 	    DoNode(interp, nodePtr, uid);
-	}
     } else if ((c == 'n') && (strncmp(argv[0], "next", length) == 0) &&
 	length > 2) {
 
@@ -2042,9 +2010,9 @@ FindNodes(
 	    if (nodePtr->parent == NULL)
 		nextPtr = nodePtr->next;
 	    if (nodePtr->firstChild != NULL &&
-	        (nodePtr->flags & SHOWCHILDREN)) {
+		(nodePtr->flags & SHOWCHILDREN))
 		nodePtr = nodePtr->firstChild;
-	    } else if (nodePtr->next != NULL)
+	    else if (nodePtr->next != NULL)
 		nodePtr = nodePtr->next;
 	    else {
 		while (nodePtr != NULL) {
@@ -2066,7 +2034,7 @@ FindNodes(
 	    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 	}
     } else if ((c == 'p') && (strncmp(argv[0], "prev", length) == 0)) {
-    	int done = 0;
+	int done = 0;
 	Node *parentPtr, *nextPtr;
 
 	if (argc != 2) {
@@ -2086,7 +2054,7 @@ FindNodes(
 		} else
 		    nextPtr = parentPtr->firstChild;
 	    } else
-	    	parentPtr = nextPtr = treePtr->firstChild;
+		parentPtr = nextPtr = treePtr->firstChild;
 	    if (!done) {
 		for (;nextPtr != NULL && nextPtr->next != nodePtr;
 		     nextPtr = nextPtr->next) {
@@ -2159,9 +2127,8 @@ TreeUpdateVScrollbar(Tree *treePtr)	/* Information about widget. */
 	first = treePtr->topIndex / ((double) treePtr->visibleNodes);
 	last = (treePtr->topIndex + treePtr->winPtr->height)
 		/ ((double) treePtr->visibleNodes);
-	if (last > 1.0) {
+	if (last > 1.0)
 	    last = 1.0;
-	}
     }
     sprintf(string, " %g %g", first, last);
     result = Tcl_VarEval(treePtr->interp, treePtr->yScrollCmd, string,
