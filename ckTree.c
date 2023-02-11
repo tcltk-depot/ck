@@ -190,7 +190,7 @@ typedef struct Tree {
  * REDRAW_PENDING:		Non-zero means a DoWhenIdle handler
  *				has already been queued to redraw
  *				this window.
- * GOT_FOCUS:			Non-zero means this button currently
+ * GOT_FOCUS:			Non-zero means this window currently
  *				has the input focus.
  * UPDATE_V_SCROLLBAR:		Non-zero means vertical scrollbar needs
  *				to be updated.
@@ -379,7 +379,7 @@ Ck_TreeCmd(
 	return TCL_ERROR;
 
     /*
-     * Initialize the data structure for the button.
+     * Initialize the data structure for the widget.
      */
 
     treePtr = (Tree *) ckalloc(sizeof (Tree));
@@ -446,7 +446,7 @@ Ck_TreeCmd(
 
 static int
 TreeWidgetCmd(
-    ClientData clientData,	/* Information about button widget. */
+    ClientData clientData,	/* Information about widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
     char **argv)		/* Argument strings. */
@@ -863,8 +863,9 @@ TreeWidgetCmd(
 	}
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
-		"\":  must be cget or configure",
-		(char *) NULL);
+		"\":  must be addtag, cget, children, configure, delete, "
+	        "dtag, find, gettags, insert, nodecget, nodeconfigure, "
+		"parent, select, xview, or yview", (char *) NULL);
 	goto error;
     }
     if (recompute)
@@ -1115,6 +1116,9 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
 	TreeUpdateVScrollbar(treePtr);
     treePtr->flags &= ~(REDRAW_PENDING|UPDATE_H_SCROLLBAR|UPDATE_V_SCROLLBAR);
 
+    Ck_SetWindowAttr(winPtr, treePtr->normalFg, treePtr->normalBg,
+	treePtr->normalAttr);
+
     if (treePtr->firstChild == NULL) {
 	Ck_ClearToBot(winPtr, 0, 0);
 	Ck_EventuallyRefresh(winPtr);
@@ -1130,9 +1134,6 @@ DisplayTree(ClientData clientData)	/* Information about widget. */
     Ck_GetGChar(NULL, "hline", &lhline);
     Ck_GetGChar(NULL, "ltee", &ltee);
     Ck_GetGChar(NULL, "ttee", &ttee);
-
-    Ck_SetWindowAttr(winPtr, treePtr->normalFg, treePtr->normalBg,
-	treePtr->normalAttr);
 
     nodePtr = treePtr->topNode;
     window = winPtr->window;
@@ -2084,7 +2085,8 @@ FindNodes(
 	}
     } else  {
 	Tcl_AppendResult(interp, "bad search command \"", argv[0],
-		"\": must be all, nearest, or withtag", (char *) NULL);
+		"\": must be all, nearest, next, prev, or withtag",
+	       	(char *) NULL);
 	return TCL_ERROR;
     }
     return TCL_OK;
