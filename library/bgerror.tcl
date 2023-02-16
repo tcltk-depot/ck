@@ -15,7 +15,6 @@ if {[winfo depth .] > 1} {
     option add *ckerrorDialog*background red
     option add *ErrorTrace*background red
 }
-option add *ckerrorDialog*Button.width 7
 
 # bgerror --
 # This is the default version of bgerror.  It posts a dialog box containing
@@ -29,7 +28,7 @@ proc bgerror err {
     global errorInfo
     set info $errorInfo
     set button [ck_dialog .ckerrorDialog "Error in Tcl Script" \
-	    "Error: $err" OK Skip Trace]
+	    "Error: $err" " OK " Skip Trace]
     if {$button == 0} {
         return
     } elseif {$button == 1} {
