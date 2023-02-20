@@ -6,7 +6,7 @@
 #
 # Copyright (c) 1992-1994 The Regents of the University of California.
 # Copyright (c) 1994-1995 Sun Microsystems, Inc.
-# Copyright (c) 1999 Christian Werner
+# Copyright (c) 1999-2023 Christian Werner
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -28,7 +28,7 @@ proc bgerror err {
     global errorInfo
     set info $errorInfo
     set button [ck_dialog .ckerrorDialog "Error in Tcl Script" \
-	    "Error: $err" Okay Skip Trace]
+	    "Error: $err" " OK " Skip Trace]
     if {$button == 0} {
         return
     } elseif {$button == 1} {
@@ -52,6 +52,7 @@ proc bgerror err {
     $w.text insert 0.0 $info
     $w.text mark set insert 0.0
     bind $w.text <Tab> {focus [ck_focusNext %W] ; break}
+    update idletasks
     focus $w.ok
     tkwait window $w
 }

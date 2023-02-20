@@ -3,7 +3,7 @@
 #
 # This file defines the command dialog procedure.
 #
-# Copyright (c) 1995-1996 Christian Werner
+# Copyright (c) 1995-2023 Christian Werner
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -50,6 +50,7 @@ proc ckCommand {{w .ckCommand}} {
     bind $w <Control-U> [subst {ckCmdToggleSize $w ; break}]
     bind $w <Control-L> {update screen ; break}
 
+    update idletasks
     focus $w.entry
 
     set ckPriv(cmdHistory) {}
