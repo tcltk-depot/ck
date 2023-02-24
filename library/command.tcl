@@ -60,7 +60,7 @@ proc ckCommand {{w .ckCommand}} {
 
 proc ckCmdToggleSize w {
     if {[string first "-relwidth 1" [place info $w]] >= 0} {
-        place $w -relx 0.5 -rely 0.5 -relwidth 0.5 -relheight 0.5 \
+        place $w -relx 0.5 -rely 0.5 -relwidth 0.7 -relheight 0.7 \
             -anchor center
     } else {
         place $w -relx 0.5 -rely 0.5 -relwidth 1.0 -relheight 1.0 \
