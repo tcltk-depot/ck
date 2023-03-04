@@ -705,31 +705,7 @@ ConfigureText(
     textPtr->selTagPtr->bg = textPtr->selBg;
     textPtr->selTagPtr->fg = textPtr->selFg;
     textPtr->selTagPtr->attr = textPtr->selAttr;
-    textPtr->selTagPtr->affectsDisplay = 0;
-#if 0
-/* ??? */
-    if ((textPtr->selTagPtr->border != NULL)
-	    || (textPtr->selTagPtr->bdString != NULL)
-	    || (textPtr->selTagPtr->reliefString != NULL)
-	    || (textPtr->selTagPtr->bgStipple != None)
-	    || (textPtr->selTagPtr->fgColor != NULL)
-	    || (textPtr->selTagPtr->fontPtr != None)
-	    || (textPtr->selTagPtr->fgStipple != None)
-	    || (textPtr->selTagPtr->justifyString != NULL)
-	    || (textPtr->selTagPtr->lMargin1String != NULL)
-	    || (textPtr->selTagPtr->lMargin2String != NULL)
-	    || (textPtr->selTagPtr->offsetString != NULL)
-	    || (textPtr->selTagPtr->overstrikeString != NULL)
-	    || (textPtr->selTagPtr->rMarginString != NULL)
-	    || (textPtr->selTagPtr->spacing1String != NULL)
-	    || (textPtr->selTagPtr->spacing2String != NULL)
-	    || (textPtr->selTagPtr->spacing3String != NULL)
-	    || (textPtr->selTagPtr->tabString != NULL)
-	    || (textPtr->selTagPtr->underlineString != NULL)
-	    || (textPtr->selTagPtr->wrapMode != NULL)) {
-	textPtr->selTagPtr->affectsDisplay = 1;
-    }
-#endif
+    textPtr->selTagPtr->affectsDisplay = 1;
     CkTextRedrawTag(textPtr, (CkTextIndex *) NULL, (CkTextIndex *) NULL,
 	    textPtr->selTagPtr, 1);
 

@@ -50,7 +50,7 @@ bind Text <Linefeed> {
     ckTextInsert %W \n
 }
 bind Text <Delete> {
-    if {[%W tag nextrange sel 1.0 end] ne ""} {
+    if {[%W tag nextrange sel 1.0 end] ne {}} {
 	%W delete sel.first sel.last
     } else {
 	%W delete insert
@@ -58,7 +58,7 @@ bind Text <Delete> {
     }
 }
 bind Text <ASCIIDelete> {
-    if {[%W tag nextrange sel 1.0 end] ne ""} {
+    if {[%W tag nextrange sel 1.0 end] ne {}} {
 	%W delete sel.first sel.last
     } else {
 	%W delete insert
@@ -66,7 +66,7 @@ bind Text <ASCIIDelete> {
     }
 }
 bind Text <BackSpace> {
-    if {[%W tag nextrange sel 1.0 end] ne ""} {
+    if {[%W tag nextrange sel 1.0 end] ne {}} {
 	%W delete sel.first sel.last
     } elseif {[%W compare insert != 1.0]} {
 	%W delete insert-1c
@@ -140,13 +140,14 @@ bind Text <FocusIn> {
 bind Text <FocusOut> {
     if {[info exists ckPriv(textInSel)] && ($ckPriv(textInSel) eq "%W")} {
 	set ckPriv(textInSel) ""
-	%W tag delete sel 1.0 end
+	%W tag remove sel 1.0 end
     }
 }
 bind Text <Control-q> {
     set ckPriv(textInSel) %W
-    %W tag delete sel 1.0 end
+    %W tag remove sel 1.0 end
     %W tag add sel insert {insert + 1c}
+    %W tag raise sel
 }
 bind Text <Control-w> {ckTextCutSel %W}
 bind Text <Control-y> {ckTextPasteSel %W}
@@ -213,7 +214,7 @@ proc ckTextSetCursor {w pos} {
     $w mark set insert $pos
     if {![info exists ckPriv(textInSel)] || $ckPriv(textInSel) ne $w} {
 	$w tag remove sel 1.0 end
-    } elseif {[$w tag ranges sel] ne ""} {
+    } elseif {[$w tag ranges sel] ne {}} {
 	if {[$w compare insert < sel.first]} {
 	    set first insert
 	    set last sel.first
@@ -222,6 +223,7 @@ proc ckTextSetCursor {w pos} {
 	    set last {insert + 1c}
 	}
 	$w tag add sel $first $last
+	$w tag raise sel
     }
     $w see insert
 }
@@ -293,7 +295,7 @@ proc ckTextUpDownLine {w n} {
 proc ckTextScrollPages {w count} {
     set bbox [$w bbox insert]
     $w yview scroll $count pages
-    if {$bbox eq ""} {
+    if {$bbox eq {}} {
 	return [$w index @[expr {[winfo height $w]/2}],0]
     }
     return [$w index @[lindex $bbox 0],[lindex $bbox 1]]
