@@ -143,10 +143,10 @@ bind Text <FocusOut> {
 	%W tag remove sel 1.0 end
     }
 }
-bind Text <Control-q> {
+bind Text <Control-at> {
     set ckPriv(textInSel) %W
     %W tag remove sel 1.0 end
-    %W tag add sel insert {insert + 1c}
+    %W tag add sel insert 
     %W tag raise sel
 }
 bind Text <Control-w> {ckTextCutSel %W}
@@ -220,7 +220,7 @@ proc ckTextSetCursor {w pos} {
 	    set last sel.first
 	} else {
 	    set first sel.first
-	    set last {insert + 1c}
+	    set last insert
 	}
 	$w tag add sel $first $last
 	$w tag raise sel
