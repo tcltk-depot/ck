@@ -91,8 +91,8 @@ typedef struct Pattern {
 				 * must match. For keystrokes this
 				 * is the keycode. Keycode 0 means
 				 * any keystroke, keycode -1 means
-				 * control keystroke, keycode -2 means
-				 * Control-at. */
+				 * control keystroke, keycode 0x200000
+				 * means Control-at. */
 } Pattern;
 
 /*
@@ -597,13 +597,13 @@ Ck_GetAllBindings(
 			goto endPat;
 		    }
 		    if (patPtr->eventType == CK_EV_KEYPRESS &&
-		        ((patPtr->detail >= 0 && patPtr->detail < 0x20) ||
-		         patPtr->detail == -2)) {
+		        ((patPtr->detail > 0 && patPtr->detail < 0x20) ||
+		         patPtr->detail == 0x200000)) {
 			char *string;
 
 		        string = CkKeysymToString((KeySym) patPtr->detail, 0);
 		        if (string == NULL) {
-			    if (patPtr->detail == -2)
+			    if (patPtr->detail == 0x200000)
 				strcpy(buffer, "Control-at");
 			    else if (patPtr->detail == 0x40 + '[')
 				strcpy(buffer, "Escape");
@@ -774,9 +774,11 @@ Ck_BindEvent(
     memcpy((void *) ringPtr, (void *) eventPtr, sizeof (CkEvent));
     detail = 0;
     bindPtr->detailRing[bindPtr->curEvent] = 0;
-    if (ringPtr->type == CK_EV_KEYPRESS)
+    if (ringPtr->type == CK_EV_KEYPRESS) {
 	detail = ringPtr->key.keycode;
-    else if (ringPtr->type == CK_EV_MOUSE_DOWN ||
+	if (detail == 0x00 && !ringPtr->key.is_uch)
+	    detail |= 0x200000;
+    } else if (ringPtr->type == CK_EV_MOUSE_DOWN ||
         ringPtr->type == CK_EV_MOUSE_UP)
 	detail = ringPtr->mouse.button;
     bindPtr->detailRing[bindPtr->curEvent] = detail;
@@ -811,8 +813,8 @@ Ck_BindEvent(
 	    matchPtr = MatchPatterns(bindPtr,
 		    (PatSeq *) Tcl_GetHashValue(hPtr));
 	}
-	if (ringPtr->type == CK_EV_KEYPRESS && detail == 0) {
-	    key.detail = -2;
+	if (ringPtr->type == CK_EV_KEYPRESS && detail == 0x200000) {
+	    key.detail = detail;
 	    hPtr = Tcl_FindHashEntry(&bindPtr->patternTable, (char *) &key);
 	    if (hPtr != NULL) {
 		matchPtr = MatchPatterns(bindPtr,
@@ -828,7 +830,7 @@ Ck_BindEvent(
 			(PatSeq *) Tcl_GetHashValue(hPtr));
 	    }
 	}
-	if (detail != 0 && matchPtr == NULL) {
+	if (detail != 0x200000 && detail != 0 && matchPtr == NULL) {
 	    key.detail = 0;
 	    hPtr = Tcl_FindHashEntry(&bindPtr->patternTable, (char *) &key);
 	    if (hPtr != NULL) {
@@ -1073,7 +1075,7 @@ badKeySym:
 		if (patPtr->detail < 0 || patPtr->detail >= 0x20)
 		    goto badKeySym;
 		if (patPtr->detail == 0x00)
-		    patPtr->detail = -2;
+		    patPtr->detail = 0x200000;
 	    }
 	    if (patPtr->eventType == -1) {
 		patPtr->eventType = CK_EV_KEYPRESS;
@@ -1270,13 +1272,10 @@ MatchPatterns(
 	     */
 
 	    if ((patPtr->detail != 0) && (patPtr->detail != -1)
-		    && (patPtr->detail != -2)
 		    && (patPtr->detail != *detailPtr))
 		goto nextSequence;
 
 	    if ((patPtr->detail == -1) && (*detailPtr >= 0x20))
-		goto nextSequence;
-	    if ((patPtr->detail == -2) && (*detailPtr != 0x00))
 		goto nextSequence;
 
 	    patPtr++;
@@ -1594,6 +1593,8 @@ CkKeysymToString(KeySym keySym, int printControl)
 	    sprintf(buffer, "Control-%c", (int) keySym);
 	return buffer;
     }
+    if (printControl && keySym == 0x200000)
+   	return "Control-at";
     return printControl ? "NoSymbol" : NULL;
 }
 
