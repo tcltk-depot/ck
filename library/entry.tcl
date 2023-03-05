@@ -28,14 +28,18 @@ bind Entry <End> {
 }
 bind Entry <Delete> {
     if {[%W selection present]} {
+	set ckPriv(entryInSel) ""
 	%W delete sel.first sel.last
+	%W selection clear
     } else {
 	%W delete insert
     }
 }
 bind Entry <ASCIIDelete> {
     if {[%W selection present]} {
+	set ckPriv(entryInSel) ""
 	%W delete sel.first sel.last
+	%W selection clear
     } else {
 	%W delete insert
     }
@@ -120,6 +124,7 @@ proc ckEntryCutSel {w} {
 	    set ckPriv(textSelection) [string range [$w get] \
 		    [$w index sel.first] [$w index sel.last]]
 	    $w delete sel.first sel.last
+	    $w selection clear
 	}
 	ckEntrySeeInsert $w
     }
@@ -141,7 +146,10 @@ proc ckEntryPasteSel {w} {
     if {[string length $ckPriv(textSelection)] == 0} {
 	return
     }
-    catch {$w delete sel.first sel.last}
+    catch {
+	$w delete sel.first sel.last
+	$w selection clear
+    }
     $w insert insert $ckPriv(textSelection)
     ckEntrySeeInsert $w
 }
@@ -176,12 +184,16 @@ proc ckEntryKeySelect {w new} {
 # s -		The string to insert (usually just a single character)
 
 proc ckEntryInsert {w s} {
+    global ckPriv
+
     if {$s eq ""} return
     catch {
 	set insert [$w index insert]
 	if {([$w index sel.first] <= $insert)
 		&& ([$w index sel.last] >= $insert)} {
+	    set ckPriv(entryInSel) ""
 	    $w delete sel.first sel.last
+	    $w selection clear
 	}
     }
     $w insert insert $s
@@ -197,8 +209,12 @@ proc ckEntryInsert {w s} {
 # w -		The entry window in which to backspace.
 
 proc ckEntryBackspace w {
+    global ckPriv
+
     if {[$w selection present]} {
+	set ckPriv(entryInSel) ""
 	$w delete sel.first sel.last
+	$w selection clear
     } else {
 	set x [expr {[$w index insert] - 1}]
 	if {$x >= 0} {$w delete $x}
