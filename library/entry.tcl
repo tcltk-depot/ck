@@ -96,7 +96,7 @@ bind Entry <FocusOut> {
 	%W selection clear
     }
 }
-bind Entry <Control-q> {
+bind Entry <Control-at> {
     set ckPriv(entryInSel) %W
     %W selection clear
     %W selection from insert

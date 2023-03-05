@@ -91,7 +91,8 @@ typedef struct Pattern {
 				 * must match. For keystrokes this
 				 * is the keycode. Keycode 0 means
 				 * any keystroke, keycode -1 means
-				 * control keystroke. */
+				 * control keystroke, keycode -2 means
+				 * Control-at. */
 } Pattern;
 
 /*
@@ -532,7 +533,7 @@ Ck_GetAllBindings(
     Pattern *patPtr;
     Tcl_HashEntry *hPtr;
     Tcl_DString ds;
-    char c, buffer[10];
+    char c, buffer[32];
     int patsLeft;
     EventInfo *eiPtr;
 
@@ -596,13 +597,27 @@ Ck_GetAllBindings(
 			goto endPat;
 		    }
 		    if (patPtr->eventType == CK_EV_KEYPRESS &&
-		        patPtr->detail > 0 && patPtr->detail < 0x20) {
+		        ((patPtr->detail >= 0 && patPtr->detail < 0x20) ||
+		         patPtr->detail == -2)) {
 			char *string;
 
 		        string = CkKeysymToString((KeySym) patPtr->detail, 0);
 		        if (string == NULL) {
-			    sprintf(buffer, "Control-%c",
-			        patPtr->detail + 0x40);
+			    if (patPtr->detail == -2)
+				strcpy(buffer, "Control-at");
+			    else if (patPtr->detail == 0x40 + '[')
+				strcpy(buffer, "Escape");
+			    else if (patPtr->detail == 0x40 + '\\')
+				strcpy(buffer, "Control-backslash");
+			    else if (patPtr->detail == 0x40 + ']')
+				strcpy(buffer, "Control-bracketright");
+			    else if (patPtr->detail == 0x40 + '^')
+				strcpy(buffer, "Control-asciicircum");
+			    else if (patPtr->detail == 0x40 + '_')
+				strcpy(buffer, "Control-underscore");
+			    else
+				sprintf(buffer, "Control-%c",
+					patPtr->detail + 0x40);
 			    string = buffer;
 			}
 			Tcl_DStringAppend(&ds, string, -1);
@@ -795,6 +810,14 @@ Ck_BindEvent(
 	if (hPtr != NULL) {
 	    matchPtr = MatchPatterns(bindPtr,
 		    (PatSeq *) Tcl_GetHashValue(hPtr));
+	}
+	if (ringPtr->type == CK_EV_KEYPRESS && detail == 0) {
+	    key.detail = -2;
+	    hPtr = Tcl_FindHashEntry(&bindPtr->patternTable, (char *) &key);
+	    if (hPtr != NULL) {
+		matchPtr = MatchPatterns(bindPtr,
+			(PatSeq *) Tcl_GetHashValue(hPtr));
+	    }
 	}
 	if (ringPtr->type == CK_EV_KEYPRESS && detail > 0 && detail < 0x20 &&
             matchPtr == NULL) {
@@ -1049,6 +1072,8 @@ badKeySym:
 		    patPtr->detail -= 0x20;
 		if (patPtr->detail < 0 || patPtr->detail >= 0x20)
 		    goto badKeySym;
+		if (patPtr->detail == 0x00)
+		    patPtr->detail = -2;
 	    }
 	    if (patPtr->eventType == -1) {
 		patPtr->eventType = CK_EV_KEYPRESS;
@@ -1245,10 +1270,13 @@ MatchPatterns(
 	     */
 
 	    if ((patPtr->detail != 0) && (patPtr->detail != -1)
+		    && (patPtr->detail != -2)
 		    && (patPtr->detail != *detailPtr))
 		goto nextSequence;
 
 	    if ((patPtr->detail == -1) && (*detailPtr >= 0x20))
+		goto nextSequence;
+	    if ((patPtr->detail == -2) && (*detailPtr != 0x00))
 		goto nextSequence;
 
 	    patPtr++;
@@ -1550,7 +1578,20 @@ CkKeysymToString(KeySym keySym, int printControl)
     }
     if (printControl && keySym >= 0x00 && keySym < 0x20) {
     	keySym += 0x40;
-	sprintf(buffer, "Control-%c", (int) keySym);
+	if (keySym == '@')
+	    strcpy(buffer, "Control-at");
+	else if (keySym == '[')
+	    strcpy(buffer, "Escape");
+	else if (keySym == '\\')
+	    strcpy(buffer, "Control-backslash");
+	else if (keySym == ']')
+	    strcpy(buffer, "Control-bracketright");
+	else if (keySym == '^')
+	    strcpy(buffer, "Control-asciicircum");
+	else if (keySym == '_')
+	    strcpy(buffer, "Control-underscore");
+	else
+	    sprintf(buffer, "Control-%c", (int) keySym);
 	return buffer;
     }
     return printControl ? "NoSymbol" : NULL;
@@ -1581,12 +1622,18 @@ CkTermHasKey(
     Tcl_HashEntry *hPtr;
     char *tiname, *tivalue;
 #endif
-    char buf[8];
+    char buf[16];
 
     if (strncmp("Control-", name, 8) == 0) {
-	if (sscanf(name, "Control-%7s", buf) != 1 || strlen(buf) != 1)
+	if (sscanf(name, "Control-%15s", buf) != 1)
 	    goto error;
-	if (buf[0] < 'A' && buf[0] > 'z')
+	if (strcmp(buf, "at") == 0 ||
+	    strcmp(buf, "backslash") == 0 ||
+	    strcmp(buf, "bracketright") == 0 ||
+	    strcmp(buf, "asciicircum") == 0 ||
+	    strcmp(buf, "underscore") == 0)
+	    ; /* acceptable */
+	else if (strlen(buf) != 1 || buf[0] < 'A' || buf[0] > 'z')
 	    goto error;
 	Tcl_SetResult(interp, "1", TCL_STATIC);
 	return TCL_OK;
