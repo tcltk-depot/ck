@@ -837,6 +837,8 @@ mouseEventNC:
 
 	request_mouse_pos();
 	for (i = 0; i < 3; i++) {
+	    if ((Mouse_status.changes & (1 << i)) == 0)
+		continue;
 	    if (Mouse_status.button[i] == BUTTON_PRESSED) {
 		event.mouse.type = CK_EV_MOUSE_DOWN;
 		goto mouseEvt;
@@ -844,6 +846,8 @@ mouseEventNC:
 		event.mouse.type = CK_EV_MOUSE_UP;
 mouseEvt:
 		event.mouse.button = i + 1;
+		event.mouse.rootx = Mouse_status.x;
+		event.mouse.rooty = Mouse_status.y;
 		event.mouse.x = Mouse_status.x;
 		event.mouse.y = Mouse_status.y;
 		event.mouse.winPtr = Ck_GetWindowXY(mainPtr, &event.mouse.x,
@@ -920,6 +924,12 @@ mouseEvent:
 #endif
 
 keyEvent:
+#ifdef _WIN32
+    if (code == 0x20 && (PDC_get_key_modifiers() & PDC_KEY_MODIFIER_CONTROL)) {
+	code = 0x00;	/* Control-at */
+	ucp = 0;
+    }
+#endif
     event.key.type = CK_EV_KEYPRESS;
     event.key.winPtr = mainPtr->focusPtr;
     event.key.keycode = code;
