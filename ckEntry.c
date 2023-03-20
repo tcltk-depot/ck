@@ -837,10 +837,15 @@ DisplayEntry(ClientData clientData)	/* Information about window. */
 
     leftIndex = Tcl_UtfAtIndex(displayString, entryPtr->leftIndex) -
 	displayString;
-    selectFirst = Tcl_UtfAtIndex(displayString, entryPtr->selectFirst) -
-	displayString;
-    selectLast = Tcl_UtfAtIndex(displayString, entryPtr->selectLast) -
-	displayString;
+
+    if (entryPtr->selectFirst >= 0) {
+	selectFirst = Tcl_UtfAtIndex(displayString, entryPtr->selectFirst) -
+		displayString;
+	selectLast = Tcl_UtfAtIndex(displayString, entryPtr->selectLast) -
+		displayString;
+    } else
+	selectFirst = selectLast = -1;
+
     insertPos = Tcl_UtfAtIndex(displayString, entryPtr->insertPos) -
 	displayString;
 
@@ -850,9 +855,10 @@ DisplayEntry(ClientData clientData)	/* Information about window. */
 	entryPtr->leftX, y, entryPtr->tabOrigin,
 	CK_NEWLINES_NOT_SPECIAL);
 
-    if (entryPtr->selectLast >= entryPtr->leftIndex) {
+    if (selectFirst >= 0 && entryPtr->selectLast >= entryPtr->leftIndex) {
 	if (entryPtr->selectFirst < entryPtr->leftIndex) {
 	    startX = 0;
+	    selectFirst = leftIndex;
 	} else {
 	    CkMeasureChars(winPtr->mainPtr,
 		displayString + leftIndex,
