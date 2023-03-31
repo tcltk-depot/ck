@@ -164,6 +164,6 @@ proc ck_messageBox args {
     # restore any grab that was in effect.
     tkwait variable ckPriv(button)
     catch {focus $oldFocus}
-    destroy $w
+    catch {destroy $w}
     return $ckPriv(button)
 }

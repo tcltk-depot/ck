@@ -56,7 +56,7 @@ proc ck_optionMenu {w varName firstValue args} {
         -border { ulcorner hline urcorner vline lrcorner hline llcorner vline }
     $w.menu add radiobutton -label $firstValue -variable $varName
     foreach i $args {
-    	$w.menu add radiobutton -label $i -variable $varName
+	$w.menu add radiobutton -label $i -variable $varName
     }
     return $w.menu
 }

@@ -477,10 +477,10 @@ proc ckEntryBooleanInput {w s} {
         return
     }
     if {$s ne $old} {
-    	$w delete 0 end
-    	$w insert 0 $s
+	$w delete 0 end
+	$w insert 0 $s
 	$w icursor 0
-    	ckEntryTouched $w
+	ckEntryTouched $w
     }
 }
 

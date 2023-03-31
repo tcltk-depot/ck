@@ -117,7 +117,7 @@ bind Entry <Control-y> {ckEntryPasteSel %W}
 
 proc ckEntryCutSel {w} {
     global ckPriv
-    
+
     catch {
 	if {[$w selection present]} {
 	    set ckPriv(entryInSel) ""
