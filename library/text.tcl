@@ -146,7 +146,7 @@ bind Text <FocusOut> {
 bind Text <Control-at> {
     set ckPriv(textInSel) %W
     %W tag remove sel 1.0 end
-    %W tag add sel insert 
+    %W tag add sel insert
     %W tag raise sel
 }
 bind Text <Control-w> {ckTextCutSel %W}
@@ -162,7 +162,7 @@ set ckPriv(prevPos) {}
 
 proc ckTextCutSel {w} {
     global ckPriv
-    
+
     catch {
 	if {[$w compare sel.first <= insert]
 	    && [$w compare sel.last >= insert]} {

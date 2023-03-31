@@ -30,7 +30,7 @@ proc ckCommand {{w .ckCommand}} {
     scrollbar $w.t.scroll -command [list $w.t.output yview] -takefocus 0
     text $w.t.output -yscrollcommand [list $w.t.scroll set]
     frame $w.sep1 -border hline -height 1
-    button $w.close -command "lower $w" -text Dismiss
+    button $w.close -command [list lower $w] -text Dismiss
 
     pack $w.close -side bottom -ipadx 1
     pack $w.sep1 -side bottom -fill x

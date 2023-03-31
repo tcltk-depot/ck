@@ -41,9 +41,9 @@ proc bgerror err {
     place $w -relx 0.5 -rely 0.5 -anchor center
     label $w.title -text "Stack Trace for Error"
     place $w.title -y 0 -relx 0.5 -anchor center -bordermode ignore
-    button $w.ok -text OK -command "destroy $w"
-    scrollbar $w.scroll -command "$w.text yview" -takefocus 0
-    text $w.text -yscrollcommand "$w.scroll set"
+    button $w.ok -text OK -command [list catch [list destroy $w]]
+    scrollbar $w.scroll -command [list $w.text yview] -takefocus 0
+    text $w.text -yscrollcommand [list $w.scroll set]
     frame $w.sep -border hline
     pack $w.ok -side bottom -ipadx 1
     pack $w.sep -side bottom -fill x

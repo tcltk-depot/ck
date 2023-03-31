@@ -210,24 +210,24 @@ proc ckFDialog_Create {w} {
     pack $w.sep1 -side bottom -fill x
     pack $data(list) -expand 1 -fill both -padx 1
     # Set up the event handlers
-    bind $data(ent) <Return> "ckFDialog_ActivateEnt $w"
-    bind $data(ent) <Linefeed> "ckFDialog_ActivateEnt $w"
-    $data(upBtn) config -command "ckFDialog_UpDirCmd $w"
-    $data(okBtn) config -command "ckFDialog_OkCmd $w"
-    $data(cancelBtn) config -command "ckFDialog_CancelCmd $w"
-    trace variable data(selectPath) w "ckFDialog_SetPath $w"
-    bind $w <Control-d> "focus $data(dirMenuBtn) ; break"
-    bind $w <Control-t> [format {
-	if {[%s cget -state] eq "normal"} {
-	    focus %s
+    bind $data(ent) <Return> [list ckFDialog_ActivateEnt $w]
+    bind $data(ent) <Linefeed> [list ckFDialog_ActivateEnt $w]
+    $data(upBtn) config -command [list ckFDialog_UpDirCmd $w]
+    $data(okBtn) config -command [list ckFDialog_OkCmd $w]
+    $data(cancelBtn) config -command [list ckFDialog_CancelCmd $w]
+    trace variable data(selectPath) w [list ckFDialog_SetPath $w]
+    bind $w <Control-d> [subst {focus $data(dirMenuBtn) ; break}]
+    bind $w <Control-t> [subst -nocommands {
+	if {[$data(typeMenuBtn) cget -state] eq "normal"} {
+	    focus $data(typeMenuBtn)
 	}
-    } $data(typeMenuBtn) $data(typeMenuBtn)]
-    bind $w <Control-n> "focus $data(ent) ; break"
-    bind $w <Escape> "ckButtonInvoke $data(cancelBtn)"
-    bind $w <Control-c> "ckButtonInvoke $data(cancelBtn) ; break"
-    bind $w <Control-o> "ckFDialog_InvokeBtn $w Open ; break"
-    bind $w <Control-s> "ckFDialog_InvokeBtn $w Save ; break"
-    bind $w <Control-u> "ckFDialog_UpDirCmd $w ; break"
+    }]
+    bind $w <Control-n> [subst {focus $data(ent) ; break}]
+    bind $w <Escape> [list ckButtonInvoke $data(cancelBtn)]
+    bind $w <Control-c> [subst {ckButtonInvoke $data(cancelBtn) ; break}]
+    bind $w <Control-o> [subst {ckFDialog_InvokeBtn $w Open ; break}]
+    bind $w <Control-s> [subst {ckFDialog_InvokeBtn $w Save ; break}]
+    bind $w <Control-u> [subst {ckFDialog_UpDirCmd $w ; break}]
 }
 
 # ckFDialog_UpdateWhenIdle --
@@ -339,7 +339,7 @@ proc ckFDialog_Update {w} {
 
 # ckFDialog_SetPathSilently --
 #
-# 	Sets data(selectPath) without invoking the trace procedure
+#	Sets data(selectPath) without invoking the trace procedure
 
 proc ckFDialog_SetPathSilently {w path} {
     upvar #0 [winfo name $w] data

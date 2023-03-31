@@ -46,8 +46,7 @@ proc ck_dialog {w title text args} {
     pack $w.b -side top -fill x
     set i 0
     foreach but $args {
-	button $w.b.b$i -text $but -command \
-	    "set ckPriv(button) $i ; destroy $w"
+	button $w.b.b$i -text $but -command [list ck_dialogCB $w $i]
 	pack $w.b.b$i -side left -ipadx 1 -expand 1
 	incr i
     }
@@ -55,4 +54,10 @@ proc ck_dialog {w title text args} {
     focus $w.b.b0
     tkwait window $w
     return $ckPriv(button)
+}
+
+proc ck_dialogCB {w i} {
+    global ckPriv
+    set ckPriv(button) $i
+    catch {destroy $w}
 }
