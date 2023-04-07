@@ -8,8 +8,6 @@
 # out for themselves.
 #
 # The information in this file is specific to a single platform.
-#
-# $Id: ckConfig.sh.in,v 1.2 1999/12/12 09:22:09 chw Exp chw $
 
 # Ck's version number.
 CK_VERSION='@CK_VERSION@'
