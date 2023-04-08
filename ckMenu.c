@@ -1850,7 +1850,7 @@ MenuVarProc(
 
     if (flags & TCL_TRACE_UNSETS) {
 	mePtr->flags &= ~ENTRY_SELECTED;
-	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
+	if ((flags & TCL_TRACE_DESTROYED) && !Tcl_InterpDeleted(interp)) {
 	    Tcl_TraceVar(interp, mePtr->name,
 		    TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
 		    MenuVarProc, clientData);
