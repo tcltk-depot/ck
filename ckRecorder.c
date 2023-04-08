@@ -255,7 +255,7 @@ RecorderReplay(ClientData clientData)
 	while (*p == ' ' || *p == '\t')
 	    ++p;
 	if (*p == '#') {
-	    Tcl_DStringTrunc(&input, 0);
+	    Tcl_DStringSetLength(&input, 0);
 	    continue;
 	}
 	if (*p == '<') {
@@ -352,7 +352,7 @@ doMouse:
 	    getsResult = TCL_ERROR;
 	    break;
 	}
-	Tcl_DStringTrunc(&input, 0);
+	Tcl_DStringSetLength(&input, 0);
     }
     if (getsResult != TCL_OK) {
 	Tcl_Close(NULL, recPtr->replay);

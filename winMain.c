@@ -8,8 +8,6 @@
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
- *
- * RCS: @(#) $Id: winMain.c,v 1.1 1999/12/12 09:29:03 chw Exp chw $
  */
 
 #include "ck.h"

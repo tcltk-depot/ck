@@ -544,7 +544,7 @@ Ck_GetAllBindings(
     Tcl_DStringInit(&ds);
     for (psPtr = (PatSeq *) Tcl_GetHashValue(hPtr); psPtr != NULL;
 	    psPtr = psPtr->nextObjPtr) {
-	Tcl_DStringTrunc(&ds, 0);
+	Tcl_DStringSetLength(&ds, 0);
 
 	/*
 	 * For each binding, output information about each of the
