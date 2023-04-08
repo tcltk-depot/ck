@@ -808,7 +808,7 @@ MenuButtonTextVarProc(
      */
 
     if (flags & TCL_TRACE_UNSETS) {
-	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
+	if ((flags & TCL_TRACE_DESTROYED) && !Tcl_InterpDeleted(interp)) {
 	    Tcl_SetVar(interp, mbPtr->textVarName, mbPtr->text,
 		    TCL_GLOBAL_ONLY);
 	    Tcl_TraceVar(interp, mbPtr->textVarName,

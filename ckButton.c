@@ -1090,7 +1090,7 @@ ButtonVarProc(
 
     if (flags & TCL_TRACE_UNSETS) {
 	butPtr->flags &= ~SELECTED;
-	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
+	if ((flags & TCL_TRACE_DESTROYED) && !Tcl_InterpDeleted(interp)) {
 	    Tcl_TraceVar2(interp, name1, name2,
 		    TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
 		    ButtonVarProc, clientData);
@@ -1159,7 +1159,7 @@ ButtonTextVarProc(
      */
 
     if (flags & TCL_TRACE_UNSETS) {
-	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
+	if ((flags & TCL_TRACE_DESTROYED) && !Tcl_InterpDeleted(interp)) {
 	    Tcl_SetVar2(interp, name1, name2,
 		    (butPtr->text != NULL) ? butPtr->text : "",
 		    flags & TCL_GLOBAL_ONLY);

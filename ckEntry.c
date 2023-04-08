@@ -1818,7 +1818,7 @@ EntryTextVarProc(
      */
 
     if (flags & TCL_TRACE_UNSETS) {
-	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
+	if ((flags & TCL_TRACE_DESTROYED) && !Tcl_InterpDeleted(interp)) {
 	    Tcl_SetVar(interp, entryPtr->textVarName, entryPtr->string,
 		    TCL_GLOBAL_ONLY);
 	    Tcl_TraceVar(interp, entryPtr->textVarName,
