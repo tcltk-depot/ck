@@ -13,15 +13,20 @@ proc showglob args {
     if {[llength $args] == 0} {
 	set args *
     }
+    array set glob {}
     foreach i $args {
-	foreach k [info globals $i] {
+	set sub global
+	if {[string match *::* $i]} {
+	    set sub vars
+	}
+	foreach k [info $sub $i] {
 	    set glob($k) {}
 	}
     }
-    foreach i [lsort -ascii [array names glob]] {
+    foreach i [lsort -dictionary [array names glob]] {
 	upvar #0 $i var
 	if {[array exists var]} {
-	    foreach k [lsort -ascii [array names var]] {
+	    foreach k [lsort -dictionary [array names var]] {
 		lappend result [list set [list $i]($k) $var($k)]
 	    }
 	} else {
