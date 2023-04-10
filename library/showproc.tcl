@@ -18,7 +18,7 @@ proc showproc args {
 	    set procs($k) {}
 	}
     }
-    foreach i [lsort -ascii [array names procs]] {
+    foreach i [lsort -dictionary [array names procs]] {
 	set proc proc
 	lappend proc $i
 	set args {}

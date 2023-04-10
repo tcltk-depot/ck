@@ -87,6 +87,9 @@ proc ckCmdHist {w dir} {
 
 proc ckCommandRunInt {w cmd} {
     global errorInfo ckPriv
+    $w.t.output delete 1.0 end
+    $w.t.output insert 1.0 ...
+    update idletasks
     set code [catch {uplevel #0 $cmd} result]
     if {$code == 0} {
         set ckPriv(cmdHistory) [lrange [concat [list $cmd] \
