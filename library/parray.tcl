@@ -7,12 +7,11 @@
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
 
 proc parray {a {pattern *}} {
     upvar 1 $a array
     if {![array exists array]} {
-	error "\"$a\" isn't an array"
+	return -code error "\"$a\" isn't an array"
     }
     set maxl 0
     foreach name [lsort [array names array $pattern]] {
@@ -22,7 +21,7 @@ proc parray {a {pattern *}} {
     }
     set result ""
     set maxl [expr {$maxl + [string length $a] + 2}]
-    foreach name [lsort [array names array $pattern]] {
+    foreach name [lsort -dictionary [array names array $pattern]] {
 	set nameString [format %s(%s) $a $name]
 	append result \
 	    [format "set %-*s %s\n" $maxl $nameString [list $array($name)]]
