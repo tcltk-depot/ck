@@ -2132,12 +2132,15 @@ TreeUpdateVScrollbar(Tree *treePtr)	/* Information about widget. */
 	if (last > 1.0)
 	    last = 1.0;
     }
+    Tcl_Preserve(treePtr->interp);
     sprintf(string, " %g %g", first, last);
     result = Tcl_VarEval(treePtr->interp, treePtr->yScrollCmd, string,
 	    (char *) NULL);
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(treePtr->interp,
 		"\n    (vertical scrolling command executed by tree)");
-	Tcl_BackgroundError(treePtr->interp);
+	Tcl_BackgroundException(treePtr->interp, result);
     }
+    Tcl_ResetResult(treePtr->interp);
+    Tcl_Release(treePtr->interp);
 }

@@ -1090,7 +1090,7 @@ ConfigureMenuEntry(
     if (menuPtr->postedCascade == mePtr) {
 	if (PostSubmenu(menuPtr->interp, menuPtr, (MenuEntry *) NULL)
 		!= TCL_OK) {
-	    Tcl_BackgroundError(menuPtr->interp);
+	    Tcl_BackgroundException(menuPtr->interp, TCL_ERROR);
 	}
     }
 

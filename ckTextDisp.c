@@ -2690,7 +2690,7 @@ GetXView(
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(interp,
 		"\n    (horizontal scrolling command executed by text)");
-	Tcl_BackgroundError(interp);
+	Tcl_BackgroundException(interp, code);
     }
 }
 
@@ -2775,7 +2775,7 @@ GetYView(
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(interp,
 		"\n    (vertical scrolling command executed by text)");
-	Tcl_BackgroundError(interp);
+	Tcl_BackgroundException(interp, code);
     }
 }
 
