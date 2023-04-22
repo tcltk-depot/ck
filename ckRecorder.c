@@ -249,6 +249,7 @@ RecorderReplay(ClientData clientData)
     if (recPtr->replay == NULL)
 	return;
 
+    Tcl_Preserve(recPtr->interp);
     Tcl_DStringInit(&input);
     while ((getsResult = DStringGets(recPtr->replay, &input)) == TCL_OK) {
 	p = Tcl_DStringValue(&input);
@@ -265,7 +266,7 @@ RecorderReplay(ClientData clientData)
 	    char **argv;
 
 	    if (Tcl_SplitList(recPtr->interp, p, &argc, &argv) != TCL_OK) {
-		Tcl_BackgroundError(recPtr->interp);
+		Tcl_BackgroundException(recPtr->interp, TCL_ERROR);
 		getsResult = TCL_ERROR;
 		break;
 	    }
@@ -339,7 +340,7 @@ doMouse:
 	    }
 	    ckfree((char *) argv);
 	    if (cmdError != TCL_OK) {
-		Tcl_BackgroundError(recPtr->interp);
+		Tcl_BackgroundException(recPtr->interp, cmdError);
 		getsResult = cmdError;
 	    } else if (deliver) {
 		doidle = delayValue = 0;
@@ -347,10 +348,14 @@ doMouse:
 		Tcl_DoWhenIdle(DeliverEvent, (ClientData) recPtr);
 	    }
 	    break;
-	} else if (Tcl_GlobalEval(recPtr->interp, p) != TCL_OK) {
-	    Tcl_BackgroundError(recPtr->interp);
-	    getsResult = TCL_ERROR;
-	    break;
+	} else {
+	    int cmdError = Tcl_GlobalEval(recPtr->interp, p);
+
+	    if (cmdError != TCL_OK) {
+		Tcl_BackgroundException(recPtr->interp, cmdError);
+		getsResult = TCL_ERROR;
+		break;
+	    }
 	}
 	Tcl_DStringSetLength(&input, 0);
     }
@@ -365,6 +370,7 @@ doMouse:
 	Tcl_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
     }
     Tcl_DStringFree(&input);
+    Tcl_Release(recPtr->interp);
 }
 
 /*

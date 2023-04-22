@@ -1638,14 +1638,17 @@ ListboxUpdateVScrollbar(
 	    last = 1.0;
 	}
     }
+    Tcl_Preserve(listPtr->interp);
     sprintf(string, " %g %g", first, last);
     result = Tcl_VarEval(listPtr->interp, listPtr->yScrollCmd, string,
 	    (char *) NULL);
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(listPtr->interp,
 		"\n    (vertical scrolling command executed by listbox)");
-	Tcl_BackgroundError(listPtr->interp);
+	Tcl_BackgroundException(listPtr->interp, result);
     }
+    Tcl_ResetResult(listPtr->interp);
+    Tcl_Release(listPtr->interp);
 }
 
 /*
@@ -1691,12 +1694,15 @@ ListboxUpdateHScrollbar(
 	    last = 1.0;
 	}
     }
+    Tcl_Preserve(listPtr->interp);
     sprintf(string, " %g %g", first, last);
     result = Tcl_VarEval(listPtr->interp, listPtr->xScrollCmd, string,
 	    (char *) NULL);
     if (result != TCL_OK) {
 	Tcl_AddErrorInfo(listPtr->interp,
 		"\n    (horizontal scrolling command executed by listbox)");
-	Tcl_BackgroundError(listPtr->interp);
+	Tcl_BackgroundException(listPtr->interp, result);
     }
+    Tcl_ResetResult(listPtr->interp);
+    Tcl_Release(listPtr->interp);
 }

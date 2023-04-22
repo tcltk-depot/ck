@@ -1563,6 +1563,7 @@ EntryUpdateScrollbar(Entry *entryPtr)		/* Information about widget. */
 	return;
     }
 
+    Tcl_Preserve(entryPtr->interp);
     EntryVisibleRange(entryPtr, &first, &last);
     sprintf(args, " %g %g", first, last);
     code = Tcl_VarEval(entryPtr->interp, entryPtr->scrollCmd, args,
@@ -1570,9 +1571,10 @@ EntryUpdateScrollbar(Entry *entryPtr)		/* Information about widget. */
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(entryPtr->interp,
 		"\n    (horizontal scrolling command executed by entry)");
-	Tcl_BackgroundError(entryPtr->interp);
+	Tcl_BackgroundException(entryPtr->interp, code);
     }
-    Tcl_SetResult(entryPtr->interp, (char *) NULL, TCL_STATIC);
+    Tcl_ResetResult(entryPtr->interp);
+    Tcl_Release(entryPtr->interp);
 }
 
 /*

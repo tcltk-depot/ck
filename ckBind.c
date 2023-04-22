@@ -872,6 +872,7 @@ Ck_BindEvent(
     Tcl_DStringGetResult(interp, &savedResult);
     p = Tcl_DStringValue(&scripts);
     end = p + Tcl_DStringLength(&scripts);
+    Tcl_Preserve(interp);
     while (p != end) {
 	Tcl_AllowExceptions(interp);
 	code = Tcl_GlobalEval(interp, p);
@@ -884,7 +885,7 @@ Ck_BindEvent(
 		break;
 	    } else {
 		Tcl_AddErrorInfo(interp, "\n    (command bound to event)");
-		Tcl_BackgroundError(interp);
+		Tcl_BackgroundException(interp, code);
 		break;
 	    }
 	}
@@ -900,6 +901,7 @@ Ck_BindEvent(
     }
     Tcl_DStringResult(interp, &savedResult);
     Tcl_DStringFree(&scripts);
+    Tcl_Release(interp);
 }
 
 /*
