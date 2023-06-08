@@ -215,7 +215,7 @@ proc ckFDialog_Create {w} {
     $data(upBtn) config -command [list ckFDialog_UpDirCmd $w]
     $data(okBtn) config -command [list ckFDialog_OkCmd $w]
     $data(cancelBtn) config -command [list ckFDialog_CancelCmd $w]
-    trace variable data(selectPath) w [list ckFDialog_SetPath $w]
+    trace add variable data(selectPath) write [list ckFDialog_SetPath $w]
     bind $w <Control-d> [subst {focus $data(dirMenuBtn) ; break}]
     bind $w <Control-t> [subst -nocommands {
 	if {[$data(typeMenuBtn) cget -state] eq "normal"} {
@@ -343,9 +343,9 @@ proc ckFDialog_Update {w} {
 
 proc ckFDialog_SetPathSilently {w path} {
     upvar #0 [winfo name $w] data
-    trace vdelete  data(selectPath) w "ckFDialog_SetPath $w"
+    trace remove variable data(selectPath) write [list ckFDialog_SetPath $w]
     set data(selectPath) $path
-    trace variable data(selectPath) w "ckFDialog_SetPath $w"
+    trace add variable data(selectPath) write [list ckFDialog_SetPath $w]
 }
 
 # This proc gets called whenever data(selectPath) is set
