@@ -187,9 +187,9 @@ proc ckEntryInsert {w s} {
     global ckPriv
 
     if {$s eq ""} return
+    set insert [$w index insert]
     catch {
-	set insert [$w index insert]
-	if {([$w index sel.first] <= $insert)
+	if {[$w selection present] && ([$w index sel.first] <= $insert)
 		&& ([$w index sel.last] >= $insert)} {
 	    set ckPriv(entryInSel) ""
 	    $w delete sel.first sel.last
