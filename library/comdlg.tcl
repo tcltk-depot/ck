@@ -136,7 +136,7 @@ proc ckFDGetFileTypes {string} {
 	set name "$label ("
 	set sep ""
 	foreach ext $fileTypes($label) {
-	    if {$ext ne ""} {
+	    if {$ext eq ""} {
 		continue
 	    }
 	    regsub {^[.]} $ext "*." ext
