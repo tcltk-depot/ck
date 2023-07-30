@@ -134,6 +134,9 @@ proc ckListboxUpDown {w amount} {
 
 proc ckListboxCancel w {
     global ckPriv
+    if {![winfo exists $w]} {
+	return
+    }
     if {[$w cget -selectmode] ne "extended"} {
 	return
     }

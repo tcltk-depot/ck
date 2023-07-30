@@ -938,6 +938,10 @@ DisplayListbox(ClientData clientData)	/* Information about window. */
 	    CkDisplayChars(winPtr->mainPtr, winPtr->window, p,
 		strlen(p), 0, y, 0,
 		CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS | CK_FILL_UNTIL_EOL);
+	} else {
+	    CkDisplayChars(winPtr->mainPtr, winPtr->window, "",
+		0, 0, y, 0,
+		CK_NEWLINES_NOT_SPECIAL | CK_IGNORE_TABS | CK_FILL_UNTIL_EOL);
 	}
 	y++;
     }

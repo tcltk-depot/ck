@@ -681,7 +681,7 @@ Ck_WinfoCmd(
 	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
-		"\": must be children, class, containing, depth ",
+		"\": must be children, class, containing, depth, ",
 		"exists, geometry, height, ",
 		"ismapped, manager, name, parent, ",
 		"reqheight, reqwidth, rootx, rooty, ",
