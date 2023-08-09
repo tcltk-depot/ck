@@ -62,6 +62,18 @@ bind Listbox <Button-1> {
     focus %W
     ckListboxBeginSelect %W [%W index @0,%y]
 }
+bind Listbox <Control-P> {
+    ckListboxUpDown %W -1
+}
+bind Listbox <Control-N> {
+    ckListboxUpDown %W 1
+}
+bind Listbox <Control-A> {
+    %W xview moveto 0
+}
+bind Listbox <Control-E> {
+    %W xview moveto 1
+}
 
 # ckListboxBeginSelect --
 #
