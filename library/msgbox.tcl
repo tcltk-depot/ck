@@ -3,7 +3,7 @@
 #	Implements messageboxes.
 #
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
-# Copyright (c) 1999 Christian Werner
+# Copyright (c) 1999-2023 Christian Werner
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -15,9 +15,9 @@
 #	an icon and a list of buttons.
 #	See the user documentation for details on what ck_messageBox does.
 
-option add *Dialog.border \
-    {ulcorner hline urcorner vline lrcorner hline llcorner vline} \
-    widgetDefault
+option add *Dialog.border {
+    ulcorner hline urcorner vline lrcorner hline llcorner vline
+} widgetDefault
 option add *Dialog*Message.aspect 1000 widgetDefault
 
 proc ck_messageBox args {
@@ -26,18 +26,21 @@ proc ck_messageBox args {
     upvar #0 $w data
     set specs {
 	{-default "" "" ""}
-        {-icon "" "" "info"}
-        {-message "" "" ""}
-        {-parent "" "" .}
-        {-title "" "" ""}
-        {-type "" "" "ok"}
+	{-delay "" "" ""}
+	{-icon "" "" "info"}
+	{-message "" "" ""}
+	{-parent "" "" .}
+	{-title "" "" ""}
+	{-type "" "" "ok"}
     }
     tclParseConfigSpec $w $specs "" $args
     if {[lsearch {info warning error question} $data(-icon)] == -1} {
-	error "invalid icon \"$data(-icon)\", must be error, info, question or warning"
+	return -code error \
+	    "invalid icon \"$data(-icon)\", must be error, info, question or warning"
     }
     if {![winfo exists $data(-parent)]} {
-	error "bad window path name \"$data(-parent)\""
+	return -code error \
+	    "bad window path name \"$data(-parent)\""
     }
     switch -- $data(-type) {
 	abortretryignore {
@@ -81,7 +84,8 @@ proc ck_messageBox args {
 	    }
 	}
 	default {
-	    error "invalid message box type \"$data(-type)\", must be abortretryignore, ok, okcancel, retrycancel, yesno or yesnocancel"
+	    return -code error \
+		"invalid message box type \"$data(-type)\", must be abortretryignore, none, ok, okcancel, retrycancel, yesno or yesnocancel"
 	}
     }
     if {$data(-default) ne ""} {
@@ -93,7 +97,8 @@ proc ck_messageBox args {
 	    }
 	}
 	if {!$valid} {
-	    error "invalid default button \"$data(-default)\""
+	    return -code error \
+		"invalid default button \"$data(-default)\""
 	}
     }
     # 2. Set the dialog to be a child window of $parent
@@ -146,8 +151,15 @@ proc ck_messageBox args {
     # 6. Create a binding for <Return> on the dialog if there is a
     # default button.
     if {$data(-default) ne ""} {
-	bind $w <Return> "ckButtonInvoke $w.bot.$data(-default) ; break"
-	bind $w <Linefeed> "ckButtonInvoke $w.bot.$data(-default) ; break"
+	bind $w <Return> \
+	    [subst {ckButtonInvoke $w.bot.$data(-default) ; break}]
+	bind $w <Linefeed> \
+	    [subst {ckButtonInvoke $w.bot.$data(-default) ; break}]
+	if {([scan $data(-delay) %d ms] == 1) && ($ms > 0)} {
+	    set cmd [list ckButtonInvoke $w.bot.$data(-default)]
+	    after $ms $cmd
+	    set cancel [list after cancel $cmd]
+	}
     }
     # 7. Claim the focus.
     set oldFocus [focus]
@@ -163,6 +175,9 @@ proc ck_messageBox args {
     # may take the focus away so we can't redirect it.  Finally,
     # restore any grab that was in effect.
     tkwait variable ckPriv(button)
+    if {[info exists cancel]} {
+	{*}$cancel
+    }
     catch {focus $oldFocus}
     catch {destroy $w}
     return $ckPriv(button)

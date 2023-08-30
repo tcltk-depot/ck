@@ -5,10 +5,15 @@
 #
 # Copyright (c) 1992-1993 The Regents of the University of California.
 # Copyright (c) 1994-1995 Sun Microsystems, Inc.
+# Copyright (c) 1997-2023 Christian Werner
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
+
+option add *Dialog.border {
+    ulcorner hline urcorner vline lrcorner hline llcorner vline
+} widgetDefault
 
 #
 # ck_dialog:
@@ -29,21 +34,34 @@ proc ck_dialog {w title text args} {
 	return -1
     }
     catch {destroy $w}
-    toplevel $w -class Dialog \
-	-border {ulcorner hline urcorner vline lrcorner hline llcorner vline}
+    toplevel $w -class Dialog
     place $w -relx 0.5 -rely 0.5 -anchor center
+    set border [expr {[$w cget -border] ne {}}]
     if {[string length $title] > 0} {
 	label $w.title -text $title
-	pack $w.title -side top -fill x
-	frame $w.sep0 -border hline -height 1
-	pack $w.sep0 -side top -fill x
+	if {$border} {
+	    pack $w.title -side top -fill x
+	    frame $w.sep0 -border hline -height 1
+	    pack $w.sep0 -side top -fill x
+	} else {
+	    pack $w.title -side top -fill x -pady 1
+	}
     }
     message $w.msg -text $text
-    pack $w.msg -side top
-    frame $w.sep1 -border hline -height 1
-    pack $w.sep1 -side top -fill x
-    frame $w.b
-    pack $w.b -side top -fill x
+    if {$border} {
+	pack $w.msg -side top -padx 1
+	frame $w.sep1 -border hline -height 1
+	pack $w.sep1 -side top -fill x
+	frame $w.b
+	pack $w.b -side top -fill x
+    } else {
+	pack $w.msg -side top -padx 2
+	frame $w.b
+	pack $w.b -side top -fill x -pady 1
+    }
+    if {[llength $args] == 0} {
+	set args OK
+    }
     set i 0
     foreach but $args {
 	button $w.b.b$i -text $but -command [list ck_dialogCB $w $i]

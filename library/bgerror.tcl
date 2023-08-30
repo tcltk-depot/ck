@@ -12,8 +12,14 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
 if {[winfo depth .] > 1} {
-    option add *ckerrorDialog*background red
-    option add *ErrorTrace*background red
+    option add *ckerrorDialog.border {
+	ulcorner hline urcorner vline lrcorner hline llcorner vline
+    } widgetDefault
+    option add *ErrorTrace.border {
+	ulcorner hline urcorner vline lrcorner hline llcorner vline
+    } widgetDefault
+    option add *ckerrorDialog*background red interactive
+    option add *ErrorTrace*background red interactive
 }
 
 # bgerror --
@@ -36,15 +42,27 @@ proc bgerror err {
     }
     set w .ckerrorTrace
     catch {destroy $w}
-    toplevel $w -class ErrorTrace \
-        -border { ulcorner hline urcorner vline lrcorner hline llcorner vline }
+    toplevel $w -class ErrorTrace
     place $w -relx 0.5 -rely 0.5 -anchor center
-    label $w.title -text "Stack Trace for Error"
-    place $w.title -y 0 -relx 0.5 -anchor center -bordermode ignore
+    set border [expr {[$w cget -border] ne {}}]
+    if {$border} {
+	label $w.title -text "Stack Trace for Error"
+	place $w.title -y 0 -relx 0.5 -anchor center -bordermode ignore
+    } else {
+	$w configure -border {{ }}
+	label $w.title -text "Stack Trace for Error"
+	pack $w.title -side top -fill x
+        frame $w.sep0 -height 1
+	pack $w.sep0 -side top -fill x
+    }
     button $w.ok -text OK -command [list catch [list destroy $w]]
     scrollbar $w.scroll -command [list $w.text yview] -takefocus 0
     text $w.text -yscrollcommand [list $w.scroll set]
-    frame $w.sep -border hline
+    if {$border} {
+	frame $w.sep -border hline
+    } else {
+	frame $w.sep -border {{ }}
+    }
     pack $w.ok -side bottom -ipadx 1
     pack $w.sep -side bottom -fill x
     pack $w.scroll -side right -fill y

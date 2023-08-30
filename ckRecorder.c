@@ -96,9 +96,12 @@ RecorderInput(
 	case CK_EV_KEYPRESS:
 	    argv[2] = NULL;
 	    keySym = CkKeysymToString(eventPtr->key.keycode, 1);
-	    if (strcmp(keySym, "NoSymbol") != 0)
+	    if (eventPtr->key.is_uch || eventPtr->key.keycode == 0) {
+		sprintf(buffer, "\\U%06x", eventPtr->key.uch);
+		argv[2] = buffer;
+	    } else if (strcmp(keySym, "NoSymbol") != 0) {
 		argv[2] = keySym;
-	    else if (eventPtr->key.keycode > 0 &&
+	    } else if (eventPtr->key.keycode > 0 &&
 		eventPtr->key.keycode < 256) {
 		/* Unsafe, ie not portable */
 		sprintf(buffer, "0x%2x", eventPtr->key.keycode);
@@ -270,6 +273,7 @@ RecorderReplay(ClientData clientData)
 		getsResult = TCL_ERROR;
 		break;
 	    }
+	    memset(&event, 0, sizeof(event));
 	    if (strcmp(argv[0], "<Delay>") == 0) {
 		if (argc != 2) {
 badNumArgs:
@@ -285,16 +289,22 @@ badNumArgs:
 		if (argc != 3)
 		    goto badNumArgs;
 		event.any.type = CK_EV_KEYPRESS;
-		if (argv[1][0] == '\0')
+		if (argv[1][0] == '\0') {
 		    event.any.winPtr = NULL;
-		else if ((event.any.winPtr = Ck_NameToWindow(recPtr->interp,
-		    argv[1], recPtr->mainPtr)) == NULL)
+		} else if ((event.any.winPtr = Ck_NameToWindow(recPtr->interp,
+		    argv[1], recPtr->mainPtr)) == NULL) {
 		    cmdError = TCL_ERROR;
-		else if (strncmp(argv[2], "Control-", 8) == 0 &&
+		} else if (strncmp(argv[2], "Control-", 8) == 0 &&
 		    strlen(argv[2]) == 9) {
 		    event.key.keycode = argv[2][8] - 0x40;
 		    if (event.key.keycode > 0x20)
 			event.key.keycode -= 0x20;
+		    deliver++;
+		} else if (strncmp(argv[2], "\\U", 2) == 0 &&
+		    strlen(argv[2]) == 8) {
+		    sscanf(&argv[2][2], "%x", &event.key.uch);
+		    if (event.key.uch != 0)
+			event.key.is_uch = 1;
 		    deliver++;
 		} else if (strncmp(argv[2], "0x", 2) == 0 &&
 		    strlen(argv[2]) == 4) {
