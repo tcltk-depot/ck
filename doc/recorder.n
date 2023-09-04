@@ -46,7 +46,7 @@ Delay replay for \fImilliseconds\fR.
 \fB<Key> \fIwindow keysym\fR
 Key pressed in \fIwindow\fR. \fIKeysym\fR is the symbolic name of the
 key, e.g. ``Linefeed'', ``Return'', ``Control-A'', or a hexadecimal
-key code like 0xc3.
+key code like 0xc3, or a Unicode char like \\U123456.
 Note that hexadecimal key codes greater than 0x7f are not portable
 accross different systems.
 .PP
