@@ -36,12 +36,10 @@ bind Listbox <Right> {
     %W xview scroll 1 units
 }
 bind Listbox <Prior> {
-    %W yview scroll -1 pages
-    %W activate @0,0
+    ckListboxPage %W -1
 }
 bind Listbox <Next> {
-    %W yview scroll 1 pages
-    %W activate @0,0
+    ckListboxPage %W 1
 }
 bind Listbox <Home> {
     %W xview moveto 0
@@ -118,6 +116,35 @@ proc ckListboxBeginSelect {w el} {
 proc ckListboxUpDown {w amount} {
     global ckPriv
     $w activate [expr {[$w index active] + $amount}]
+    $w see active
+    switch -- [$w cget -selectmode] {
+	browse {
+	    $w selection clear 0 end
+	    $w selection set active
+	}
+	extended {
+	    $w selection clear 0 end
+	    $w selection set active
+	    $w selection anchor active
+	    set ckPriv(listboxPrev) [$w index active]
+	    set ckPriv(listboxSelection) {}
+	}
+    }
+}
+
+# ckListboxPage --
+#
+# Moves the location cursor (active element) up or down by one page,
+# and changes the selection if we're in browse or extended selection
+# mode.
+#
+# Arguments:
+# w -		The listbox widget.
+# amount -	+1 to move down one page, -1 to move up one page.
+
+proc ckListboxPage {w amount} {
+    $w yview scroll $amount pages
+    $w activate @0,0
     $w see active
     switch -- [$w cget -selectmode] {
 	browse {
