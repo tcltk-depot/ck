@@ -681,7 +681,7 @@ CkMeasureChars(
 	    int len = wcwidth((wint_t) uch);
 #endif
 
-	    if (len < 0) {
+	    if (len < 0 || (unsigned int) uch < 0x20) {
 		newX += MakeUCRepl(uch, NULL);
 	    } else {
 		newX += len;
