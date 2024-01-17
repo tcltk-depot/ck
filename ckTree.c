@@ -1636,7 +1636,7 @@ TreeTagsPrintProc(
 	*freeProcPtr = (Tcl_FreeProc *) NULL;
 	return (char *) nodePtr->tagPtr[0];
     }
-    *freeProcPtr = (Tcl_FreeProc *) free;
+    *freeProcPtr = TCL_DYNAMIC;
     return Tcl_Merge(nodePtr->numTags, (char **) nodePtr->tagPtr);
 }
 

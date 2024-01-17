@@ -398,6 +398,12 @@ HandleWinch(int sig)
  *----------------------------------------------------------------------
  */
 
+static void
+CleanupRedirInfo(ClientData clientData)
+{
+    ckfree((char *) clientData);
+}
+
 CkWindow *
 Ck_CreateMainWindow(
     Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
@@ -706,7 +712,7 @@ Ck_CreateMainWindow(
 	Tcl_GlobalEval(interp, Tcl_DStringValue(&cmd));
 	Tcl_DStringFree(&cmd);
 	Tcl_CreateCommand(interp, cmdPtr->name, cmdPtr->cmdProc,
-	    (ClientData) redirInfo, (Tcl_CmdDeleteProc *) free);
+	    (ClientData) redirInfo, CleanupRedirInfo);
     }
 
     /*

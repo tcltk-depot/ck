@@ -608,7 +608,7 @@ Ck_ConfigureValue(
     p = FormatConfigValue(interp, winPtr, specPtr, widgRec, buffer, &freeProc);
     if (p == buffer) {
 	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
-    } else if (freeProc == (Tcl_FreeProc *) free) {
+    } else if (freeProc == TCL_DYNAMIC) {
 	Tcl_SetResult(interp, p, TCL_DYNAMIC);
     } else {
 	Tcl_SetResult(interp, p, freeProc);
@@ -671,7 +671,7 @@ FormatConfigInfo(
     }
     result = Tcl_Merge(5, argv);
     if (freeProc != NULL) {
-	if (freeProc == (Tcl_FreeProc *) free) {
+	if (freeProc == TCL_DYNAMIC) {
 	    ckfree(argv[4]);
 	} else {
 	    (*freeProc)(argv[4]);
@@ -769,7 +769,7 @@ FormatConfigValue(
 	    break;
 	case CK_CONFIG_ATTR:
 	    result = Ck_NameOfAttr(*(int *) ptr);
-            *freeProcPtr = (Tcl_FreeProc *) free;
+            *freeProcPtr = TCL_DYNAMIC;
 	    break;
 	case CK_CONFIG_WINDOW: {
 	    CkWindow *winPtr2;
