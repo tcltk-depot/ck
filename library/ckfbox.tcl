@@ -3,17 +3,17 @@
 #	Implements the "CK" standard file selection dialog box.
 #
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
-# Copyright (c) 1999-2000 Christian Werner
+# Copyright (c) 1999-2024 Christian Werner
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
 proc ck_getOpenFile args {
-    eval ckFDialog open $args
+    tailcall ckFDialog open {*}$args
 }
 
 proc ck_getSaveFile args {
-    eval ckFDialog save $args
+    tailcall ckFDialog save {*}$args
 }
 
 # ckFDialog --
@@ -21,20 +21,21 @@ proc ck_getSaveFile args {
 #	Implements the file selection dialog.
 
 proc ckFDialog {type args} {
-    global ckPriv
     set w __ck_filedialog
     upvar #0 $w data
     ckFDialog_Config $w $type $args
     if {$data(-parent) eq "."} {
-        set w .$w
+	set w .$w
     } else {
-        set w $data(-parent).$w
+	set w $data(-parent).$w
     }
     # (re)create the dialog box if necessary
     if {![winfo exists $w]} {
 	ckFDialog_Create $w
     } elseif {[winfo class $w] ne "CkFDialog"} {
 	destroy $w
+	set cmd [list ckFDialog_Update $w]
+	after cancel $cmd
 	ckFDialog_Create $w
     } else {
 	set data(dirMenuBtn) $w.f1.menu
@@ -65,6 +66,7 @@ proc ckFDialog {type args} {
 	$data(typeMenuBtn) config -state disabled -takefocus 0
 	$data(typeMenuLab) config -state disabled
     }
+    unset -nocomplain data(updateId)
     ckFDialog_UpdateWhenIdle $w
     place forget $w
     place $w -relx 0.5 -rely 0.5 -anchor center
@@ -76,10 +78,10 @@ proc ckFDialog {type args} {
     $data(ent) select from 0
     $data(ent) select to end
     $data(ent) icursor end
-    tkwait variable ckPriv(selectFilePath)
+    tkwait variable ::ckPriv(selectFilePath)
     catch {focus $oldFocus}
     destroy $w
-    return $ckPriv(selectFilePath)
+    return $::ckPriv(selectFilePath)
 }
 
 # ckFDialog_Config --
@@ -238,11 +240,14 @@ proc ckFDialog_Create {w} {
 #	due to multiple concurrent events.
 
 proc ckFDialog_UpdateWhenIdle {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {[info exists data(updateId)]} {
 	return
     } else {
-	set data(updateId) [after idle ckFDialog_Update $w]
+	set cmd [list ckFDialog_Update $w]
+	after cancel $cmd
+	set data(updateId) [after idle $cmd]
     }
 }
 
@@ -253,16 +258,14 @@ proc ckFDialog_UpdateWhenIdle {w} {
 #	directories.
 
 proc ckFDialog_Update {w} {
-    global tcl_version
     # This proc may be called within an idle handler. Make sure that the
     # window has not been destroyed before this proc is called
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
+    unset -nocomplain data(updateId)
     if {![winfo exists $w] || [winfo class $w] ne "CkFDialog"} {
 	return
     }
-    set dataName [winfo name $w]
-    upvar #0 $dataName data
-    global ckPriv
-    catch {unset data(updateId)}
     set appPWD [pwd]
     if {[catch {
 	cd $data(selectPath)
@@ -279,12 +282,7 @@ proc ckFDialog_Update {w} {
     update idletasks
     $data(list) delete 0 end
     # Make the dir list
-    if {$tcl_version >= 8.0} {
-	set sortmode -dictionary
-    } else {
-	set sortmode -ascii
-    }
-    foreach f [lsort $sortmode [glob -nocomplain .* *]] {
+    foreach f [lsort -dictionary [glob -nocomplain .* *]] {
 	if {$f eq "."} {
 	    continue
 	}
@@ -299,13 +297,10 @@ proc ckFDialog_Update {w} {
 	}
     }
     # Make the file list
-    #
     if {$data(filter) eq "*"} {
-	set files [lsort $sortmode \
-	    [glob -nocomplain .* *]]
+	set files [lsort -dictionary [glob -nocomplain .* *]]
     } else {
-	set files [lsort $sortmode \
-	    [eval glob -nocomplain $data(filter)]]
+	set files [lsort -dictionary [glob -nocomplain {*}$data(filter)]]
     }
 
     set top 0
@@ -342,7 +337,8 @@ proc ckFDialog_Update {w} {
 #	Sets data(selectPath) without invoking the trace procedure
 
 proc ckFDialog_SetPathSilently {w path} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     trace remove variable data(selectPath) write [list ckFDialog_SetPath $w]
     set data(selectPath) $path
     trace add variable data(selectPath) write [list ckFDialog_SetPath $w]
@@ -352,7 +348,6 @@ proc ckFDialog_SetPathSilently {w path} {
 
 proc ckFDialog_SetPath {w name1 name2 op} {
     if {[winfo exists $w]} {
-	upvar #0 [winfo name $w] data
 	ckFDialog_UpdateWhenIdle $w
     }
 }
@@ -360,7 +355,8 @@ proc ckFDialog_SetPath {w name1 name2 op} {
 # This proc gets called whenever data(filter) is set
 
 proc ckFDialog_SetFilter {w type} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     set data(filter) [lindex $type 1]
     $data(typeMenuBtn) config -text [lindex $type 0] -indicatoron 0
     ckFDialog_UpdateWhenIdle $w
@@ -392,8 +388,8 @@ proc ckFDialog_SetFilter {w type} {
 #	      = CHDIR	: Cannot change to the directory
 #	      = ERROR	: Invalid entry
 #
-#	 directory      : valid only if flag = OK or PATTERN or FILE
-#	 file           : valid only if flag = OK or PATTERN
+#	 directory	: valid only if flag = OK or PATTERN or FILE
+#	 file		: valid only if flag = OK or PATTERN
 #
 #	directory may not be the same as context, because text may contain
 #	a subdirectory name
@@ -464,7 +460,8 @@ proc ckFDialogResolveFile {context text defaultext} {
 # entry box is the selection.
 
 proc ckFDialog_EntFocusIn {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {[$data(ent) get] ne ""} {
 	$data(ent) selection from 0
 	$data(ent) selection to end
@@ -481,14 +478,16 @@ proc ckFDialog_EntFocusIn {w} {
 }
 
 proc ckFDialog_EntFocusOut {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     $data(ent) selection clear
 }
 
 # Gets called when user presses Return in the "File name" entry.
 
 proc ckFDialog_ActivateEnt {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     set text [string trim [$data(ent) get]]
     set list [ckFDialogResolveFile $data(selectPath) $text \
 		  $data(-defaultextension)]
@@ -551,7 +550,8 @@ proc ckFDialog_ActivateEnt {w} {
 # Gets called when user presses the Alt-s or Alt-o keys.
 
 proc ckFDialog_InvokeBtn {w key} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {[$data(okBtn) cget -text] eq $key} {
 	ckButtonInvoke $data(okBtn)
     }
@@ -560,7 +560,8 @@ proc ckFDialog_InvokeBtn {w key} {
 # Gets called when user presses the "parent directory" button
 
 proc ckFDialog_UpDirCmd {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {$data(selectPath) ne "/"} {
 	set data(selectPath) [file dirname $data(selectPath)]
     }
@@ -580,7 +581,8 @@ proc ckFDialog_JoinFile {path file} {
 # Gets called when user presses the "OK" button
 
 proc ckFDialog_OkCmd {w} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     set text ""
     set index [$data(list) curselection]
     if {$index ne ""} {
@@ -599,15 +601,16 @@ proc ckFDialog_OkCmd {w} {
 # Gets called when user presses the "Cancel" button
 
 proc ckFDialog_CancelCmd {w} {
-    upvar #0 [winfo name $w] data
-    global ckPriv
-    set ckPriv(selectFilePath) ""
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
+    set ::ckPriv(selectFilePath) ""
 }
 
 # Gets called when user browses the listbox.
 
 proc ckFDialog_ListBrowse w {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     set index [$data(list) curselection]
     set text ""
     if {$index ne ""} {
@@ -633,7 +636,8 @@ proc ckFDialog_ListBrowse w {
 # Gets called when user invokes the lisbox.
 
 proc ckFDialog_ListInvoke {w {text {}}} {
-    upvar #0 [winfo name $w] data
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {$text eq ""} {
 	set index [$data(list) curselection]
 	if {$index ne ""} {
@@ -668,13 +672,13 @@ proc ckFDialog_ListInvoke {w {text {}}} {
 #	script that calls ck_getOpenFile or ck_getSaveFile
 
 proc ckFDialog_Done {w {selectFilePath ""}} {
-    upvar #0 [winfo name $w] data
-    global ckPriv
+    set dataName [lindex [split $w .] end]
+    upvar #0 $dataName data
     if {$selectFilePath eq ""} {
 	set selectFilePath [ckFDialog_JoinFile $data(selectPath) \
 		$data(selectFile)]
-	set ckPriv(selectFile) $data(selectFile)
-	set ckPriv(selectPath) $data(selectPath)
+	set ::ckPriv(selectFile) $data(selectFile)
+	set ::ckPriv(selectPath) $data(selectPath)
 	if {[file exists $selectFilePath] &&
 	    $data(type) eq "save"} {
 		set reply [ck_messageBox -icon warning -type yesno\
@@ -686,6 +690,6 @@ proc ckFDialog_Done {w {selectFilePath ""}} {
 		}
 	}
     }
-    set ckPriv(selectFilePath) $selectFilePath
+    set ::ckPriv(selectFilePath) $selectFilePath
 }
 
