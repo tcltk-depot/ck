@@ -1,0 +1,29 @@
+--- PDCurses-3.9.orig/curses.h	2019-09-04 22:08:02.000000000 +0200
++++ PDCurses-3.9/curses.h	2020-09-23 11:09:29.955553000 +0200
+@@ -187,6 +187,7 @@
+ #define PDC_MOUSE_WHEEL_RIGHT   0x0100
+ 
+ #define A_BUTTON_CHANGED        (Mouse_status.changes & 7)
++#undef  MOUSE_MOVED
+ #define MOUSE_MOVED             (Mouse_status.changes & PDC_MOUSE_MOVED)
+ #define MOUSE_POS_REPORT        (Mouse_status.changes & PDC_MOUSE_POSITION)
+ #define BUTTON_CHANGED(x)       (Mouse_status.changes & (1 << ((x) - 1)))
+--- PDCurses-3.9.orig/wincon/Makefile	2019-09-04 22:08:02.000000000 +0200
++++ PDCurses-3.9/wincon/Makefile	2020-09-23 08:14:00.000000000 +0200
+@@ -26,11 +26,11 @@
+ 
+ PDCURSES_WIN_H	= $(osdir)/pdcwin.h
+ 
+-CC		= gcc
+-AR		= ar
+-STRIP		= strip
+-LINK		= gcc
+-WINDRES		= windres
++CC		= $(TARGET)gcc
++AR		= $(TARGET)ar
++STRIP		= $(TARGET)strip
++LINK		= $(TARGET)gcc
++WINDRES		= $(TARGET)windres
+ 
+ ifeq ($(DEBUG),Y)
+ 	CFLAGS  = -g -Wall -DPDCDEBUG
