@@ -681,6 +681,15 @@ doResize:
     errCount = 0;
 #endif
 
+#ifdef _WIN32
+    if (mainPtr->isoEncoding == NULL &&
+	((code >= 0xa0 && code < 0x100) ||
+	 (code > KEY_MAX) && code < 0x10000)) {
+	ch = uch = code;
+	code = 0;
+	ucp = 1;
+    }
+#else
     if (mainPtr->isoEncoding == NULL && code >= 0xc0 && code < 0x100) {
 	int need = 2;
 
@@ -721,6 +730,7 @@ done_uc:
 #endif
 	code = 0;
     }
+#endif
 
     /*
      * Barcode reader handling.
