@@ -338,6 +338,8 @@ wcwidth(int wc)
 	return -1;
     if (wc >= 0x2500 && wc <= 0x25ff)	/* Unicode box drawing chars. */
 	return 1;
+    if (wc >= 0x20a0 && wc <= 0x20bf)	/* Currency symbols. */
+	return 1;
     return iswprint((wint_t) wc) ? 1 : -1;
 }
 #endif
