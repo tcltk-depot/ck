@@ -8,9 +8,9 @@
 #include "tcl.h"
 
 struct window;
-typedef struct window *WINDOW;
+typedef struct window WINDOW;
 struct mevent;
-typedef struct mevent *MEVENT;
+typedef struct mevent MEVENT;
 typedef int NCURSES_PAIRS_T;
 typedef int NCURSES_COLOR_T;
 typedef unsigned long mmask_t;
