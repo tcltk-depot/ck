@@ -110,10 +110,12 @@ Ck_GetGChar(
 	local_map[(int)'Y'] = '|';  /* vertical line */
 	local_map[(int)'E'] = '+';  /* large plus or crossover */
 
-	for (i = 0; acsc[i] != 0; i += 2) {
-	    if (acsc[i] < 0 || acsc[i] >= 128)
-		continue;
-	    local_map[(int)acsc[i]] = (acsc[i+1] & 0xFF) | A_ALTCHARSET;
+	if (acsc != NULL && acsc != (char *) -1) {
+	    for (i = 0; acsc[i] != 0; i += 2) {
+		if (acsc[i] < 0 || acsc[i] >= 128)
+		    continue;
+		local_map[(int)acsc[i]] = (acsc[i+1] & 0xFF) | A_ALTCHARSET;
+	    }
 	}
 
 	Tcl_InitHashTable(&gCharTable, TCL_STRING_KEYS);

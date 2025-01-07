@@ -56,6 +56,10 @@
 
 #ifdef USE_NCURSES
 #include <ncurses.h>
+#undef getcurx
+#undef getcury
+#undef getmaxx
+#undef getmaxy
 #undef mvwaddch
 #undef mvwaddstr
 #undef waddch
