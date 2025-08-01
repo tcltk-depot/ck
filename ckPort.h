@@ -20,7 +20,9 @@
 #if defined(_WIN32) || defined(WIN32)
 #   include <windows.h>
 #else
-#   define _XOPEN_SOURCE
+#   ifndef _XOPEN_SOURCE
+#	define _XOPEN_SOURCE
+#   endif
 #   ifdef __APPLE__
 #	define _XOPEN_SOURCE_EXTENDED
 #   endif
