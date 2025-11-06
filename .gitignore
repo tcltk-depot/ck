@@ -5,6 +5,7 @@
 /ckConfig.sh
 cwsh
 libck*.so
+libck.a
 tags
 config.log
 config.status

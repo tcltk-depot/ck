@@ -648,6 +648,8 @@ ac_includes_default="\
 ac_header_c_list=
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+CWSH_INSTALL
+CWSH_TARGET
 CWSH_LIB_SPEC
 CURSESLIBSW
 CURSESINCLUDES
@@ -736,6 +738,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_tcl
+enable_cwsh
 with_cursesinc
 with_curseslib
 enable_shared
@@ -1365,6 +1368,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-cwsh           build and install cwsh binary
   --enable-shared         build libck as a shared library
 
 Optional Packages:
@@ -3798,6 +3802,12 @@ then :
   printf "%s\n" "#define HAVE_UNISTD_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
+if test "x$ac_cv_header_stdint_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_STDINT_H 1" >>confdefs.h
+
+fi
 ac_fn_c_check_header_compile "$LINENO" "limits.h" "ac_cv_header_limits_h" "$ac_includes_default"
 if test "x$ac_cv_header_limits_h" = xyes
 then :
@@ -4260,6 +4270,22 @@ fi
 
 if test ! -d $TCL_BIN_DIR ; then
     as_fn_error $? "Tcl directory $TCL_BIN_DIR doesn't exist" "$LINENO" 5
+fi
+
+# Check whether --enable-cwsh was given.
+if test ${enable_cwsh+y}
+then :
+  enableval=$enable_cwsh; BUILD_CWSH=$enableval
+else $as_nop
+  BUILD_CWSH=no
+fi
+
+if test "$BUILD_CWSH" = "yes" ; then
+    CWSH_TARGET=cwsh
+    CWSH_INSTALL=install-cwsh
+else
+    CWSH_TARGET=
+    CWSH_INSTALL=
 fi
 
 #--------------------------------------------------------------------
@@ -5130,7 +5156,7 @@ if test ${enable_shared+y}
 then :
   enableval=$enable_shared; ok=$enableval
 else $as_nop
-  ok=no
+  ok=yes
 fi
 
 if test "$ok" = "yes" -a "${SHLIB_SUFFIX}" != ""; then
@@ -5184,6 +5210,8 @@ if test "$TCL_SUPPORTS_STUBS" = 1; then
 else
     CWSH_LIB_SPEC="$TCL_BUILD_LIB_SPEC"
 fi
+
+
 
 
 

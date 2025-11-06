@@ -1,4 +1,5 @@
 dnl	This file is an input file used by the GNU "autoconf" program to
+
 dnl	generate the file "configure", which is run during Ck installation
 dnl	to configure the system for the local environment.
 AC_INIT
@@ -48,6 +49,16 @@ AC_ARG_WITH(tcl, [  --with-tcl=DIR          use Tcl 8.X binaries from DIR],
         TCL_BIN_DIR=$withval, TCL_BIN_DIR=`cd ../tcl8.0/unix ; pwd`)
 if test ! -d $TCL_BIN_DIR ; then
     AC_MSG_ERROR(Tcl directory $TCL_BIN_DIR doesn't exist)
+fi
+
+AC_ARG_ENABLE(cwsh, [  --enable-cwsh           build and install cwsh binary],
+        [BUILD_CWSH=$enableval], [BUILD_CWSH=no])
+if test "$BUILD_CWSH" = "yes" ; then
+    CWSH_TARGET=cwsh
+    CWSH_INSTALL=install-cwsh
+else
+    CWSH_TARGET=
+    CWSH_INSTALL=
 fi
 
 #--------------------------------------------------------------------
@@ -428,7 +439,7 @@ fi
 
 AC_ARG_ENABLE(shared,
     [  --enable-shared         build libck as a shared library],
-    [ok=$enableval], [ok=no])
+    [ok=$enableval], [ok=yes])
 if test "$ok" = "yes" -a "${SHLIB_SUFFIX}" != ""; then
     CK_SHLIB_CFLAGS="${CK_SHLIB_CFLAGS} ${SHLIB_CFLAGS}"
     eval "CK_LIB_FILE=libck${TCL_SHARED_LIB_SUFFIX}"
@@ -513,6 +524,8 @@ AC_SUBST(USE_NCURSESW)
 AC_SUBST(CURSESINCLUDES)
 AC_SUBST(CURSESLIBSW)
 AC_SUBST(CWSH_LIB_SPEC)
+AC_SUBST(CWSH_TARGET)
+AC_SUBST(CWSH_INSTALL)
 
 AC_CONFIG_FILES([Makefile ckConfig.sh pkgIndex.tcl])
 AC_OUTPUT

@@ -217,7 +217,7 @@ SRCS = ckBind.c ckBorder.c ckCmds.c ckConfig.c ckEvent.c ckFocus.c \
 
 HDRS = default.h ks_names.h ck.h ckPort.h ckText.h
 
-all: cwsh
+all: $(CK_LIB_FILE) @CWSH_TARGET@
 
 @CK_LIB_FILE@: $(OBJS)
 	rm -f @CK_LIB_FILE@
@@ -235,10 +235,10 @@ configInfo: Makefile
 	@echo "CK_CURSES_INCLUDES = ${CURSES_INCLUDES}" >> configInfo
 	@echo "CK_LIBS = ${CURSES_LIB_SWITCHES} @LIBS@" >> configInfo
 
-install: install-binaries install-libraries
+install: install-binaries install-libraries @CWSH_INSTALL@
 
-install-binaries: $(CK_LIB_FILE) cwsh
-	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
+install-binaries: $(CK_LIB_FILE)
+	@for i in $(LIB_INSTALL_DIR) ; \
 	    do \
 	    if [ ! -d $$i ] ; then \
 		echo "Making directory $$i"; \
@@ -251,6 +251,17 @@ install-binaries: $(CK_LIB_FILE) cwsh
 	@$(INSTALL_DATA) $(CK_LIB_FILE) $(LIB_INSTALL_DIR)/$(CK_LIB_FILE)
 	@$(RANLIB) $(LIB_INSTALL_DIR)/$(CK_LIB_FILE)
 	chmod 555 $(LIB_INSTALL_DIR)/$(CK_LIB_FILE)
+
+install-cwsh: cwsh
+	@for i in $(BIN_INSTALL_DIR) ; \
+	    do \
+	    if [ ! -d $$i ] ; then \
+		echo "Making directory $$i"; \
+		mkdir $$i; \
+		chmod 755 $$i; \
+		else true; \
+		fi; \
+	    done;
 	@echo "Installing cwsh"
 	@$(INSTALL_PROGRAM) cwsh $(BIN_INSTALL_DIR)/cwsh
 
