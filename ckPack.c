@@ -120,7 +120,7 @@ static Ck_GeomMgr packerType = {
 
 static void		ArrangePacking(ClientData clientData);
 static int		ConfigureSlaves(Tcl_Interp *interp,
-			    CkWindow *winPtr, int argc, char *argv[]);
+			    CkWindow *winPtr, int argc, const char *argv[]);
 static Packer *		GetPacker(CkWindow *winPtr);
 static void		PackStructureProc(ClientData clientData,
 			    CkEvent *eventPtr);
@@ -151,7 +151,7 @@ Ck_PackCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     size_t length;
@@ -1019,7 +1019,7 @@ ConfigureSlaves(
     CkWindow *winPtr,		/* Any window in application containing
 				 * slaves.  Used to look up slave names. */
     int argc,			/* Number of elements in argv. */
-    char *argv[])		/* Argument strings:  contains one or more
+    const char *argv[])		/* Argument strings:  contains one or more
 				 * window names followed by any number
 				 * of "option value" pairs.  Caller must
 				 * make sure that there is at least one

@@ -283,16 +283,16 @@ static void             ButtonCmdDeletedProc(ClientData clientData);
 static void		ButtonEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static char *		ButtonTextVarProc(ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
+			    Tcl_Interp *interp, const char *name1, const char *name2,
 			    int flags);
 static char *		ButtonVarProc(ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
+			    Tcl_Interp *interp, const char *name1, const char *name2,
 			    int flags);
 static int		ButtonWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static void		ComputeButtonGeometry(Button *butPtr);
 static int		ConfigureButton(Tcl_Interp *interp,
-			    Button *butPtr, int argc, char **argv,
+			    Button *butPtr, int argc, const char **argv,
 			    int flags);
 static void		DestroyButton(ClientData clientData);
 static void		DisplayButton(ClientData clientData);
@@ -322,7 +322,7 @@ Ck_ButtonCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Button *butPtr;
     int type;
@@ -440,7 +440,7 @@ ButtonWidgetCmd(
     ClientData clientData,	/* Information about button widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Button *butPtr = (Button *) clientData;
     int result = TCL_OK;
@@ -688,7 +688,7 @@ ConfigureButton(
     Button *butPtr,             /* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
@@ -719,7 +719,7 @@ ConfigureButton(
         butPtr->state = ckNormalUid;
 
     if (butPtr->type >= TYPE_CHECK_BUTTON) {
-	char *value;
+	const char *value;
 
 	if (butPtr->selVarName == NULL) {
 	    butPtr->selVarName = (char *) ckalloc(
@@ -762,7 +762,7 @@ ConfigureButton(
      */
 
     if (butPtr->textVarName != NULL) {
-	char *value;
+	const char *value;
 
 	value = Tcl_GetVar(interp, butPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
@@ -1076,12 +1076,12 @@ static char *
 ButtonVarProc(
     ClientData clientData,	/* Information about button. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Name of variable. */
-    char *name2,		/* Second part of variable name. */
+    const char *name1,		/* Name of variable. */
+    const char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
     Button *butPtr = (Button *) clientData;
-    char *value;
+    const char *value;
 
     /*
      * If the variable is being unset, then just re-establish the
@@ -1146,12 +1146,12 @@ static char *
 ButtonTextVarProc(
     ClientData clientData,	/* Information about button. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Name of variable. */
-    char *name2,		/* Second part of variable name. */
+    const char *name1,		/* Name of variable. */
+    const char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
     Button *butPtr = (Button *) clientData;
-    char *value;
+    const char *value;
 
     /*
      * If the variable is unset, then immediately recreate it unless

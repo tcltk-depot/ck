@@ -586,7 +586,7 @@ extern void		CkBTreeDeleteChars(CkTextIndex *index1Ptr,
 extern CkTextLine *	CkBTreeFindLine(CkTextBTree tree, int line);
 extern CkTextTag **	CkBTreeGetTags(CkTextIndex *indexPtr, int *numTagsPtr);
 extern void		CkBTreeInsertChars(CkTextIndex *indexPtr,
-			    char *string);
+			    const char *string);
 extern int		CkBTreeLineIndex(CkTextLine *linePtr);
 extern void		CkBTreeLinkSegment(CkTextSegment *segPtr,
 			    CkTextIndex *indexPtr);
@@ -616,14 +616,14 @@ extern void		CkTextCreateDInfo(CkText *textPtr);
 extern int		CkTextDLineInfo(CkText *textPtr,
 			    CkTextIndex *indexPtr, int *xPtr, int *yPtr,
 			    int *widthPtr, int *heightPtr, int *basePtr);
-extern CkTextTag *	CkTextCreateTag(CkText *textPtr, char *tagName);
+extern CkTextTag *	CkTextCreateTag(CkText *textPtr, const char *tagName);
 extern void		CkTextFreeDInfo(CkText *textPtr);
 extern void		CkTextFreeTag(CkText *textPtr, CkTextTag *tagPtr);
 extern int		CkTextGetIndex(Tcl_Interp *interp,
-			    CkText *textPtr, char *string,
+			    CkText *textPtr, const char *string,
 			    CkTextIndex *indexPtr);
 extern CkTextTabArray *	CkTextGetTabs(Tcl_Interp *interp,
-			    CkWindow *winPtr, char *string);
+			    CkWindow *winPtr, const char *string);
 extern void		CkTextIndexBackBytes(CkTextIndex *srcPtr,
 			    int count, CkTextIndex *dstPtr);
 extern void		CkTextIndexBackChars(CkTextIndex *srcPtr,
@@ -647,9 +647,9 @@ extern CkTextIndex *	CkTextMakeIndex(CkTextBTree tree,
 			    int lineIndex, int charIndex,
 			    CkTextIndex *indexPtr);
 extern int		CkTextMarkCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextMarkNameToIndex(CkText *textPtr,
-			    char *name, CkTextIndex *indexPtr);
+			    const char *name, CkTextIndex *indexPtr);
 extern void		CkTextMarkSegToIndex(CkText *textPtr,
 			    CkTextSegment *markPtr, CkTextIndex *indexPtr);
 extern void		CkTextEventuallyRepick(CkText *textPtr);
@@ -666,24 +666,24 @@ extern void		CkTextRedrawTag(CkText *textPtr,
 			    CkTextTag *tagPtr, int withTag);
 extern void		CkTextRelayoutWindow(CkText *textPtr);
 extern int		CkTextScanCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextSeeCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextSegToOffset(CkTextSegment *segPtr,
 			    CkTextLine *linePtr);
-extern CkTextSegment *	CkTextSetMark(CkText *textPtr, char *name,
+extern CkTextSegment *	CkTextSetMark(CkText *textPtr, const char *name,
 			    CkTextIndex *indexPtr);
 extern void		CkTextSetYView(CkText *textPtr,
 			    CkTextIndex *indexPtr, int pickPlace);
 extern int		CkTextTagCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextWindowCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextWindowIndex(CkText *textPtr,
-			    char *name, CkTextIndex *indexPtr);
+			    const char *name, CkTextIndex *indexPtr);
 extern int		CkTextXviewCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 extern int		CkTextYviewCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 
 #endif /* _CKTEXT_H */

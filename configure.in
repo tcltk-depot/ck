@@ -1,12 +1,13 @@
 dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run during Ck installation
 dnl	to configure the system for the local environment.
-AC_INIT(ck.h)
+AC_INIT
+AC_CONFIG_SRCDIR([ck.h])
 
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 CC=${CC-cc}
-AC_HAVE_HEADERS(unistd.h limits.h)
+AC_CHECK_HEADERS([unistd.h stdint.h limits.h])
 
 #--------------------------------------------------------------------
 #	Supply a substitute for stdlib.h if it doesn't define strtol,
@@ -14,9 +15,9 @@ AC_HAVE_HEADERS(unistd.h limits.h)
 #--------------------------------------------------------------------
 
 AC_MSG_CHECKING(stdlib.h)
-AC_HEADER_EGREP(strtol, stdlib.h, tk_ok=yes, tk_ok=no)
-AC_HEADER_EGREP(strtoul, stdlib.h, , tk_ok=no)
-AC_HEADER_EGREP(strtod, stdlib.h, , tk_ok=no)
+AC_EGREP_HEADER([strtol],[stdlib.h],[tk_ok=yes],[tk_ok=no])
+AC_EGREP_HEADER([strtoul],[stdlib.h],[],[tk_ok=no])
+AC_EGREP_HEADER([strtod],[stdlib.h],[],[tk_ok=no])
 if test $tk_ok = no; then
     AC_DEFINE(NO_STDLIB_H)
 fi
@@ -27,17 +28,16 @@ AC_MSG_RESULT($tk_ok)
 #	they don't exist.
 #--------------------------------------------------------------------
 
-AC_MODE_T
-AC_PID_T
-AC_SIZE_T
-AC_UID_T
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
 
 #------------------------------------------------------------------------------
-#       What type do signals return? Do we have sigaction ?
+#       Do we have sigaction ?
 #------------------------------------------------------------------------------
 
-AC_RETSIGTYPE
-AC_HAVE_FUNCS(sigaction)
+AC_CHECK_FUNCS([sigaction])
 
 #--------------------------------------------------------------------
 #       See if there was a command-line option for where Tcl is;  if
@@ -115,10 +115,9 @@ AC_MSG_RESULT(${CK_VERSION})
 #--------------------------------------------------------------------
 
 AC_MSG_CHECKING([fd_set and sys/select])
-AC_TRY_COMPILE([#include <sys/types.h>],
-	[fd_set readMask, writeMask;], tk_ok=yes, tk_ok=no)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>]], [[fd_set readMask, writeMask;]])],[tk_ok=yes],[tk_ok=no])
 if test $tk_ok = no; then
-    AC_HEADER_EGREP(fd_mask, sys/select.h, tk_ok=yes)
+    AC_EGREP_HEADER([fd_mask],[sys/select.h],[tk_ok=yes])
     if test $tk_ok = yes; then
 	AC_DEFINE(HAVE_SYS_SELECT_H)
     fi
@@ -175,10 +174,8 @@ if test "$CURSESINCLUDES" = "nope" -a "$CURSESLIBSW" = "nope"; then
                 AC_MSG_CHECKING([ncurses headers])
                 tk_oldCFlags=$CFLAGS
                 CFLAGS="$CFLAGS -I$i"
-                AC_TRY_COMPILE([#include <ncurses.h>],
-                    [int c; initscr(); c = ACS_ULCORNER; curs_set(1);],
-                    [AC_MSG_RESULT(yes)
-                    CURSESINCLUDES="-I$i"], AC_MSG_RESULT(no))
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <ncurses.h>]], [[int c; initscr(); c = ACS_ULCORNER; curs_set(1);]])],[AC_MSG_RESULT(yes)
+                    CURSESINCLUDES="-I$i"],[AC_MSG_RESULT(no)])
                 CFLAGS=$tk_oldCFlags
                 if test "$CURSESINCLUDES" != "nope"; then
                     USE_NCURSES=1
@@ -189,10 +186,8 @@ if test "$CURSESINCLUDES" = "nope" -a "$CURSESLIBSW" = "nope"; then
                 AC_MSG_CHECKING([curses headers])
                 tk_oldCFlags=$CFLAGS
                 CFLAGS="$CFLAGS -I$i"
-                AC_TRY_COMPILE([#include <curses.h>],
-                    [int c; initscr(); c = ACS_ULCORNER; curs_set(1);],
-                    [AC_MSG_RESULT(yes)
-                    CURSESINCLUDES="-I$i"], AC_MSG_RESULT(no))
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[int c; initscr(); c = ACS_ULCORNER; curs_set(1);]])],[AC_MSG_RESULT(yes)
+                    CURSESINCLUDES="-I$i"],[AC_MSG_RESULT(no)])
                 CFLAGS=$tk_oldCFlags
                 if test "$CURSESINCLUDES" != "nope"; then
                     break
@@ -229,10 +224,8 @@ if test "$CURSESLIBSW" = "nope" ; then
 	        fi
 	        tk_oldLibs=$LIBS
 	        LIBS="$LIBSW"
-	        AC_TRY_LINK([#include <curses.h>],
-	            [int c; initscr(); c = ACS_ULCORNER; curs_set(1);],
-	            [AC_MSG_RESULT(yes)
-	            CURSESLIBSW="$LIBSW"], AC_MSG_RESULT(no))
+	        AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[int c; initscr(); c = ACS_ULCORNER; curs_set(1);]])],[AC_MSG_RESULT(yes)
+	            CURSESLIBSW="$LIBSW"],[AC_MSG_RESULT(no)])
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
 	        if test "$CURSESLIBSW" != "nope"; then
@@ -251,12 +244,10 @@ if test "$CURSESLIBSW" = "nope" ; then
 	        fi
 	        tk_oldLibs=$LIBS
 	        LIBS="$LIBSW"
-	        AC_TRY_LINK([#include <ncurses.h>],
-	            [int c; initscr(); c = ACS_ULCORNER; addwstr("");],
-	            [AC_MSG_RESULT(yes)
+	        AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <ncurses.h>]], [[int c; initscr(); c = ACS_ULCORNER; addwstr("");]])],[AC_MSG_RESULT(yes)
 	            USE_NCURSESW=1
 	            CURSESINCLUDES="$CURSESINCLUDES -D_XOPEN_SOURCE_EXTENDED"
-	            CURSESLIBSW="$LIBSW"], AC_MSG_RESULT(no))
+	            CURSESLIBSW="$LIBSW"],[AC_MSG_RESULT(no)])
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
 	        if test "$CURSESLIBSW" != "nope"; then
@@ -271,10 +262,8 @@ if test "$CURSESLIBSW" = "nope" ; then
 	        fi
 	        tk_oldLibs=$LIBS
 	        LIBS="$LIBSW"
-	        AC_TRY_LINK([#include <ncurses.h>],
-	            [int c; initscr(); c = ACS_ULCORNER; curs_set(1);],
-	            [AC_MSG_RESULT(yes)
-	            CURSESLIBSW="$LIBSW"], AC_MSG_RESULT(no))
+	        AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <ncurses.h>]], [[int c; initscr(); c = ACS_ULCORNER; curs_set(1);]])],[AC_MSG_RESULT(yes)
+	            CURSESLIBSW="$LIBSW"],[AC_MSG_RESULT(no)])
 	        CFLAGS=$tk_oldCFlags
 	        LIBS=$tk_oldLibs
 	        if test "$CURSESLIBSW" != "nope"; then
@@ -296,15 +285,11 @@ else
     tk_oldLibs=$LIBS
     LIBS="$CURSESLIBSW"
     if test $USE_NCURSES = 1 ; then
-	AC_TRY_LINK([#include <ncurses.h>],
-	   [int c; initscr(); scr_dump("xx");],
-           [AC_MSG_RESULT(yes)
-           AC_DEFINE(HAVE_SCR_DUMP)], AC_MSG_RESULT(no))
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <ncurses.h>]], [[int c; initscr(); scr_dump("xx");]])],[AC_MSG_RESULT(yes)
+           AC_DEFINE(HAVE_SCR_DUMP)],[AC_MSG_RESULT(no)])
     else
-	AC_TRY_LINK([#include <curses.h>],
-	   [int c; initscr(); scr_dump("xx");],
-           [AC_MSG_RESULT(yes)
-           AC_DEFINE(HAVE_SCR_DUMP)], AC_MSG_RESULT(no))
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[int c; initscr(); scr_dump("xx");]])],[AC_MSG_RESULT(yes)
+           AC_DEFINE(HAVE_SCR_DUMP)],[AC_MSG_RESULT(no)])
     fi
     CFLAGS=$tk_oldCFlags
     LIBS=$tk_oldLibs
@@ -329,12 +314,9 @@ if test $NOGPM -eq 0 ; then
     AC_MSG_CHECKING([GPM library])
     tk_oldLibs=$LIBS
     LIBS="-lgpm"
-    AC_TRY_LINK([#include <gpm.h>],
-        [Gpm_Connect conn; Gpm_Open(&conn, 0);],
-        [AC_MSG_RESULT(yes)
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <gpm.h>]], [[Gpm_Connect conn; Gpm_Open(&conn, 0);]])],[AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_GPM)
-        CURSESLIBSW="$CURSESLIBSW -lgpm"],
-        [AC_MSG_RESULT(no)])
+        CURSESLIBSW="$CURSESLIBSW -lgpm"],[AC_MSG_RESULT(no)])
     LIBS=$tk_oldLibs
 fi
 
@@ -419,7 +401,7 @@ AC_EGREP_HEADER(gettimeofday, sys/time.h, AC_MSG_RESULT(present), [
 AC_CHECK_FUNC(strtod, tk_strtod=1, tk_strtod=0)
 if test "$tk_strtod" = 1; then
     AC_MSG_CHECKING([for Solaris 2.4 strtod bug])
-    AC_TRY_RUN([
+    AC_RUN_IFELSE([AC_LANG_SOURCE([[
         extern double strtod();
         int main()
         {
@@ -430,7 +412,7 @@ if test "$tk_strtod" = 1; then
                 exit(1);
             }
             exit(0);
-        }], tk_ok=1, tk_ok=0, tk_ok=0)
+        }]])],[tk_ok=1],[tk_ok=0],[tk_ok=0])
     if test "$tk_ok" = 1; then
         AC_MSG_RESULT(ok)
     else
@@ -532,4 +514,5 @@ AC_SUBST(CURSESINCLUDES)
 AC_SUBST(CURSESLIBSW)
 AC_SUBST(CWSH_LIB_SPEC)
 
-AC_OUTPUT(Makefile ckConfig.sh pkgIndex.tcl)
+AC_CONFIG_FILES([Makefile ckConfig.sh pkgIndex.tcl])
+AC_OUTPUT

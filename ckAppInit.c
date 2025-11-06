@@ -41,7 +41,7 @@ main(
     char **argv)		/* Values of command-line arguments. */
 {
     Tcl_FindExecutable(argv[0]);
-    Ck_Main(argc, argv, Tcl_AppInit, Tcl_CreateInterp());
+    Ck_Main(argc, (const char **) argv, Tcl_AppInit, Tcl_CreateInterp());
     return 0;			/* Needed only to prevent compiler warning. */
 }
 

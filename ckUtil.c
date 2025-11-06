@@ -409,7 +409,7 @@ int
 Ck_GetScrollInfo(
     Tcl_Interp *interp,			/* Used for error reporting. */
     int argc,				/* # arguments for command. */
-    char **argv,			/* Arguments for command. */
+    const char **argv,			/* Arguments for command. */
     double *dblPtr,			/* Filled in with argument "moveto"
 					 * option, if any. */
     int *intPtr)			/* Filled in with number of pages
@@ -471,7 +471,7 @@ Ck_GetScrollInfo(
 int
 Ck_SetEncoding(
     Tcl_Interp *interp,
-    char *name)
+    const char *name)
 {
     int i;
 
@@ -774,7 +774,7 @@ void
 CkDisplayChars(
     CkMainInfo *mainPtr,	/* Needed for encoding. */
     WINDOW *window,		/* Curses window. */
-    char *string,		/* Characters to be displayed. */
+    const char *string,		/* Characters to be displayed. */
     int numChars,		/* Number of characters to display from
 				 * string. */
     int x, int y,		/* Coordinates at which to draw string. */
@@ -786,7 +786,7 @@ CkDisplayChars(
 				 * now.  See CkMeasureChars for information
 				 * about it. */
 {
-    char *p;			/* Current character being scanned. */
+    const char *p;		/* Current character being scanned. */
     int c;
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */

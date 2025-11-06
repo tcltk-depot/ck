@@ -33,12 +33,12 @@ static int		DoConfig(Tcl_Interp *interp,
 			    CkWindow *winPtr, Ck_ConfigSpec *specPtr,
 			    Ck_Uid value, int valueIsUid, char *widgRec);
 static Ck_ConfigSpec *	FindConfigSpec(Tcl_Interp *interp,
-			    Ck_ConfigSpec *specs, char *argvName,
+			    Ck_ConfigSpec *specs, const char *argvName,
 			    int needFlags, int hateFlags);
 static char *		FormatConfigInfo(Tcl_Interp *interp,
 			    CkWindow *winPtr, Ck_ConfigSpec *specPtr,
 			    char *widgRec);
-static char *           FormatConfigValue(Tcl_Interp *interp,
+static const char *     FormatConfigValue(Tcl_Interp *interp,
                             CkWindow *tkwin, Ck_ConfigSpec *specPtr,
                             char *widgRec, char *buffer,
                             Tcl_FreeProc **freeProcPtr);
@@ -69,7 +69,7 @@ Ck_ConfigureWidget(
     CkWindow *winPtr,		/* Window containing widget. */
     Ck_ConfigSpec *specs,	/* Describes legal options. */
     int argc,			/* Number of elements in argv. */
-    char **argv,		/* Command-line options. */
+    const char **argv,		/* Command-line options. */
     char *widgRec,		/* Record whose fields are to be
 				 * modified.  Values must be properly
 				 * initialized. */
@@ -225,7 +225,7 @@ FindConfigSpec(
     Tcl_Interp *interp,		/* Used for reporting errors. */
     Ck_ConfigSpec *specs,	/* Pointer to table of configuration
 				 * specifications for a widget. */
-    char *argvName,		/* Name (suitable for use in a "config"
+    const char *argvName,	/* Name (suitable for use in a "config"
 				 * command) identifying particular option. */
     int needFlags,		/* Flags that must be present in matching
 				 * entry. */
@@ -320,14 +320,14 @@ DoConfig(
     Tcl_Interp *interp,		/* Interpreter for error reporting. */
     CkWindow *winPtr,		/* Window containing widget. */
     Ck_ConfigSpec *specPtr,	/* Specifier to apply. */
-    char *value,		/* Value to use to fill in widgRec. */
+    const char *value,		/* Value to use to fill in widgRec. */
     int valueIsUid,		/* Non-zero means value is a Ck_Uid;
 				 * zero means it's an ordinary string. */
     char *widgRec)		/* Record whose fields are to be
 				 * modified.  Values must be properly
 				 * initialized. */
 {
-    char *ptr;
+    const char *ptr;
     Ck_Uid uid;
     int nullValue;
 
@@ -498,7 +498,7 @@ Ck_ConfigureInfo(
     Ck_ConfigSpec *specs,	/* Describes legal options. */
     char *widgRec,		/* Record whose fields contain current
 				 * values for options. */
-    char *argvName,		/* If non-NULL, indicates a single option
+    const char *argvName,	/* If non-NULL, indicates a single option
 				 * whose info is to be returned.  Otherwise
 				 * info is returned for all options. */
     int flags)			/* Used to specify additional flags
@@ -585,7 +585,7 @@ Ck_ConfigureValue(
     Ck_ConfigSpec *specs,       /* Describes legal options. */
     char *widgRec,              /* Record whose fields contain current
                                  * values for options. */
-    char *argvName,             /* Gives the command-line name for the
+    const char *argvName,       /* Gives the command-line name for the
                                  * option whose value is to be returned. */
     int flags)                  /* Used to specify additional flags
                                  * that must be present in config specs
@@ -593,7 +593,8 @@ Ck_ConfigureValue(
 {
     Ck_ConfigSpec *specPtr;
     int needFlags, hateFlags;
-    char buffer[200 + 1], *p;
+    char buffer[200 + 1];
+    const char *p;
     Tcl_FreeProc *freeProc = (Tcl_FreeProc *) NULL;
 
     needFlags = flags & ~(CK_CONFIG_USER_BIT - 1);
@@ -609,9 +610,9 @@ Ck_ConfigureValue(
     if (p == buffer) {
 	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
     } else if (freeProc == TCL_DYNAMIC) {
-	Tcl_SetResult(interp, p, TCL_DYNAMIC);
+	Tcl_SetResult(interp, (char *) p, TCL_DYNAMIC);
     } else {
-	Tcl_SetResult(interp, p, freeProc);
+	Tcl_SetResult(interp, (char *) p, freeProc);
     }
     return TCL_OK;
 }
@@ -644,7 +645,8 @@ FormatConfigInfo(
     char *widgRec)			/* Pointer to record holding current
 					 * values of info for widget. */
 {
-    char *argv[6], *result;
+    const char *argv[6];
+    char *result;
     char buffer[200];
     Tcl_FreeProc *freeProc = (Tcl_FreeProc *) NULL;
 
@@ -674,7 +676,7 @@ FormatConfigInfo(
 	if (freeProc == TCL_DYNAMIC) {
 	    ckfree(argv[4]);
 	} else {
-	    (*freeProc)(argv[4]);
+	    (*freeProc)((char *) argv[4]);
 	}
     }
     return result;
@@ -702,13 +704,13 @@ FormatConfigInfo(
  *----------------------------------------------------------------------
  */
 
-static char *
+static const char *
 FormatConfigValue(
     Tcl_Interp *interp,         /* Interpreter for use in real conversions. */
     CkWindow *winPtr,           /* Window corresponding to widget. */
     Ck_ConfigSpec *specPtr,     /* Pointer to information describing option.
                                  * Must not point to a synonym option. */
-    char *widgRec,              /* Pointer to record holding current
+    char *widgRec,	        /* Pointer to record holding current
                                  * values of info for widget. */
     char *buffer,               /* Static buffer to use for small values.
                                  * Must have at least 200 bytes of storage. */
@@ -716,7 +718,7 @@ FormatConfigValue(
                                  * of procedure to free the result, or NULL
                                  * if result is static. */
 {
-    char *ptr, *result;
+    const char *ptr, *result;
 
     *freeProcPtr = NULL;
     ptr = widgRec + specPtr->offset;

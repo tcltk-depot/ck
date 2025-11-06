@@ -53,7 +53,7 @@ static Ck_ConfigSpec tagConfigSpecs[] = {
 static void		ChangeTagPriority(CkText *textPtr,
 			    CkTextTag *tagPtr, int prio);
 static CkTextTag *	FindTag(Tcl_Interp *interp,
-			    CkText *textPtr, char *tagName);
+			    CkText *textPtr, const char *tagName);
 static void		SortTags(int numTags,
 			    CkTextTag **tagArrayPtr);
 static int		TagSortProc(const void *first,
@@ -82,7 +82,7 @@ CkTextTagCmd(
     CkText *textPtr,		/* Information about text widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings.  Someone else has already
+    const char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "tag". */
 {
@@ -581,7 +581,7 @@ CkTextTagCmd(
 CkTextTag *
 CkTextCreateTag(
     CkText *textPtr,		/* Widget in which tag is being used. */
-    char *tagName)		/* Name of desired tag. */
+    const char *tagName)	/* Name of desired tag. */
 {
     CkTextTag *tagPtr;
     Tcl_HashEntry *hPtr;
@@ -645,7 +645,7 @@ FindTag(
 				 * if NULL, then don't record an error
 				 * message. */
     CkText *textPtr,		/* Widget in which tag is being used. */
-    char *tagName)		/* Name of desired tag. */
+    const char *tagName)	/* Name of desired tag. */
 {
     Tcl_HashEntry *hPtr;
 

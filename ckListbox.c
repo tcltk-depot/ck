@@ -223,16 +223,16 @@ static Ck_ConfigSpec configSpecs[] = {
 static void		ChangeListboxOffset(Listbox *listPtr, int offset);
 static void		ChangeListboxView(Listbox *listPtr, int index);
 static int		ConfigureListbox(Tcl_Interp *interp,
-			    Listbox *listPtr, int argc, char **argv,
+			    Listbox *listPtr, int argc, const char **argv,
 			    int flags);
 static void		DeleteEls(Listbox *listPtr, int first, int last);
 static void		DestroyListbox(ClientData clientData);
 static void		DisplayListbox(ClientData clientData);
 static int		GetListboxIndex(Tcl_Interp *interp,
-			    Listbox *listPtr, char *string, int numElsOK,
+			    Listbox *listPtr, const char *string, int numElsOK,
 			    int *indexPtr);
 static void		InsertEls(Listbox *listPtr, int index,
-			    int argc, char **argv);
+			    int argc, const char **argv);
 static void		ListboxCmdDeletedProc(ClientData clientData);
 static void		ListboxComputeGeometry(Listbox *listPtr);
 static void		ListboxEventProc(ClientData clientData,
@@ -244,7 +244,7 @@ static void		ListboxSelect(Listbox *listPtr,
 static void		ListboxUpdateHScrollbar(Listbox *listPtr);
 static void		ListboxUpdateVScrollbar(Listbox *listPtr);
 static int		ListboxWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		NearestListboxElement(Listbox *listPtr, int y);
 
 /*
@@ -271,7 +271,7 @@ Ck_ListboxCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Listbox *listPtr;
     CkWindow *new;
@@ -366,7 +366,7 @@ ListboxWidgetCmd(
     ClientData clientData,		/* Information about listbox widget. */
     Tcl_Interp *interp,			/* Current interpreter. */
     int argc,				/* Number of arguments. */
-    char **argv)			/* Argument strings. */
+    const char **argv)			/* Argument strings. */
 {
     Listbox *listPtr = (Listbox *) clientData;
     int result = TCL_OK;
@@ -845,7 +845,7 @@ ConfigureListbox(
     Listbox *listPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, listPtr->winPtr, configSpecs,
@@ -933,7 +933,7 @@ DisplayListbox(ClientData clientData)	/* Information about window. */
         	listPtr->normalAttr);
         }
 	if (listPtr->xOffset < elPtr->textWidth) {
-	    char *p = Tcl_UtfAtIndex(elPtr->text, listPtr->xOffset);
+	    const char *p = Tcl_UtfAtIndex(elPtr->text, listPtr->xOffset);
 
 	    CkDisplayChars(winPtr->mainPtr, winPtr->window, p,
 		strlen(p), 0, y, 0,
@@ -1017,7 +1017,7 @@ InsertEls(
     int index,			/* Add the new elements before this
 				 * element. */
     int argc,			/* Number of new elements to add. */
-    char **argv)		/* New elements (one per entry). */
+    const char **argv)		/* New elements (one per entry). */
 {
     Element *prevPtr, *newPtr;
     int length, i, oldMaxWidth;
@@ -1317,7 +1317,7 @@ GetListboxIndex(
     Tcl_Interp *interp,		/* For error messages. */
     Listbox *listPtr,		/* Listbox for which the index is being
 				 * specified. */
-    char *string,		/* Specifies an element in the listbox. */
+    const char *string,		/* Specifies an element in the listbox. */
     int numElsOK,		/* 0 means the return value must be less
 				 * less than the number of entries in
 				 * the listbox;  1 means it may also be
@@ -1339,7 +1339,8 @@ GetListboxIndex(
 	*indexPtr = listPtr->numElements;
     } else if (c == '@') {
 	int x, y;
-	char *p, *end;
+	const char *p;
+	char *end;
 
 	p = string+1;
 	x = strtol(p, &end, 0);

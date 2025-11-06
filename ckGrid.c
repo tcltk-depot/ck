@@ -154,7 +154,7 @@ static int initialized = 0;
 
 static void		ArrangeGrid(ClientData clientData);
 static int		ConfigureSlaves(Tcl_Interp *interp,
-			    CkWindow *winPtr, int argc, char *argv[]);
+			    CkWindow *winPtr, int argc, const char *argv[]);
 static void		DestroyGridBag(char *memPtr);
 static void		GetCachedLayoutInfo(GridBag *masterPtr);
 static GridBag *	GetGridBag(CkWindow *winPtr);
@@ -170,7 +170,7 @@ static void		GridReqProc(ClientData clientData,
 static void		GridBagStructureProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static void		StickyToString(int flags, char *result);
-static int		StringToSticky(char *string);
+static int		StringToSticky(const char *string);
 static void		Unlink(GridBag *gridPtr);
 
 static Ck_GeomMgr gridMgrType = {
@@ -202,7 +202,7 @@ Ck_GridCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     size_t length;
@@ -1626,7 +1626,7 @@ ConfigureSlaves(
     CkWindow *winPtr,		/* Any window in application containing
 				 * slaves.  Used to look up slave names. */
     int argc,			/* Number of elements in argv. */
-    char *argv[])		/* Argument strings:  contains one or more
+    const char *argv[])		/* Argument strings:  contains one or more
 				 * window names followed by any number
 				 * of "option value" pairs.  Caller must
 				 * make sure that there is at least one
@@ -2001,8 +2001,8 @@ ConfigureSlaves(
 
     for (j = 0; j < numWindows; j++) {
 	struct GridBag *otherPtr;
-    	char *lastWindow; /* use this window to base current row/col on */
-	int match;	  /* found a match for the ^ */
+    	const char *lastWindow;	/* use this window to base current row/col on */
+	int match;		/* found a match for the ^ */
 
 	lastWindow = NULL;
     	if (*argv[j] == '.') {
@@ -2079,7 +2079,7 @@ StickyToString(
  */
 
 static int
-StringToSticky(char *string)
+StringToSticky(const char *string)
 {
     int sticky = 0;
     char c;

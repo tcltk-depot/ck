@@ -358,31 +358,31 @@ static Ck_ConfigSpec configSpecs[] = {
 static int		ActivateMenuEntry(Menu *menuPtr, int index);
 static void		ComputeMenuGeometry(ClientData clientData);
 static int		ConfigureMenu(Tcl_Interp *interp,
-			    Menu *menuPtr, int argc, char **argv,
+			    Menu *menuPtr, int argc, const char **argv,
 			    int flags);
 static int		ConfigureMenuEntry(Tcl_Interp *interp,
 			    Menu *menuPtr, MenuEntry *mePtr, int index,
-			    int argc, char **argv, int flags);
+			    int argc, const char **argv, int flags);
 static void		DestroyMenu(ClientData clientData);
 static void		DestroyMenuEntry(ClientData clientData);
 static void		DisplayMenu(ClientData clientData);
 static void		EventuallyRedrawMenu(Menu *menuPtr,
 			    MenuEntry *mePtr);
 static int		GetMenuIndex(Tcl_Interp *interp,
-			    Menu *menuPtr, char *string, int lastOK,
+			    Menu *menuPtr, const char *string, int lastOK,
 			    int *indexPtr);
 static int		MenuAddOrInsert(Tcl_Interp *interp,
-			    Menu *menuPtr, char *indexString, int argc,
-			    char **argv);
+			    Menu *menuPtr, const char *indexString, int argc,
+			    const char **argv);
 static void		MenuCmdDeletedProc(ClientData clientData);
 static void		MenuEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static MenuEntry *	MenuNewEntry(Menu *menuPtr, int index, int type);
 static char *		MenuVarProc(ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
+			    Tcl_Interp *interp, const char *name1, const char *name2,
 			    int flags);
 static int		MenuWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		PostSubmenu(Tcl_Interp *interp,
 			    Menu *menuPtr, MenuEntry *mePtr);
 
@@ -410,7 +410,7 @@ Ck_MenuCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
@@ -502,7 +502,7 @@ MenuWidgetCmd(
     ClientData clientData,	/* Information about menu widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Menu *menuPtr = (Menu *) clientData;
     MenuEntry *mePtr;
@@ -1012,7 +1012,7 @@ ConfigureMenu(
     Menu *menuPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int i;
@@ -1033,7 +1033,7 @@ ConfigureMenu(
 	MenuEntry *mePtr;
 
 	mePtr = menuPtr->entries[i];
-	ConfigureMenuEntry(interp, menuPtr, mePtr, i, 0, (char **) NULL,
+	ConfigureMenuEntry(interp, menuPtr, mePtr, i, 0, (const char **) NULL,
 		CK_CONFIG_ARGV_ONLY | COMMAND_MASK << mePtr->type);
     }
 
@@ -1076,7 +1076,7 @@ ConfigureMenuEntry(
     int index,				/* Index of mePtr within menuPtr's
 					 * entries. */
     int argc,				/* Number of valid entries in argv. */
-    char **argv,			/* Arguments. */
+    const char **argv,			/* Arguments. */
     int flags)				/* Additional flags to pass to
 					 * Ck_ConfigureWidget. */
 {
@@ -1148,7 +1148,7 @@ ConfigureMenuEntry(
 
     if ((mePtr->type == CHECK_BUTTON_ENTRY)
 	    || (mePtr->type == RADIO_BUTTON_ENTRY)) {
-	char *value;
+	const char *value;
 
 	if (mePtr->name == NULL) {
 	    mePtr->name = (char *) ckalloc(mePtr->labelLength + 1);
@@ -1493,7 +1493,7 @@ GetMenuIndex(
     Tcl_Interp *interp,		/* For error messages. */
     Menu *menuPtr,		/* Menu for which the index is being
 				 * specified. */
-    char *string,		/* Specification of an entry in menu.  See
+    const char *string,		/* Specification of an entry in menu.  See
 				 * manual entry for valid .*/
     int lastOK,			/* Non-zero means its OK to return index
 				 * just *after* last entry. */
@@ -1745,11 +1745,11 @@ MenuAddOrInsert(
     Tcl_Interp *interp,			/* Used for error reporting. */
     Menu *menuPtr,			/* Widget in which to create new
 					 * entry. */
-    char *indexString,			/* String describing index at which
+    const char *indexString,		/* String describing index at which
 					 * to insert.  NULL means insert at
 					 * end. */
     int argc,				/* Number of elements in argv. */
-    char **argv)			/* Arguments to command:  first arg
+    const char **argv)			/* Arguments to command:  first arg
 					 * is type of entry, others are
 					 * config options. */
 {
@@ -1833,13 +1833,13 @@ static char *
 MenuVarProc(
     ClientData clientData,	/* Information about menu entry. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* First part of variable's name. */
-    char *name2,		/* Second part of variable's name. */
+    const char *name1,		/* First part of variable's name. */
+    const char *name2,		/* Second part of variable's name. */
     int flags)			/* Describes what just happened. */
 {
     MenuEntry *mePtr = (MenuEntry *) clientData;
     Menu *menuPtr;
-    char *value;
+    const char *value;
 
     menuPtr = mePtr->menuPtr;
 

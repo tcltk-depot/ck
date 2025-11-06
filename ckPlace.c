@@ -136,7 +136,7 @@ static Ck_GeomMgr placerType = {
 static void		SlaveStructureProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static int		ConfigureSlave(Tcl_Interp *interp,
-			    Slave *slavePtr, int argc, char **argv);
+			    Slave *slavePtr, int argc, const char **argv);
 static Slave *		FindSlave(CkWindow *winPtr);
 static Master *		FindMaster(CkWindow *winPtr);
 static void		MasterStructureProc(ClientData clientData,
@@ -167,7 +167,7 @@ Ck_PlaceCmd(
     ClientData clientData,	/* Main window associated with interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr;
     Slave *slavePtr;
@@ -472,7 +472,7 @@ ConfigureSlave(
     Slave *slavePtr,		/* Pointer to current information
 				 * about slave. */
     int argc,			/* Number of config arguments. */
-    char **argv)		/* String values for arguments. */
+    const char **argv)		/* String values for arguments. */
 {
     Master *masterPtr;
     int c, length, result;

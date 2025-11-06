@@ -81,7 +81,7 @@ typedef struct Node {
  */
 
 static int		TreeTagsParseProc(ClientData clientData,
-			    Tcl_Interp *interp, CkWindow *winPtr, char *value,
+			    Tcl_Interp *interp, CkWindow *winPtr, const char *value,
 			    char *widgRec, int offset);
 static char *		TreeTagsPrintProc(ClientData clientData,
 			    CkWindow *winPtr, char *widgRec, int offset,
@@ -305,7 +305,7 @@ static Ck_Uid activeUid = NULL;
  */
 
 static Node *		StartTagSearch(Tree *treePtr,
-			    char *tag, TagSearch *searchPtr);
+			    const char *tag, TagSearch *searchPtr);
 static Node *		NextNode(TagSearch *searchPtr);
 static void		DoNode(Tcl_Interp *interp,
 			    Node *nodePtr, Ck_Uid tag);
@@ -313,16 +313,16 @@ static void		TreeCmdDeletedProc(ClientData clientData);
 static void		TreeEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static int		TreeWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		ConfigureTree(Tcl_Interp *interp,
-			    Tree *treePtr, int argc, char **argv,
+			    Tree *treePtr, int argc, const char **argv,
 			    int flags);
 static void		DestroyTree(ClientData clientData);
 static void		DisplayTree(ClientData clientData);
 static void		TreeEventuallyRedraw(Tree *treePtr);
 static int		FindNodes(Tcl_Interp *interp,
-			    Tree *treePtr, int argc, char **argv,
-			    char *newTag, char *cmdName, char *option);
+			    Tree *treePtr, int argc, const char **argv,
+			    const char *newTag, const char *cmdName, const char *option);
 static void		DeleteNode(Tree *treePtr, Node *nodePtr);
 static void		RecomputeVisibleNodes(Tree *treePtr);
 static void		ChangeTreeView(Tree *treePtr, int index);
@@ -354,7 +354,7 @@ Ck_TreeCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Tree *treePtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -449,7 +449,7 @@ TreeWidgetCmd(
     ClientData clientData,	/* Information about widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Tree *treePtr = (Tree *) clientData;
     int result = TCL_OK, redraw = 0, recompute = 0;
@@ -957,7 +957,7 @@ ConfigureTree(
     Tree *treePtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int result, width, height;
@@ -1523,14 +1523,14 @@ TreeTagsParseProc(
     ClientData clientData,		/* Not used.*/
     Tcl_Interp *interp,			/* Used for reporting errors. */
     CkWindow *winPtr,			/* Window containing tree widget. */
-    char *value,			/* Value of option (list of tag
+    const char *value,			/* Value of option (list of tag
 					 * names). */
     char *widgRec,			/* Pointer to record for item. */
     int offset)				/* Offset into item (ignored). */
 {
     Node *nodePtr = (Node *) widgRec, *activeNode = NULL;
     int argc, i, hideChildren = 0, redraw = 0, recompute = 0;
-    char **argv;
+    const char **argv;
     Ck_Uid *newPtr;
 
     /*
@@ -1637,7 +1637,7 @@ TreeTagsPrintProc(
 	return (char *) nodePtr->tagPtr[0];
     }
     *freeProcPtr = TCL_DYNAMIC;
-    return Tcl_Merge(nodePtr->numTags, (char **) nodePtr->tagPtr);
+    return Tcl_Merge(nodePtr->numTags, (const char **) nodePtr->tagPtr);
 }
 
 /*
@@ -1669,7 +1669,7 @@ static Node *
 StartTagSearch(
     Tree *treePtr,			/* Tree whose nodes are to be
 					 * searched. */
-    char *tag,				/* String giving tag value. */
+    const char *tag,			/* String giving tag value. */
     TagSearch *searchPtr)		/* Record describing tag search;
 					 * will be initialized here. */
 {
@@ -1924,16 +1924,16 @@ FindNodes(
 					 * searched. */
     int argc,				/* Number of entries in argv.  Must be
 					 * greater than zero. */
-    char **argv,			/* Arguments that describe what items
+    const char **argv,			/* Arguments that describe what items
 					 * to search for (see user doc on
 					 * "find" and "addtag" options). */
-    char *newTag,			/* If non-NULL, gives new tag to set
+    const char *newTag,			/* If non-NULL, gives new tag to set
 					 * on all found items;  if NULL, then
 					 * ids of found items are returned
 					 * in interp's result. */
-    char *cmdName,			/* Name of original Tcl command, for
+    const char *cmdName,		/* Name of original Tcl command, for
 					 * use in error messages. */
-    char *option)			/* For error messages:  gives option
+    const char *option)			/* For error messages:  gives option
 					 * from Tcl command and other stuff
 					 * up to what's in argc/argv. */
 {

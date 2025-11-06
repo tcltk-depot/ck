@@ -382,7 +382,7 @@ CkBTreeInsertChars(
 					 * index is no longer valid because
 					 * of changes to the segment
 					 * structure. */
-    char *string)			/* Pointer to bytes to insert (may
+    const char *string)			/* Pointer to bytes to insert (may
 					 * contain newlines, must be null-
 					 * terminated). */
 {
@@ -399,7 +399,7 @@ CkBTreeInsertChars(
     CkTextSegment *segPtr;
     CkTextLine *newLinePtr;
     int chunkSize;			/* # characters in current chunk. */
-    char *eol;				/* Pointer to character just after last
+    const char *eol;			/* Pointer to character just after last
 					 * one in current chunk. */
     int changeToLineCount;		/* Counts change to total number of
 					 * lines in file. */

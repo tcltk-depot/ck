@@ -69,7 +69,7 @@ Ck_Uid ckNormalUid = NULL;
  */
 
 typedef int (CkCmdProc)(ClientData clientData, Tcl_Interp *interp,
-			int argc, char **argv);
+			int argc, const char **argv);
 
 typedef struct {
     char *name;				/* Name of command. */
@@ -134,19 +134,19 @@ static void	RefreshThem(CkWindow *winPtr);
 static void     UpdateHWCursor(CkMainInfo *mainPtr);
 static CkWindow *GetWindowXY(CkWindow *winPtr, int *xPtr, int *yPtr);
 static int	DeadAppCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      ExecCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      PutsCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      CloseCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      FlushCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      ReadCmd (ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 static int      GetsCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, char **argv);
+			Tcl_Interp *interp, int argc, const char **argv);
 
 /*
  * Some plain Tcl commands are handled specially.
@@ -249,7 +249,7 @@ NameWindow(
     CkWindow *winPtr,		/* Window that is to be named and inserted. */
     CkWindow *parentPtr,	/* Pointer to logical parent for winPtr
 				 * (used for naming, options, etc.). */
-    char *name)			/* Name for winPtr;   must be unique among
+    const char *name)		/* Name for winPtr;   must be unique among
 				 * parentPtr's children. */
 {
 #define FIXED_SIZE 200
@@ -374,7 +374,7 @@ static void
 HandleWinch(int sig)
 {
     if (ckMainInfo != NULL && ckMainInfo->winchFd[1] >= 0) {
-	write(ckMainInfo->winchFd[1], "R", 1);
+	if (-1 == write(ckMainInfo->winchFd[1], "R", 1)) perror("write");
     }
 }
 #endif
@@ -755,7 +755,8 @@ int
 Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 {
     CkWindow *mainWindow;
-    char *p, *name, *class;
+    const char *p, *name;
+    char *class;
     int code;
     static char initCmd[] =
 "proc init {} {\n\
@@ -889,7 +890,7 @@ Ck_CreateWindowFromPath(
 				 * initialized by the caller. */
     CkWindow *anywin,		/* Pointer to any window in application
 				 * that is to contain new window. */
-    char *pathName,		/* Path name for new window within the
+    const char *pathName,	/* Path name for new window within the
 				 * application of anywin. The parent of
 				 * this window must already exist, but
 				 * the window itself must not exist. */
@@ -1579,7 +1580,7 @@ Ck_GetRootGeometry(
 CkWindow *
 Ck_NameToWindow(
     Tcl_Interp *interp,		/* Where to report errors. */
-    char *pathName,		/* Path name of window. */
+    const char *pathName,	/* Path name of window. */
     CkWindow *winPtr)		/* Pointer to window:  name is assumed to
 				 * belong to the same main window as winPtr. */
 {
@@ -1614,7 +1615,7 @@ Ck_NameToWindow(
 void
 Ck_SetClass(
     CkWindow *winPtr,		/* Window to assign class. */
-    char *className)		/* New class for window. */
+    const char *className)	/* New class for window. */
 {
     winPtr->classUid = Ck_GetUid(className);
     CkOptionClassChanged(winPtr);
@@ -2327,7 +2328,7 @@ DeadAppCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     Tcl_SetResult(interp, "toolkit uninstalled", TCL_STATIC);
     return TCL_ERROR;
@@ -2352,12 +2353,12 @@ ExecCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
     int result, endWin = 0, length;
-    char *savedargv1 = NULL;
+    const char *savedargv1 = NULL;
     char *clrCmd = NULL;
 #ifdef SIGINT
 #ifdef HAVE_SIGACTION
@@ -2390,7 +2391,13 @@ ExecCmd(
 #endif
 #ifndef _WIN32
 	if (clrCmd != NULL && clrCmd != (char *) -1) {
-	    write(1, clrCmd, strlen(clrCmd));
+	    size_t remain = strlen(clrCmd);
+	    while (remain > 0) {
+		int wrote = write(1, clrCmd, remain);
+		if (wrote == -1) perror("write");
+		remain -= wrote;
+	    }
+
 	}
 #endif
     }
@@ -2431,12 +2438,12 @@ PutsCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
     int index = 0;
-    char *newArgv[5];
+    const char *newArgv[5];
 
     newArgv[0] = argv[0];
     if (argc > 1 && strcmp(argv[1], "-nonewline") == 0) {
@@ -2476,7 +2483,7 @@ CloseCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2511,7 +2518,7 @@ FlushCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2546,7 +2553,7 @@ ReadCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
@@ -2582,7 +2589,7 @@ GetsCmd(
     ClientData clientData,
     Tcl_Interp *interp,
     int argc,
-    char **argv)
+    const char **argv)
 {
     RedirInfo *redirInfo = (RedirInfo *) clientData;
     Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;

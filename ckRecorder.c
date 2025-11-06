@@ -63,7 +63,7 @@ RecorderInput(
     Tcl_Time now;
     char buffer[64];
     char *keySym, *barCode, *result;
-    char *argv[16];
+    const char *argv[16];
 
     if (recPtr->record == NULL) {
 	Ck_DeleteGenericHandler(RecorderInput, clientData);
@@ -266,7 +266,7 @@ RecorderReplay(ClientData clientData)
 	    CkEvent event;
 	    int cmdError = TCL_OK, deliver = 0;
 	    int argc;
-	    char **argv;
+	    const char **argv;
 
 	    if (Tcl_SplitList(recPtr->interp, p, &argc, &argv) != TCL_OK) {
 		Tcl_BackgroundException(recPtr->interp, TCL_ERROR);
@@ -406,7 +406,7 @@ Ck_RecorderCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Recorder *recPtr = ckRecorder;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -471,11 +471,12 @@ replayError:
 	Tcl_DoWhenIdle(RecorderReplay, (ClientData) recPtr);
     } else if ((c == 's') && (strncmp(argv[1], "start", length) == 0) &&
 	(length > 1)) {
-	char *fileName, *ires;
+	char *fileName;
+	const char *ires;
 	int withDelay = 0, fileArg = 2;
 	Tcl_DString buffer;
 	Tcl_Channel newRecord;
-	char *string;
+	const char *string;
 
 	if (argc < 3 || argc > 4) {
 badStartArgs:

@@ -201,9 +201,9 @@ static ElArray *	ExtendArray(ElArray *arrayPtr, Element *elPtr);
 static void		ExtendStacks(ElArray *arrayPtr, int leaf);
 static ElArray *	NewArray(int numEls);
 static void		OptionInit(CkMainInfo *mainPtr);
-static int		ParsePriority(Tcl_Interp *interp, char *string);
+static int		ParsePriority(Tcl_Interp *interp, const char *string);
 static int		ReadOptionFile(Tcl_Interp *interp,
-			    CkWindow *winPtr, char *fileName, int priority);
+			    CkWindow *winPtr, const char *fileName, int priority);
 static void		SetupStacks(CkWindow *winPtr, int leaf);
 
 /*
@@ -226,8 +226,8 @@ void
 Ck_AddOption(
     CkWindow *winPtr,		/* Window pointer; option will be associated
 				 * with main window for this window. */
-    char *name,			/* Multi-element name of option. */
-    char *value,		/* String value for option. */
+    const char *name,		/* Multi-element name of option. */
+    const char *value,		/* String value for option. */
     int priority)		/* Overall priority level to use for
 				 * this option, such as CK_USER_DEFAULT_PRIO
 				 * or CK_INTERACTIVE_PRIO.  Must be between
@@ -236,8 +236,8 @@ Ck_AddOption(
     ElArray **arrayPtrPtr;
     Element *elPtr;
     Element newEl;
-    char *p;
-    char *field;
+    const char *p;
+    const char *field;
     int count, firstField, length;
 #define TMP_SIZE 100
     char tmp[TMP_SIZE+1];
@@ -383,8 +383,8 @@ Ck_Uid
 Ck_GetOption(
     CkWindow *winPtr,		/* Pointer to window that option is
 				 * associated with. */
-    char *name,			/* Name of option. */
-    char *className)		/* Class of option.  NULL means there
+    const char *name,		/* Name of option. */
+    const char *className)	/* Class of option.  NULL means there
 				 * is no class for this option:  just
 				 * check for name. */
 {
@@ -464,7 +464,7 @@ Ck_OptionCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     size_t length;
@@ -525,7 +525,7 @@ Ck_OptionCmd(
 	}
 	value = Ck_GetOption(winPtr2, argv[3], argv[4]);
 	if (value != NULL) {
-	    Tcl_SetResult(interp, value, TCL_VOLATILE);
+	    Tcl_SetResult(interp, (char *) value, TCL_VOLATILE);
 	}
 	return TCL_OK;
     } else if ((c == 'r') && (strncmp(argv[1], "readfile", length) == 0)) {
@@ -678,7 +678,7 @@ CkOptionClassChanged(CkWindow *winPtr)	/* Window whose class changed. */
 static int
 ParsePriority(
     Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
-    char *string)		/* Describes a priority level, either
+    const char *string)		/* Describes a priority level, either
 				 * symbolically or numerically. */
 {
     int priority, c;
@@ -887,7 +887,7 @@ ReadOptionFile(
     Tcl_Interp *interp,		/* Interpreter to use for reporting results. */
     CkWindow *winPtr,		/* Pointer to window:  options are entered
 				 * for this window's main window. */
-    char *fileName,		/* Name of file containing options. */
+    const char *fileName,	/* Name of file containing options. */
     int priority)		/* Priority level to use for options in
 				 * this file, such as TK_USER_DEFAULT_PRIO
 				 * or TK_INTERACTIVE_PRIO.  Must be between

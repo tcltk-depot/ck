@@ -22,8 +22,8 @@
  * Global variables used by the main program:
  */
 
-static Tcl_Interp *interp;	/* Interpreter for this application. */
-static char *fileName = NULL;	/* Script to source, if any. */
+static Tcl_Interp *interp;		/* Interpreter for this application. */
+static const char *fileName = NULL;	/* Script to source, if any. */
 
 #ifdef TCL_MEM_DEBUG
 static char dumpFile[100];      /* Records where to dump memory allocation
@@ -57,14 +57,15 @@ static int	CheckmemCmd(ClientData clientData,
 void
 Ck_Main(
     int argc,				/* Number of arguments. */
-    char **argv,			/* Array of argument strings. */
+    const char **argv,			/* Array of argument strings. */
     int (*appInitProc)(Tcl_Interp *),   /* Application-specific initialization
 					 * procedure to call after most
 					 * initialization but before starting
 					 * to execute commands. */
     Tcl_Interp *interp)
 {
-    char *args, *msg, *argv0;
+    char *args;
+    const char *msg, *argv0;
     char buf[20];
     int code;
     Tcl_Channel errChannel = NULL;
@@ -123,7 +124,7 @@ Ck_Main(
      */
 
     if ((*appInitProc)(interp) != TCL_OK) {
-	char *ires = Tcl_GetStringResult(interp);
+	const char *ires = Tcl_GetStringResult(interp);
 
 	errChannel = Tcl_GetStdChannel(TCL_STDERR);
 	if (errChannel) {
@@ -162,7 +163,7 @@ Ck_Main(
         Tcl_DStringInit(&temp);
         fullName = Tcl_TranslateFileName(interp, fileName, &temp);
         if (fullName == NULL) {
-	    char *ires = Tcl_GetStringResult(interp);
+	    const char *ires = Tcl_GetStringResult(interp);
 
             errChannel = Tcl_GetStdChannel(TCL_STDERR);
             if (errChannel) {
@@ -181,7 +182,7 @@ Ck_Main(
                 if (Tcl_EvalFile(interp, fullName) != TCL_OK) {
                     errChannel = Tcl_GetStdChannel(TCL_STDERR);
                     if (errChannel) {
-			char *ires = Tcl_GetStringResult(interp);
+			const char *ires = Tcl_GetStringResult(interp);
 
                         Tcl_Write(errChannel, ires, -1);
                         Tcl_Write(errChannel, "\n", 1);

@@ -38,7 +38,7 @@ Ck_FocusCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkWindow *newPtr, *focusWinPtr;

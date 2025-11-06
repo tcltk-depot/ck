@@ -187,8 +187,8 @@ static void		ExpandPercents(CkWindow *winPtr,
 			    Tcl_DString *dsPtr);
 static PatSeq *		FindSequence(Tcl_Interp *interp,
 			    BindingTable *bindPtr, ClientData object,
-			    char *eventString, int create);
-static char *		GetField(char *p, char *copy, int size);
+			    const char *eventString, int create);
+static const char *	GetField(const char *p, char *copy, int size);
 static PatSeq *		MatchPatterns(BindingTable *bindPtr, PatSeq *psPtr);
 
 /*
@@ -341,9 +341,9 @@ Ck_CreateBinding(
     Ck_BindingTable bindingTable,	/* Table in which to create binding. */
     ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString,			/* String describing event sequence
+    const char *eventString,		/* String describing event sequence
 					 * that triggers binding. */
-    char *command,			/* Contains Tcl command to execute
+    const char *command,		/* Contains Tcl command to execute
 					 * when binding triggers. */
     int append)				/* 0 means replace any existing
 					 * binding for eventString;  1 means
@@ -398,7 +398,7 @@ Ck_DeleteBinding(
     Ck_BindingTable bindingTable,	/* Table in which to delete binding. */
     ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString)			/* String describing event sequence
+    const char *eventString)		/* String describing event sequence
 					 * that triggers binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -486,7 +486,7 @@ Ck_GetBinding(
 					 * binding. */
     ClientData object,			/* Token for object with which binding
 					 * is associated. */
-    char *eventString)			/* String describing event sequence
+    const char *eventString)		/* String describing event sequence
 					 * that triggers binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
@@ -937,7 +937,7 @@ FindSequence(
     BindingTable *bindPtr,	/* Table to use for lookup. */
     ClientData object,		/* Token for object(s) with which binding
 				 * is associated. */
-    char *eventString,		/* String description of pattern to
+    const char *eventString,	/* String description of pattern to
 				 * match on.  See user documentation
 				 * for details. */
     int create)			/* 0 means don't create the entry if
@@ -947,7 +947,7 @@ FindSequence(
 {
     Pattern pats[EVENT_BUFFER_SIZE];
     int numPats, isCtrl;
-    char *p;
+    const char *p;
     Pattern *patPtr;
     PatSeq *psPtr;
     Tcl_HashEntry *hPtr;
@@ -1187,9 +1187,9 @@ done:
  *----------------------------------------------------------------------
  */
 
-static char *
+static const char *
 GetField(
-    char *p,			/* Pointer to part of pattern. */
+    const char *p,		/* Pointer to part of pattern. */
     char *copy,			/* Place to copy field. */
     int size)			/* Maximum number of characters to
 				 * copy. */
@@ -1524,7 +1524,7 @@ ExpandPercents(
  */
 
 KeySym
-CkStringToKeysym(char *name)		/* Name of a keysym. */
+CkStringToKeysym(const char *name)		/* Name of a keysym. */
 {
     Tcl_HashEntry *hPtr;
 
@@ -1605,7 +1605,7 @@ CkKeysymToString(KeySym keySym, int printControl)
 int
 CkTermHasKey(
     Tcl_Interp *interp,		/* Interpreter used for result. */
-    char *name)			/* Name of a keysym. */
+    const char *name)		/* Name of a keysym. */
 {
 #ifndef _WIN32
     Tcl_HashEntry *hPtr;

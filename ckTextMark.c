@@ -93,7 +93,7 @@ CkTextMarkCmd(
     CkText *textPtr,		/* Information about text widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings.  Someone else has already
+    const char **argv)		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "mark". */
 {
@@ -215,7 +215,7 @@ CkTextMarkCmd(
 CkTextSegment *
 CkTextSetMark(
     CkText *textPtr,		/* Text widget in which to create mark. */
-    char *name,			/* Name of mark to set. */
+    const char *name,		/* Name of mark to set. */
     CkTextIndex *indexPtr)	/* Where to set mark. */
 {
     Tcl_HashEntry *hPtr;
@@ -330,7 +330,7 @@ CkTextMarkSegToIndex(
 int
 CkTextMarkNameToIndex(
     CkText *textPtr,		/* Text widget containing mark. */
-    char *name,			/* Name of mark. */
+    const char *name,		/* Name of mark. */
     CkTextIndex *indexPtr)	/* Index information gets stored here. */
 {
     Tcl_HashEntry *hPtr;

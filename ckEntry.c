@@ -178,7 +178,7 @@ static Ck_ConfigSpec configSpecs[] = {
  */
 
 static int		ConfigureEntry(Tcl_Interp *interp,
-			    Entry *entryPtr, int argc, char **argv,
+			    Entry *entryPtr, int argc, const char **argv,
 			    int flags);
 static void		DeleteChars(Entry *entryPtr, int index, int count);
 static void		DestroyEntry(ClientData clientData);
@@ -189,19 +189,19 @@ static void		EntryEventProc(ClientData clientData,
 static void		EntryFocusProc(Entry *entryPtr, int gotFocus);
 static void		EventuallyRedraw(Entry *entryPtr);
 static void		EntryCmdDeletedProc(ClientData clientData);
-static void		EntrySetValue(Entry *entryPtr, char *value);
+static void		EntrySetValue(Entry *entryPtr, const char *value);
 static void		EntrySelectTo(Entry *entryPtr, int index);
 static char *		EntryTextVarProc(ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
+			    Tcl_Interp *interp, const char *name1, const char *name2,
 			    int flags);
 static void		EntryUpdateScrollbar(Entry *entryPtr);
 static void		EntryVisibleRange(Entry *entryPtr,
 			    double *firstPtr, double *lastPtr);
 static int		EntryWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		GetEntryIndex(Tcl_Interp *interp,
-			    Entry *entryPtr, char *string, int *indexPtr);
-static void		InsertChars(Entry *entryPtr, int index, char *string);
+			    Entry *entryPtr, const char *string, int *indexPtr);
+static void		InsertChars(Entry *entryPtr, int index, const char *string);
 
 /*
  *--------------------------------------------------------------
@@ -227,7 +227,7 @@ Ck_EntryCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     Entry *entryPtr;
@@ -322,7 +322,7 @@ EntryWidgetCmd(
     ClientData clientData,		/* Information about entry widget. */
     Tcl_Interp *interp,			/* Current interpreter. */
     int argc,				/* Number of arguments. */
-    char **argv)			/* Argument strings. */
+    const char **argv)			/* Argument strings. */
 {
     Entry *entryPtr = (Entry *) clientData;
     int result = TCL_OK;
@@ -702,7 +702,7 @@ ConfigureEntry(
     Entry *entryPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
@@ -727,7 +727,7 @@ ConfigureEntry(
      */
 
     if (entryPtr->textVarName != NULL) {
-	char *value;
+	const char *value;
 
 	value = Tcl_GetVar(interp, entryPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
@@ -1020,7 +1020,7 @@ InsertChars(
 				 * elements. */
     int index,			/* Add the new elements before this
 				 * element. */
-    char *string)		/* New characters to add (NULL-terminated
+    const char *string)		/* New characters to add (NULL-terminated
 				 * string). */
 {
     int length, clength;
@@ -1199,7 +1199,7 @@ static void
 EntrySetValue(
     Entry *entryPtr,			/* Entry whose value is to be
 					 * changed. */
-    char *value)			/* New text to display in entry. */
+    const char *value)			/* New text to display in entry. */
 {
     ckfree(entryPtr->string);
     entryPtr->numBytes = strlen(value);
@@ -1289,7 +1289,7 @@ GetEntryIndex(
     Tcl_Interp *interp,		/* For error messages. */
     Entry *entryPtr,		/* Entry for which the index is being
 				 * specified. */
-    char *string,		/* Specifies character in entryPtr. */
+    const char *string,		/* Specifies character in entryPtr. */
     int *indexPtr)		/* Where to store converted index. */
 {
     size_t length;
@@ -1629,12 +1629,12 @@ static char *
 EntryTextVarProc(
     ClientData clientData,	/* Information about button. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Not used. */
-    char *name2,		/* Not used. */
+    const char *name1,		/* Not used. */
+    const char *name2,		/* Not used. */
     int flags)			/* Information about what happened. */
 {
     Entry *entryPtr = (Entry *) clientData;
-    char *value;
+    const char *value;
 
     /*
      * If the variable is unset, then immediately recreate it unless

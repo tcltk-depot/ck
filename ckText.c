@@ -100,19 +100,19 @@ int ckTextDebug = 0;
  */
 
 static int		ConfigureText(Tcl_Interp *interp,
-			    CkText *textPtr, int argc, char **argv, int flags);
+			    CkText *textPtr, int argc, const char **argv, int flags);
 static int		DeleteChars(CkText *textPtr,
-			    char *index1String, char *index2String);
+			    const char *index1String, const char *index2String);
 static void		DestroyText(ClientData clientData);
 static void		InsertChars(CkText *textPtr,
-			    CkTextIndex *indexPtr, char *string);
+			    CkTextIndex *indexPtr, const char *string);
 static void		TextCmdDeletedProc(ClientData clientData);
 static void		TextEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static int		TextSearchCmd(CkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		TextWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 
 /*
  *--------------------------------------------------------------
@@ -137,7 +137,7 @@ Ck_TextCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *new;
@@ -259,7 +259,7 @@ TextWidgetCmd(
     ClientData clientData,	/* Information about text widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkText *textPtr = (CkText *) clientData;
     int result = TCL_OK;
@@ -308,7 +308,7 @@ TextWidgetCmd(
     } else if ((c == 'c') && (strncmp(argv[1], "compare", length) == 0)
 	    && (length >= 3)) {
 	int relation, value;
-	char *p;
+	const char *p;
 
 	if (argc != 5) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -482,7 +482,7 @@ TextWidgetCmd(
     } else if ((c == 'i') && (strncmp(argv[1], "insert", length) == 0)
 	    && (length >= 3)) {
 	int i, j, numTags;
-	char **tagNames;
+	const char **tagNames;
 	CkTextTag **oldTagArrayPtr;
 
 	if (argc < 4) {
@@ -647,7 +647,7 @@ ConfigureText(
     CkText *textPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, textPtr->winPtr, configSpecs,
@@ -846,7 +846,7 @@ InsertChars(
     CkText *textPtr,		/* Overall information about text widget. */
     CkTextIndex *indexPtr,	/* Where to insert new characters.  May be
 				 * modified and/or invalidated. */
-    char *string)		/* Null-terminated string containing new
+    const char *string)		/* Null-terminated string containing new
 				 * information to add to text. */
 {
     int lineIndex;
@@ -897,9 +897,9 @@ InsertChars(
 static int
 DeleteChars(
     CkText *textPtr,		/* Overall information about text widget. */
-    char *index1String,		/* String describing location of first
+    const char *index1String,	/* String describing location of first
 				 * character to delete. */
-    char *index2String)		/* String describing location of last
+    const char *index2String)	/* String describing location of last
 				 * character to delete.  NULL means just
 				 * delete the one character given by
 				 * index1String. */
@@ -1053,14 +1053,14 @@ TextSearchCmd(
     CkText *textPtr,		/* Information about text widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     int backwards, exact, c, i, argsLeft, noCase, leftToScan;
     size_t length;
     int numLines, startingLine, startingChar, lineNum, firstChar, lastChar;
     int code, matchLength, matchChar, passes, stopLine, searchWholeText;
     int patLength;
-    char *arg, *pattern, *varName, *p, *startOfLine;
+    const char *arg, *pattern, *varName, *p, *startOfLine;
     char buffer[64];
     CkTextIndex index, stopIndex;
     Tcl_DString line, patDString;
@@ -1133,7 +1133,7 @@ TextSearchCmd(
 	Tcl_DStringInit(&patDString);
 	Tcl_DStringAppend(&patDString, pattern, -1);
 	pattern = Tcl_DStringValue(&patDString);
-	Tcl_UtfToLower(pattern);
+	Tcl_UtfToLower((char *) pattern);
     }
 
     if (CkTextGetIndex(interp, textPtr, argv[i+1], &index) != TCL_OK) {
@@ -1282,7 +1282,7 @@ TextSearchCmd(
 		i = p - startOfLine;
 		thisLength = patLength;
 	    } else {
-		char *start, *end;
+		const char *start, *end;
 		int match;
 
 		match = Tcl_RegExpExec(interp, regexp,
@@ -1424,11 +1424,11 @@ CkTextGetTabs(
     Tcl_Interp *interp,			/* Used for error reporting. */
     CkWindow *winPtr,			/* Window in which the tabs will be
 					 * used. */
-    char *string)			/* Description of the tab stops.  See
+    const char *string)			/* Description of the tab stops.  See
 					 * text manual entry for details. */
 {
     int argc, i, count, c = 0;
-    char **argv;
+    const char **argv;
     CkTextTabArray *tabArrayPtr;
     CkTextTab *tabPtr;
     Tcl_UniChar ch;

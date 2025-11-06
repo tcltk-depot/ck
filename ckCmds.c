@@ -16,7 +16,7 @@
 #include "ck.h"
 
 static char *     WaitVariableProc(ClientData clientData,
-		      Tcl_Interp *interp, char *name1, char *name2,
+		      Tcl_Interp *interp, const char *name1, const char *name2,
                       int flags);
 static void       WaitVisibilityProc(ClientData clientData,
                       CkEvent *eventPtr);
@@ -47,7 +47,7 @@ Ck_DestroyCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -87,7 +87,7 @@ Ck_ExitCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     extern CkMainInfo *ckMainInfo;
     int index = 1, noclear = 0, value = 0;
@@ -143,7 +143,7 @@ Ck_LowerCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *winPtr, *other;
@@ -195,7 +195,7 @@ Ck_RaiseCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     CkWindow *winPtr, *other;
@@ -247,7 +247,7 @@ Ck_BellCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     beep();
     doupdate();
@@ -277,7 +277,7 @@ Ck_UpdateCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int flags;
@@ -343,7 +343,7 @@ Ck_CursesCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkMainInfo *mainPtr = winPtr->mainPtr;
@@ -533,7 +533,7 @@ Ck_WinfoCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int length;
@@ -719,7 +719,7 @@ Ck_BindCmd(
     ClientData clientData,	/* Main window associated with interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainWin = (CkWindow *) clientData;
     CkWindow *winPtr;
@@ -878,12 +878,12 @@ Ck_BindtagsCmd(
     ClientData clientData,	/* Main window associated with interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainWin = (CkWindow *) clientData;
     CkWindow *winPtr, *winPtr2;
     int i, tagArgc;
-    char *p, **tagArgv;
+    const char *p, **tagArgv;
 
     if ((argc < 2) || (argc > 3)) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
@@ -1011,7 +1011,7 @@ Ck_TkwaitCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     int c, done;
@@ -1092,8 +1092,8 @@ static char *
 WaitVariableProc(
     ClientData clientData,	/* Pointer to integer to set to 1. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Name of variable. */
-    char *name2,		/* Second part of variable name. */
+    const char *name1,		/* Name of variable. */
+    const char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
     int *donePtr = (int *) clientData;

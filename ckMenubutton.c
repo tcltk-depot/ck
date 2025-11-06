@@ -208,11 +208,11 @@ static void		MenuButtonEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static char *		MenuButtonTextVarProc(ClientData clientData,
 			    Tcl_Interp *interp,
-			    char *name1, char *name2, int flags);
+			    const char *name1, const char *name2, int flags);
 static int		MenuButtonWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static int		ConfigureMenuButton(Tcl_Interp *interp,
-			    MenuButton *mbPtr, int argc, char **argv,
+			    MenuButton *mbPtr, int argc, const char **argv,
 			    int flags);
 static void		DestroyMenuButton(ClientData clientData);
 static void		DisplayMenuButton(ClientData clientData);
@@ -241,7 +241,7 @@ Ck_MenubuttonCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     MenuButton *mbPtr;
     CkWindow *mainPtr = (CkWindow *) clientData;
@@ -333,7 +333,7 @@ MenuButtonWidgetCmd(
     ClientData clientData,	/* Information about button widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
     int result = TCL_OK;
@@ -450,7 +450,7 @@ ConfigureMenuButton(
     MenuButton *mbPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     int result;
@@ -491,7 +491,7 @@ ConfigureMenuButton(
 	 * for any changes in it.
 	 */
 
-	char *value;
+	const char *value;
 
 	value = Tcl_GetVar(interp, mbPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
@@ -795,12 +795,12 @@ static char *
 MenuButtonTextVarProc(
     ClientData clientData,	/* Information about button. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Name of variable. */
-    char *name2,		/* Second part of variable name. */
+    const char *name1,		/* Name of variable. */
+    const char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
     MenuButton *mbPtr = (MenuButton *) clientData;
-    char *value;
+    const char *value;
 
     /*
      * If the variable is unset, then immediately recreate it unless

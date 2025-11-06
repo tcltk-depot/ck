@@ -81,7 +81,7 @@ static struct {
  */
 
 Ck_Uid
-Ck_GetUid(char *string)		/* String to convert. */
+Ck_GetUid(const char *string)		/* String to convert. */
 {
     int dummy;
 
@@ -179,11 +179,11 @@ Ck_NameOfColor(int color)	/* Curses color to get name for */
 int
 Ck_GetAttr(
     Tcl_Interp *interp,
-    char *name,
+    const char *name,
     int *attrPtr)
 {
     int i, k, len, largc;
-    char **largv;
+    const char **largv;
 
     if (Tcl_SplitList(interp, name, &largc, &largv) != TCL_OK)
 	return TCL_ERROR;
@@ -316,7 +316,7 @@ Ck_GetPair(CkWindow *winPtr, int fg, int bg)
 int
 Ck_GetAnchor(
     Tcl_Interp *interp,		/* Use this for error reporting. */
-    char *string,		/* String describing a direction. */
+    const char *string,		/* String describing a direction. */
     Ck_Anchor *anchorPtr)	/* Where to store Ck_Anchor corresponding
 				 * to string. */
 {
@@ -431,7 +431,7 @@ Ck_NameOfAnchor(Ck_Anchor anchor)	/* Anchor for which identifying string
 int
 Ck_GetJustify(
     Tcl_Interp *interp,		/* Use this for error reporting. */
-    char *string,		/* String describing a justification style. */
+    const char *string,		/* String describing a justification style. */
     Ck_Justify *justifyPtr)	/* Where to store Ck_Justify corresponding
 				 * to string. */
 {
@@ -515,7 +515,7 @@ int
 Ck_GetCoord(
     Tcl_Interp *interp,        /* Use this for error reporting. */
     CkWindow *winPtr,          /* Window (not used). */
-    char *string,              /* String to convert. */
+    const char *string,        /* String to convert. */
     int *intPtr)               /* Place to store converted result. */
 {
     int value;

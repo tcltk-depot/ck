@@ -26,8 +26,8 @@
  * Forward declarations for procedures defined later in this file:
  */
 
-static char *		ForwBack(char *string, CkTextIndex *indexPtr);
-static char *		StartEnd(char *string, CkTextIndex *indexPtr);
+static const char *	ForwBack(const char *string, CkTextIndex *indexPtr);
+static const char *	StartEnd(const char *string, CkTextIndex *indexPtr);
 
 /*
  *---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ CkTextMakeByteIndex(
 {
     CkTextSegment *segPtr;
     int index;
-    char *p, *start;
+    const char *p, *start;
     Tcl_UniChar ch;
 
     indexPtr->tree = tree;
@@ -309,17 +309,20 @@ int
 CkTextGetIndex(
     Tcl_Interp *interp,		/* Use this for error reporting. */
     CkText *textPtr,		/* Information about text widget. */
-    char *string,		/* Textual description of position. */
+    const char *string,		/* Textual description of position. */
     CkTextIndex *indexPtr)	/* Index structure to fill in. */
 {
-    char *p;
-    char *end, *endOfBase;
+    int code = TCL_OK;
+    const char *p;
+    const char *end, *endOfBase;
     Tcl_HashEntry *hPtr;
     CkTextTag *tagPtr;
     CkTextSearch search;
     CkTextIndex first, last;
     int wantLast, result;
     char c;
+    Tcl_DString tmp;
+    Tcl_DStringInit(&tmp);
 
     /*
      *---------------------------------------------------------------------
@@ -331,7 +334,8 @@ CkTextGetIndex(
      */
 
     if (CkTextMarkNameToIndex(textPtr, string, indexPtr) == TCL_OK) {
-	return TCL_OK;
+	code = TCL_OK;
+	goto finally;
     }
 
     /*
@@ -361,9 +365,9 @@ CkTextGetIndex(
 	} else {
 	    goto tryxy;
 	}
-	*p = 0;
-	hPtr = Tcl_FindHashEntry(&textPtr->tagTable, string);
-	*p = '.';
+	Tcl_DStringAppend(&tmp, string, (int) (p - string));
+	hPtr = Tcl_FindHashEntry(&textPtr->tagTable, Tcl_DStringValue(&tmp));
+	Tcl_DStringSetLength(&tmp, 0);
 	if (hPtr == NULL) {
 	    goto tryxy;
 	}
@@ -377,7 +381,8 @@ CkTextGetIndex(
 		    "text doesn't contain any characters tagged with \"",
 		    Tcl_GetHashKey(&textPtr->tagTable, hPtr), "\"",
 			    (char *) NULL);
-	    return TCL_ERROR;
+	    code = TCL_ERROR;
+	    goto finally;
 	}
 	*indexPtr = search.curIndex;
 	if (wantLast) {
@@ -397,12 +402,12 @@ CkTextGetIndex(
 	int x, y;
 
 	p = string+1;
-	x = strtol(p, &end, 0);
+	x = strtol(p, (char **) &end, 0);
 	if ((end == p) || (*end != ',')) {
 	    goto error;
 	}
 	p = end+1;
-	y = strtol(p, &end, 0);
+	y = strtol(p, (char **) &end, 0);
 	if (end == p) {
 	    goto error;
 	}
@@ -418,7 +423,7 @@ CkTextGetIndex(
 	 * Base is identified with line and character indices.
 	 */
 
-	lineIndex = strtol(string, &end, 0) - 1;
+	lineIndex = strtol(string, (char **) &end, 0) - 1;
 	if ((end == string) || (*end != '.')) {
 	    goto error;
 	}
@@ -427,7 +432,7 @@ CkTextGetIndex(
 	    charIndex = LAST_CHAR;
 	    endOfBase = p+3;
 	} else {
-	    charIndex = strtol(p, &end, 0);
+	    charIndex = strtol(p, (char **) &end, 0);
 	    if (end == p) {
 		goto error;
 	    }
@@ -472,10 +477,9 @@ CkTextGetIndex(
 	 * See if the base position is the name of a mark.
 	 */
 
-	c = *endOfBase;
-	*endOfBase = 0;
-	result = CkTextMarkNameToIndex(textPtr, string, indexPtr);
-	*endOfBase = c;
+	Tcl_DStringAppend(&tmp, string, (int) (endOfBase - string));
+	result = CkTextMarkNameToIndex(textPtr, Tcl_DStringValue(&tmp), indexPtr);
+	Tcl_DStringSetLength(&tmp, 0);
 	if (result == TCL_OK) {
 	    goto gotBase;
 	}
@@ -510,12 +514,16 @@ CkTextGetIndex(
 	    goto error;
 	}
     }
-    return TCL_OK;
+
+    finally:
+    Tcl_DStringFree(&tmp);
+    return code;
 
     error:
     Tcl_AppendResult(interp, "bad text index \"", string, "\"",
 	    (char *) NULL);
-    return TCL_ERROR;
+    code = TCL_ERROR;
+    goto finally;
 }
 
 /*
@@ -633,16 +641,16 @@ CkTextIndexCmp(
  *----------------------------------------------------------------------
  */
 
-static char *
+static const char *
 ForwBack(
-    char *string,		/* String to parse for additional info
+    const char *string,		/* String to parse for additional info
 				 * about modifier (count and units).
 				 * Points to "+" or "-" that starts
 				 * modifier. */
     CkTextIndex *indexPtr)	/* Index to update as specified in string. */
 {
-    char *p;
-    char *end, *units;
+    const char *p;
+    const char *end, *units;
     int count, lineIndex;
     size_t length;
 
@@ -654,7 +662,7 @@ ForwBack(
     while (isspace((unsigned char) *p)) {
 	p++;
     }
-    count = strtol(p, &end, 0);
+    count = strtol(p, (char**) &end, 0);
     if (end == p) {
 	return NULL;
     }
@@ -955,7 +963,7 @@ CkTextIndexBackChars(
     int lineIndex;
     CkTextSegment *oldPtr;
     int segSize;
-    char *p, *start, *end;
+    const char *p, *start, *end;
 
     if (count < 0) {
 	CkTextIndexForwChars(srcPtr, -count, dstPtr);
@@ -1063,15 +1071,15 @@ CkTextIndexBackChars(
  *----------------------------------------------------------------------
  */
 
-static char *
+static const char *
 StartEnd(
-    char *string,		/* String to parse for additional info
+    const char *string,		/* String to parse for additional info
 				 * about modifier (count and units).
 				 * Points to first character of modifer
 				 * word. */
     CkTextIndex *indexPtr)	/* Index to mdoify based on string. */
 {
-    char *p;
+    const char *p;
     int c, offset;
     size_t length;
     CkTextSegment *segPtr;

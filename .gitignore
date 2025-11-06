@@ -1,0 +1,12 @@
+*.o
+*.swp
+/pkgIndex.tcl
+/Makefile
+/ckConfig.sh
+cwsh
+libck*.so
+tags
+config.log
+config.status
+autom4te.cache
+.vimrc

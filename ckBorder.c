@@ -33,7 +33,7 @@ static int initialized = 0;		/* gCharTable initialized. */
 int
 Ck_GetGChar(
     Tcl_Interp *interp,
-    char *name,
+    const char *name,
     long *gchar)
 {
     Tcl_HashEntry *hPtr;
@@ -48,7 +48,7 @@ Ck_GetGChar(
 	 * an unsigned int. Instead of using the ACS_* macros,
 	 * we build the map from the tigetstr("acsc") information.
 	 */
-	unsigned int local_map[128];
+	uintptr_t local_map[128];
 	char *acsc = tigetstr("acsc");
 	int i;
 
@@ -250,7 +250,7 @@ Ck_GetGChar(
 int
 Ck_SetGChar(
     Tcl_Interp *interp,
-    char *name,
+    const char *name,
     long gchar)
 {
     Tcl_HashEntry *hPtr;
@@ -279,11 +279,11 @@ Ck_SetGChar(
 CkBorder *
 Ck_GetBorder(
     Tcl_Interp *interp,
-    char *string)
+    const char *string)
 {
     int i, largc;
     long bchar[8];
-    char **largv;
+    const char **largv;
     CkBorder *borderPtr;
 
     if (Tcl_SplitList(interp, string, &largc, &largv) != TCL_OK)

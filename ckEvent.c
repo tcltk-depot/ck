@@ -1167,7 +1167,7 @@ CkBarcodeCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkMainInfo *mainPtr = ((CkWindow *) (clientData))->mainPtr;
     BarcodeData *bd = (BarcodeData *) mainPtr->barcodeData;

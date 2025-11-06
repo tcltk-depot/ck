@@ -125,14 +125,14 @@ static Ck_ConfigSpec configSpecs[] = {
 static void		MessageEventProc(ClientData clientData,
 			    CkEvent *eventPtr);
 static char *		MessageTextVarProc(ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
+			    Tcl_Interp *interp, const char *name1, const char *name2,
 			    int flags);
 static int		MessageWidgetCmd(ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv);
+			    Tcl_Interp *interp, int argc, const char **argv);
 static void             MessageCmdDeletedProc(ClientData clientData);
 static void		ComputeMessageGeometry(Message *msgPtr);
 static int		ConfigureMessage(Tcl_Interp *interp,
-			    Message *msgPtr, int argc, char **argv,
+			    Message *msgPtr, int argc, const char **argv,
 			    int flags);
 static void		DestroyMessage(ClientData clientData);
 static void		DisplayMessage(ClientData clientData);
@@ -161,7 +161,7 @@ Ck_MessageCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Message *msgPtr;
     CkWindow *new;
@@ -238,7 +238,7 @@ MessageWidgetCmd(
     ClientData clientData,	/* Information about message widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Message *msgPtr = (Message *) clientData;
     size_t length;
@@ -383,7 +383,7 @@ ConfigureMessage(
     Message *msgPtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     /*
@@ -408,7 +408,7 @@ ConfigureMessage(
      */
 
     if (msgPtr->textVarName != NULL) {
-	char *value;
+	const char *value;
 
 	value = Tcl_GetVar(interp, msgPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
@@ -736,12 +736,12 @@ static char *
 MessageTextVarProc(
     ClientData clientData,	/* Information about message. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    char *name1,		/* Name of variable. */
-    char *name2,		/* Second part of variable name. */
+    const char *name1,		/* Name of variable. */
+    const char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
     Message *msgPtr = (Message *) clientData;
-    char *value;
+    const char *value;
 
     /*
      * If the variable is unset, then immediately recreate it unless

@@ -169,7 +169,7 @@ static Ck_ConfigSpec configSpecs[] = {
 
 static void		ComputeScrollbarGeometry(Scrollbar *scrollPtr);
 static int		ConfigureScrollbar(Tcl_Interp *interp,
-			    Scrollbar *scrollPtr, int argc, char **argv,
+			    Scrollbar *scrollPtr, int argc, const char **argv,
 			    int flags);
 static void		DestroyScrollbar(ClientData clientData);
 static void		DisplayScrollbar(ClientData clientData);
@@ -180,7 +180,7 @@ static void             ScrollbarCmdDeletedProc(ClientData clientData);
 static int              ScrollbarPosition(Scrollbar *scrollPtr,
 			    int x, int y);
 static int		ScrollbarWidgetCmd(ClientData clientData,
-			    Tcl_Interp *, int argc, char **argv);
+			    Tcl_Interp *, int argc, const char **argv);
 
 /*
  *--------------------------------------------------------------
@@ -206,7 +206,7 @@ Ck_ScrollbarCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *mainPtr = (CkWindow *) clientData;
     Scrollbar *scrollPtr;
@@ -290,7 +290,7 @@ ScrollbarWidgetCmd(
 					 * widget. */
     Tcl_Interp *interp,			/* Current interpreter. */
     int argc,				/* Number of arguments. */
-    char **argv)			/* Argument strings. */
+    const char **argv)			/* Argument strings. */
 {
     Scrollbar *scrollPtr = (Scrollbar *) clientData;
     int result = TCL_OK;
@@ -557,7 +557,7 @@ ConfigureScrollbar(
 					 * may not already have values for
 					 * some fields. */
     int argc,				/* Number of valid entries in argv. */
-    char **argv,			/* Arguments. */
+    const char **argv,			/* Arguments. */
     int flags)				/* Flags to pass to
 					 * Ck_ConfigureWidget. */
 {

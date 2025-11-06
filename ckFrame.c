@@ -85,14 +85,14 @@ static Ck_ConfigSpec configSpecs[] = {
  */
 
 static int	ConfigureFrame(Tcl_Interp *interp,
-		    Frame *framePtr, int argc, char **argv, int flags);
+		    Frame *framePtr, int argc, const char **argv, int flags);
 static void	DestroyFrame(ClientData clientData);
 static void     FrameCmdDeletedProc(ClientData clientData);
 static void	DisplayFrame(ClientData clientData);
 static void	FrameEventProc(ClientData clientData,
 		    CkEvent *eventPtr);
 static int	FrameWidgetCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv);
+		    Tcl_Interp *interp, int argc, const char **argv);
 
 /*
  *--------------------------------------------------------------
@@ -118,11 +118,11 @@ Ck_FrameCmd(
 				 * interpreter. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     CkWindow *winPtr = (CkWindow *) clientData;
     CkWindow *new;
-    char *className;
+    const char *className;
     int src, dst, toplevel;
 
     if (argc < 2) {
@@ -200,7 +200,7 @@ CkInitFrame(
     int argc,				/* Number of configuration arguments
 					 * (not including class command and
 					 * window name). */
-    char *argv[])			/* Configuration arguments. */
+    const char *argv[])			/* Configuration arguments. */
 {
     Frame *framePtr;
 
@@ -252,7 +252,7 @@ FrameWidgetCmd(
     ClientData clientData,	/* Information about frame widget. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int argc,			/* Number of arguments. */
-    char **argv)		/* Argument strings. */
+    const char **argv)		/* Argument strings. */
 {
     Frame *framePtr = (Frame *) clientData;
     int result = TCL_OK;
@@ -393,7 +393,7 @@ ConfigureFrame(
     Frame *framePtr,		/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc,			/* Number of valid entries in argv. */
-    char **argv,		/* Arguments. */
+    const char **argv,		/* Arguments. */
     int flags)			/* Flags to pass to Ck_ConfigureWidget. */
 {
     if (Ck_ConfigureWidget(interp, framePtr->winPtr, configSpecs,
