@@ -15,9 +15,7 @@
 #ifndef _CKTEXT_H
 #define _CKTEXT_H
 
-#ifndef _CK
-#include "ck.h"
-#endif
+#include "ckInt.h"
 
 /*
  * Opaque types for structures whose guts are only needed by a single

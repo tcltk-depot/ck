@@ -9,6 +9,7 @@
  */
 
 #include "ck.h"
+#include "ckUuid.h"
 #include <string.h>
 
 #undef STRINGIFY

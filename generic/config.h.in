@@ -1,3 +1,128 @@
+/* generic/config.h.in.  Generated from configure.ac by autoheader.  */
 
-#define PACKAGE_NAME    @PACKAGE_NAME@
-#define PACKAGE_VERSION @PACKAGE_VERSION@
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the sigaction function. */
+#undef HAVE_SIGACTION
+
+/* Define to 1 if you have the BSDgettimeofday function. */
+#undef HAVE_BSDGETTIMEOFDAY
+
+/* Define to 1 if you have the scr_dump function. */
+#undef HAVE_SCR_DUMP
+
+/* Define to 1 if you have the GPM library. */
+#undef HAVE_GPM
+
+/* Define to 1 if you have sys/select.h */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have stdbool.h */
+#undef HAVE_STDBOOL_H
+
+/* Define to 1 if you have cast to union support */
+#undef HAVE_CAST_TO_UNION
+
+/* Define to 1 if you have hidden visibility support */
+#undef HAVE_HIDDEN
+
+/* Define if stdlib.h is missing or doesn't define strtol/strtoul/strtod */
+#undef NO_STDLIB_H
+
+/* Define if fd_set is not defined */
+#undef NO_FD_SET
+
+/* Define if gettimeofday is not declared */
+#undef GETTOD_NOT_DECLARED
+
+/* Define to use ncurses */
+#undef USE_NCURSES
+
+/* Define to use ncurses wide character support */
+#undef USE_NCURSESW
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define for Tcl stubs usage */
+#undef USE_TCL_STUBS
+
+/* Define for TclOO stubs usage */
+#undef USE_TCLOO_STUBS
+
+/* Define for thread allocation */
+#undef USE_THREAD_ALLOC
+
+/* Define for reentrant code */
+#undef _REENTRANT
+
+/* Define for thread safety */
+#undef _THREAD_SAFE
+
+/* Define if building with threads */
+#undef TCL_THREADS
+
+/* Define to 1 if Tcl wide int is long */
+#undef TCL_WIDE_INT_IS_LONG
+
+/* Define to build this package as a shared library */
+#undef BUILD_ck
+
+/* Default source and X/Open compatibility */
+#undef _DEFAULT_SOURCE
+#undef _XOPEN_SOURCE
+
+/* memmove fallback to memcpy */
+#undef memmove
+
+/* strtod fallback to fixstrtod */
+#undef strtod

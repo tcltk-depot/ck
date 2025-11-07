@@ -4,6 +4,8 @@
 /pkgIndex.tcl
 /Makefile
 /ckConfig.sh
+/generic/config.h
+/configure
 cwsh
 libck*.so
 libck.a
@@ -12,4 +14,6 @@ config.log
 config.status
 autom4te.cache
 .vimrc
-/generic/config.h
+/nccompat.so
+/ckUuid.h
+/manifest.uuid

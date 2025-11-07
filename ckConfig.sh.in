@@ -10,7 +10,7 @@
 # The information in this file is specific to a single platform.
 
 # Ck's version number.
-CK_VERSION='@CK_VERSION@'
+CK_VERSION='@PACKAGE_VERSION@'
 CK_MAJOR_VERSION='@CK_MAJOR_VERSION@'
 CK_MINOR_VERSION='@CK_MINOR_VERSION@'
 
@@ -18,7 +18,7 @@ CK_MINOR_VERSION='@CK_MINOR_VERSION@'
 CK_DEFS='@DEFS@'
 
 # The name of the Ck library (may be either a .a file or a shared library):
-CK_LIB_FILE=@CK_LIB_FILE@
+CK_LIB_FILE='@CK_LIB_FILE@'
 
 # Additional libraries to use when linking Ck.
 CK_LIBS='@CURSESLIBSW@ @DL_LIBS@ @LIBS@ @MATH_LIBS@'

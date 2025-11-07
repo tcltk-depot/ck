@@ -17,6 +17,8 @@
 #ifndef _CKPORT
 #define _CKPORT
 
+#include "ckInt.h"
+
 #if defined(_WIN32) || defined(WIN32)
 #   include <windows.h>
 #else
@@ -39,7 +41,7 @@
 #   ifdef HAVE_LIMITS_H
 #      include <limits.h>
 #   else
-#      include "compat/limits.h"
+#      error No limits.h available
 #   endif
 #endif
 #include <math.h>

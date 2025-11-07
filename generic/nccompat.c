@@ -2,8 +2,12 @@
  * Equalizer for ncurses 5.x and 6.x.
  */
 
+#if HAVE_CONFIG_H
+#    include "config.h"
+#endif
+
 #include <dlfcn.h>
-#include "tcl.h"
+#include <tcl.h>
 
 TCL_DECLARE_MUTEX(mutex);
 static int initialized = 0;

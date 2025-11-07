@@ -63,8 +63,26 @@ PKG_LIB_FILE8	= @PKG_LIB_FILE8@
 PKG_LIB_FILE9	= @PKG_LIB_FILE9@
 PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
-lib_BINARIES	= $(PKG_LIB_FILE)
-BINARIES	= $(lib_BINARIES)
+# Curses configuration
+CURSES_INCLUDES = @CURSESINCLUDES@
+CURSES_LIB_SWITCHES = @CURSESLIBSW@
+
+# Cwsh configuration
+CWSH_TARGET = @CWSH_TARGET@
+CWSH_INSTALL = @CWSH_INSTALL@
+CWSH_LIB_SPEC = @CWSH_LIB_SPEC@
+
+# Math libraries
+MATH_LIBS = @MATH_LIBS@
+
+# Ck version information
+CK_BUILD_LIB_SPEC = @CK_BUILD_LIB_SPEC@
+
+# nccompat shared library
+NCCOMPAT_LIB_FILE = @NCCOMPAT_LIB_FILE@
+
+lib_BINARIES	= $(PKG_LIB_FILE) $(NCCOMPAT_LIB_FILE)
+BINARIES	= $(lib_BINARIES) $(CWSH_TARGET)
 
 SHELL		= @SHELL@
 
@@ -100,7 +118,7 @@ INSTALL_LIBRARY	= @INSTALL_LIBRARY@
 PACKAGE_NAME	= @PACKAGE_NAME@
 PACKAGE_VERSION	= @PACKAGE_VERSION@
 CC		= @CC@
-CCLD		= @CCLD@
+#CCLD		= @CCLD@
 CFLAGS_DEFAULT	= @CFLAGS_DEFAULT@
 CFLAGS_WARNING	= @CFLAGS_WARNING@
 EXEEXT		= @EXEEXT@
@@ -147,7 +165,7 @@ TCLSH		= $(TCLSH_ENV) $(PKG_ENV) $(TCLSH_PROG)
 
 SHARED_BUILD	= @SHARED_BUILD@
 
-INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ -I.
+INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ $(CURSES_INCLUDES) -I.
 #INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ @TK_INCLUDES@ @TK_XINCLUDES@
 
 PKG_CFLAGS	= @PKG_CFLAGS@
@@ -165,7 +183,7 @@ CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl
 CLEANFILES	= @CLEANFILES@
 
 CPPFLAGS	= @CPPFLAGS@
-LIBS		= @PKG_LIBS@ @LIBS@
+LIBS		= @PKG_LIBS@ @LIBS@ $(CURSES_LIB_SWITCHES) $(MATH_LIBS)
 AR		= @AR@
 CFLAGS		= @CFLAGS@
 LDFLAGS		= @LDFLAGS@
@@ -217,9 +235,14 @@ doc:
 	@echo "        xml2nroff sample.xml > sample.n"
 	@echo "        xml2html sample.xml > sample.html"
 
-install: all install-binaries install-libraries install-doc
+install: all install-binaries install-libraries install-doc $(CWSH_INSTALL)
 
 install-binaries: binaries install-lib-binaries install-bin-binaries
+
+install-cwsh: cwsh
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(bindir)"
+	@echo "Installing cwsh"
+	$(INSTALL_PROGRAM) cwsh$(EXEEXT) "$(DESTDIR)$(bindir)/cwsh$(EXEEXT)"
 
 #========================================================================
 # This rule installs platform-independent files, such as header files.
@@ -245,6 +268,56 @@ install-doc: doc
 	@list='$(srcdir)/doc/*.n'; for i in $$list; do \
 	    echo "Installing $$i"; \
 	    $(INSTALL_DATA) $$i "$(DESTDIR)$(mandir)/mann" ; \
+	done
+
+install-man:
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(mandir)/man1"
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(mandir)/man3"
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(mandir)/mann"
+	@echo "Installing man pages in $(DESTDIR)$(mandir)"
+	@cd $(srcdir)/doc; for i in *.1; do \
+	    if test -f $$i; then \
+	        echo "Installing doc/$$i"; \
+	        rm -f $(DESTDIR)$(mandir)/man1/$$i; \
+	        sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+	            $$i > $(DESTDIR)$(mandir)/man1/$$i; \
+	        chmod 444 $(DESTDIR)$(mandir)/man1/$$i; \
+	    fi; \
+	done
+	@cd $(srcdir)/doc; for i in *.3; do \
+	    if test -f $$i; then \
+	        echo "Installing doc/$$i"; \
+	        rm -f $(DESTDIR)$(mandir)/man3/$$i; \
+	        sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+	            $$i > $(DESTDIR)$(mandir)/man3/$$i; \
+	        chmod 444 $(DESTDIR)$(mandir)/man3/$$i; \
+	    fi; \
+	done
+	@cd $(srcdir)/doc; for i in *.n; do \
+	    if test -f $$i; then \
+	        echo "Installing doc/$$i"; \
+	        rm -f $(DESTDIR)$(mandir)/mann/$$i; \
+	        sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+	            $$i > $(DESTDIR)$(mandir)/mann/$$i; \
+	        chmod 444 $(DESTDIR)$(mandir)/mann/$$i; \
+	    fi; \
+	done
+
+install-demos:
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(pkglibdir)/demos"
+	@$(INSTALL_DATA_DIR) "$(DESTDIR)$(pkglibdir)/demos/images"
+	@echo "Installing demos in $(DESTDIR)$(pkglibdir)/demos"
+	@for i in $(srcdir)/library/demos/*; do \
+	    if test -f $$i ; then \
+	        echo "Installing $$i"; \
+	        $(INSTALL_DATA) $$i "$(DESTDIR)$(pkglibdir)/demos"; \
+	    fi; \
+	done
+	@for i in $(srcdir)/library/demos/images/*; do \
+	    if test -f $$i ; then \
+	        echo "Installing $$i"; \
+	        $(INSTALL_DATA) $$i "$(DESTDIR)$(pkglibdir)/demos/images"; \
+	    fi; \
 	done
 
 test: binaries libraries
@@ -293,6 +366,23 @@ $(PKG_STUB_LIB_FILE): $(PKG_STUB_OBJECTS)
 	-rm -f $(PKG_STUB_LIB_FILE)
 	${MAKE_STUB_LIB}
 	$(RANLIB_STUB) $(PKG_STUB_LIB_FILE)
+
+#========================================================================
+# Build cwsh executable if --enable-cwsh was specified
+#========================================================================
+
+cwsh: ckMain.@OBJEXT@ ckAppInit.@OBJEXT@ $(PKG_LIB_FILE)
+	$(CC) $(CFLAGS_DEFAULT) $(LDFLAGS_DEFAULT) $(LDFLAGS) \
+	    ckMain.@OBJEXT@ ckAppInit.@OBJEXT@ $(CK_BUILD_LIB_SPEC) $(CWSH_LIB_SPEC) $(LIBS) \
+	    -o cwsh$(EXEEXT)
+
+#========================================================================
+# Build nccompat shared library for compatible ncurses symbol exports
+#========================================================================
+
+$(NCCOMPAT_LIB_FILE): nccompat.@OBJEXT@
+	-rm -f $(NCCOMPAT_LIB_FILE)
+	$(SHLIB_LD) $(SHLIB_LD_LIBS) nccompat.@OBJEXT@ $(CURSES_LIB_SWITCHES) -o $(NCCOMPAT_LIB_FILE)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
