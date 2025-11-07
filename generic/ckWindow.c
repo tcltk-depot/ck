@@ -429,7 +429,6 @@ Ck_CreateMainWindow(
 #endif
 #endif
 #ifdef NCURSES_MOUSE_VERSION
-    MEVENT mEvent[2];
     mmask_t mMask;
 #endif
     char *term;
@@ -603,6 +602,7 @@ Ck_CreateMainWindow(
 		      BUTTON2_PRESSED | BUTTON2_RELEASED |
 		      BUTTON3_PRESSED | BUTTON3_RELEASED, NULL);
 #if 0
+    MEVENT mEvent[2];
     mainPtr->flags |= (getmouse(mEvent) != ERR) ? CK_HAS_MOUSE : 0;
 #else
     /* has_mouse() isn't always available */
@@ -761,7 +761,6 @@ Ck_CreateMainWindow(
 DLLEXPORT int
 Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 {
-    CkWindow *mainWindow;
     const char *p, *name;
     char *className;
 
@@ -802,7 +801,7 @@ Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
     className = (char *) ckalloc((unsigned) (strlen(name) + 1));
     strcpy(className, name);
     className[0] = toupper((unsigned char) className[0]);
-    mainWindow = Ck_CreateMainWindow(interp, className);
+    Ck_CreateMainWindow(interp, className);
     ckfree(className);
 
     /* Register feature configuration  */

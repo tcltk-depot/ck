@@ -566,8 +566,6 @@ LayoutDLine(
     Ck_Uid wrapMode;			/* Wrap mode to use for this line. */
     int x = 0, maxX = 0;		/* Initializations needed only to
 					 * stop compiler warnings. */
-    int wholeLine;			/* Non-zero means this display line
-					 * runs to the end of the text line. */
     int tabIndex;			/* Index of the current tab stop. */
     int gotTab;				/* Non-zero means the current chunk
 					 * contains a tab. */
@@ -580,7 +578,6 @@ LayoutDLine(
     int tabSize;			/* Number of pixels consumed by current
 					 * tab stop. */
     int offset, code;
-    StyleValues *sValuePtr;
 
     /*
      * Create and initialize a new DLine structure.
@@ -763,7 +760,6 @@ LayoutDLine(
     if (noCharsYet) {
 	Tcl_Panic("LayoutDLine couldn't place any characters on a line");
     }
-    wholeLine = (segPtr == NULL);
 
     /*
      * We're at the end of the display line.  Throw away everything
@@ -791,7 +787,6 @@ LayoutDLine(
 		    wrapMode, breakChunkPtr);
 	}
 	lastChunkPtr = breakChunkPtr;
-	wholeLine = 0;
     }
 
     /*
@@ -833,9 +828,7 @@ LayoutDLine(
 	if (chunkPtr->minHeight > dlPtr->height) {
 	    dlPtr->height = chunkPtr->minHeight;
 	}
-	sValuePtr = chunkPtr->stylePtr->sValuePtr;
     }
-    sValuePtr = dlPtr->chunkPtr->stylePtr->sValuePtr;
 
     /*
      * Recompute line length:  may have changed because of justification.
@@ -3506,7 +3499,6 @@ AdjustForTab(
 {
     int x, desired, delta, width, decimal, i, gotDigit;
     CkTextDispChunk *chunkPtr2, *decimalChunkPtr;
-    CkTextTab *tabPtr;
     CharInfo *ciPtr = NULL;		/* Initialization needed only to
 					 * prevent compiler warnings. */
     int tabX, prev, spaceWidth, dummy;
@@ -3558,7 +3550,6 @@ AdjustForTab(
 		* (tabArrayPtr->tabs[tabArrayPtr->numTabs-1].location - prev);
     }
 
-    tabPtr = &tabArrayPtr->tabs[index];
     if (alignment == LEFT) {
 	desired = tabX;
 	goto update;

@@ -584,7 +584,7 @@ DisplayMessage(ClientData clientData)	/* Information about window. */
     Message *msgPtr = (Message *) clientData;
     CkWindow *winPtr = msgPtr->winPtr;
     char *p;
-    int x, y, lineLength, numChars, charsLeft, byteLength;
+    int x, y, lineLength, charsLeft, byteLength;
 
     msgPtr->flags &= ~REDRAW_PENDING;
     if (msgPtr->winPtr == NULL || !(winPtr->flags & CK_MAPPED)) {
@@ -627,7 +627,7 @@ DisplayMessage(ClientData clientData)	/* Information about window. */
 	    charsLeft--;
 	    continue;
 	}
-	numChars = CkMeasureChars(winPtr->mainPtr, p, charsLeft, 0,
+	CkMeasureChars(winPtr->mainPtr, p, charsLeft, 0,
 		msgPtr->lineLength,
 		0, CK_WHOLE_WORDS | CK_AT_LEAST_ONE, &lineLength, &byteLength);
 	switch (msgPtr->anchor) {

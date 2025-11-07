@@ -752,7 +752,6 @@ Ck_BindEvent(
 					 * to check for a matching binding. */
 {
     BindingTable *bindPtr = (BindingTable *) bindingTable;
-    CkMainInfo *mainPtr;
     CkEvent *ringPtr;
     PatSeq *matchPtr;
     PatternTableKey key;
@@ -866,7 +865,6 @@ Ck_BindEvent(
      *    Tcl level information such as tkPriv.
      */
 
-    mainPtr = winPtr->mainPtr;
     interp = bindPtr->interp;
     Tcl_DStringInit(&savedResult);
     Tcl_DStringGetResult(interp, &savedResult);

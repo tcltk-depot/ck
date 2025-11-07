@@ -506,7 +506,6 @@ TerminalResized(
 {
     CkMainInfo *mainPtr = parentPtr->mainPtr;
     CkWindow *winPtr;
-    CkWindowEvent event;
 
     if (flag && (parentPtr->flags & CK_TOPLEVEL)) {
 	if (parentPtr == mainPtr->winPtr) {
@@ -729,6 +728,8 @@ done_uc:
 	ch = uch;
 #endif
 	code = 0;
+    } else {
+	ch = -1;   /* TODO: What should this be?  ch is uninitialized on this branch */
     }
 #endif
 

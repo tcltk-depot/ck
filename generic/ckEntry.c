@@ -1342,7 +1342,7 @@ GetEntryIndex(
 	    goto badIndex;
 	}
     } else if (string[0] == '@') {
-	int x, roundUp;
+	int x;
 
 	if (Tcl_GetInt(interp, string+1, &x) != TCL_OK) {
 	    goto badIndex;
@@ -1350,10 +1350,8 @@ GetEntryIndex(
 	if (x < 0) {
 	    x = 0;
 	}
-	roundUp = 0;
 	if (x >= entryPtr->winPtr->width) {
 	    x = entryPtr->winPtr->width - 1;
-	    roundUp = 1;
 	}
 	if (entryPtr->numChars == 0) {
 	    *indexPtr = 0;

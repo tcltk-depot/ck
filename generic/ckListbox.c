@@ -886,7 +886,7 @@ DisplayListbox(ClientData clientData)	/* Information about window. */
     Listbox *listPtr = (Listbox *) clientData;
     CkWindow *winPtr = listPtr->winPtr;
     Element *elPtr;
-    int i, limit, y, width, cursorY;
+    int i, limit, y, cursorY;
 
     listPtr->flags &= ~REDRAW_PENDING;
     if (listPtr->flags & UPDATE_V_SCROLLBAR) {
@@ -913,7 +913,6 @@ DisplayListbox(ClientData clientData)	/* Information about window. */
     if (limit > listPtr->numElements) {
 	limit = listPtr->numElements;
     }
-    width = listPtr->xOffset + winPtr->width;
     for (elPtr = listPtr->firstPtr, i = 0, y = cursorY = 0;
             (elPtr != NULL) && (i < limit);
 	    elPtr = elPtr->nextPtr, i++) {
@@ -1338,12 +1337,12 @@ GetListboxIndex(
     } else if ((c == 'e') && (strncmp(string, "end", length) == 0)) {
 	*indexPtr = listPtr->numElements;
     } else if (c == '@') {
-	int x, y;
+	int y;
 	const char *p;
 	char *end;
 
 	p = string+1;
-	x = strtol(p, &end, 0);
+	strtol(p, &end, 0);
 	if ((end == p) || (*end != ',')) {
 	    goto badIndex;
 	}
@@ -1532,7 +1531,7 @@ ListboxSelect(
     int select)				/* 1 means select items, 0 means
 					 * deselect them. */
 {
-    int i, firstRedisplay, lastRedisplay, increment, oldCount;
+    int i, firstRedisplay, increment;
     Element *elPtr;
 
     if (last < first) {
@@ -1543,7 +1542,6 @@ ListboxSelect(
     if (first >= listPtr->numElements) {
 	return;
     }
-    oldCount = listPtr->numSelected;
     firstRedisplay = -1;
     increment = select ? 1 : -1;
     for (i = 0, elPtr = listPtr->firstPtr; i < first;
@@ -1559,7 +1557,6 @@ ListboxSelect(
 	if (firstRedisplay < 0) {
 	    firstRedisplay = i;
 	}
-	lastRedisplay = i;
     }
     if (firstRedisplay >= 0) {
 	ListboxRedrawRange(listPtr, first, last);

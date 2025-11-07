@@ -320,7 +320,6 @@ CkTextGetIndex(
     CkTextSearch search;
     CkTextIndex first, last;
     int wantLast, result;
-    char c;
     Tcl_DString tmp;
     Tcl_DStringInit(&tmp);
 

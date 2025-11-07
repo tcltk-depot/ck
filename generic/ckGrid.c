@@ -797,7 +797,7 @@ GetLayoutInfo(
     GridBag *slavePtr;
     int i, k, px, py, pixels_diff, nextSize;
     double weight_diff, weight;
-    int curX, curY, curWidth, curHeight, curRow, curCol;
+    int curX, curY, curWidth, curHeight;
     int xMax[MAXGRIDSIZE];
     int yMax[MAXGRIDSIZE];
 
@@ -808,7 +808,6 @@ GetLayoutInfo(
      */
 
     r->width = r->height = 0;
-    curRow = curCol = -1;
     memset(xMax, 0, sizeof(int) * MAXGRIDSIZE);
     memset(yMax, 0, sizeof(int) * MAXGRIDSIZE);
 
@@ -856,7 +855,6 @@ GetLayoutInfo(
      * Pass #2
      */
 
-    curRow = curCol = -1;
     memset(xMax, 0, sizeof(int) * MAXGRIDSIZE);
     memset(yMax, 0, sizeof(int) * MAXGRIDSIZE);
 

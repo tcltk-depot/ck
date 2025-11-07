@@ -22,7 +22,6 @@
  * Global variables used by the main program:
  */
 
-static Tcl_Interp *interp;		/* Interpreter for this application. */
 static const char *fileName = NULL;	/* Script to source, if any. */
 
 #ifdef TCL_MEM_DEBUG

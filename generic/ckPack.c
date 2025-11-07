@@ -1026,7 +1026,7 @@ ConfigureSlaves(
 				 * window name. */
 {
     Packer *masterPtr, *slavePtr, *prevPtr, *otherPtr;
-    CkWindow *other, *slave, *parent;
+    CkWindow *other, *slave;
     int i, j, numWindows, c, tmp, positionGiven;
     size_t length;
 
@@ -1256,7 +1256,6 @@ ConfigureSlaves(
 	 * an ancestor of the master.
 	 */
 
-	parent = slave->parentPtr;
 	if (masterPtr->winPtr != slave->parentPtr) {
 	    Tcl_AppendResult(interp, "can't pack ", argv[j],
 		" inside ", masterPtr->winPtr->pathName,

@@ -797,7 +797,7 @@ MenuWidgetCmd(
 	    Ck_MoveWindow(menuPtr->winPtr, x, y);
 	}
         if (menuPtr->winPtr->reqWidth != menuPtr->winPtr->width ||
-	    menuPtr->winPtr->reqHeight != menuPtr->winPtr->reqHeight) {
+	    menuPtr->winPtr->reqHeight != menuPtr->winPtr->height) {
 	    Ck_ResizeWindow(menuPtr->winPtr,
 		 menuPtr->winPtr->reqWidth, menuPtr->winPtr->reqHeight);
 	}

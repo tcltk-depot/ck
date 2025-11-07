@@ -791,14 +791,14 @@ CkDisplayChars(
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[16];
-    int rem, dummy, maxX, nc = 0, i;
+    int rem, maxX, nc = 0, i;
 
     /*
      * Scan the string one character at a time and display the
      * character.
      */
 
-    getmaxyx(window, dummy, maxX);
+    maxX = getmaxx(window);
     p = string;
     nc = Tcl_NumUtfChars(p, numChars);
     if (nc > maxX - x)
@@ -967,7 +967,7 @@ CkUnderlineChars(
     int startX;			/* X-coordinate corresponding to start. */
     int curX;			/* X-coordinate corresponding to p. */
     char replace[10];
-    int rem, dummy, maxX, nc = 0, i;
+    int rem, maxX, nc = 0, i;
 
     /*
      * Scan the string one character at a time and display the
@@ -975,7 +975,7 @@ CkUnderlineChars(
      */
 
     count = 0;
-    getmaxyx(window, dummy, maxX);
+    maxX = getmaxx(window);
     p = string;
     nc = Tcl_NumUtfChars(p, numChars);
     if (nc > maxX - x)
