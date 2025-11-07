@@ -14,38 +14,21 @@
 #ifndef _CK_H
 #define _CK_H
 
-#ifndef _TCL
+#include "config.h"
+
 #include <tcl.h>
+
+#if (TCL_MAJOR_VERSION < 8) || (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION < 7)
+# undef Tcl_Size
+  typedef int Tcl_Size;
+# define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
+# define Tcl_NewSizeIntObj Tcl_NewIntObj
+# define TCL_SIZE_MAX      INT_MAX
+# define TCL_SIZE_MODIFIER ""
 #endif
 
 #if (TCL_MAJOR_VERSION < 8)
 #error Tcl major version must be 8 or greater
-#endif
-
-#define CK_MAJOR_VERSION 8
-#if (TCL_MINOR_VERSION == 7)
-#define CK_VERSION "8.7"
-#define CK_MINOR_VERSION 7
-#elif (TCL_MINOR_VERSION == 6)
-#define CK_VERSION "8.6"
-#define CK_MINOR_VERSION 6
-#elif (TCL_MINOR_VERSION == 5)
-#define CK_VERSION "8.5"
-#define CK_MINOR_VERSION 5
-#elif (TCL_MINOR_VERSION == 4)
-#define CK_VERSION "8.4"
-#define CK_MINOR_VERSION 4
-#elif (TCL_MINOR_VERSION == 3)
-#define CK_VERSION "8.3"
-#define CK_MINOR_VERSION 3
-#elif (TCL_MINOR_VERSION == 2)
-#define CK_VERSION "8.2"
-#define CK_MINOR_VERSION 2
-#elif (TCL_MINOR_VERSION == 1)
-#define CK_VERSION "8.1"
-#define CK_MINOR_VERSION 1
-#else
-#error unsupported Tcl minor version
 #endif
 
 #ifdef TCL_UTF_MAX
@@ -79,6 +62,8 @@
 #else
 #include <curses.h>
 #endif
+
+/* Extension data structures */
 
 /*
  * Keyboard symbols (KeySym)
@@ -548,46 +533,44 @@ extern Ck_Uid ckNormalUid;
 extern Ck_Uid ckActiveUid;
 extern Ck_Uid ckDisabledUid;
 
+/* Function prototypes */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Internal procedures.
  */
 
-#if defined(_WIN32) || defined(WIN32)
-#   ifdef BUILD_ck
-#      undef EXTERN
-#      define EXTERN __declspec(dllexport)
-#   endif
-#endif
-
-
-EXTERN int	CkAllKeyNames(Tcl_Interp *interp);
-EXTERN int	CkBarcodeCmd(ClientData clientData,
+int	CkAllKeyNames(Tcl_Interp *interp);
+int	CkBarcodeCmd(ClientData clientData,
 		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN void	CkBindEventProc(CkWindow *winPtr,
+void	CkBindEventProc(CkWindow *winPtr,
 		    CkEvent *eventPtr);
-EXTERN int	CkCopyAndGlobalEval(Tcl_Interp *interp, char *string);
-EXTERN void	CkDisplayChars(CkMainInfo *mainPtr,
+int	CkCopyAndGlobalEval(Tcl_Interp *interp, char *string);
+void	CkDisplayChars(CkMainInfo *mainPtr,
 		    WINDOW *window, const char *string,
 		    int numChars, int x, int y, int tabOrigin, int flags);
-EXTERN void	CkEventDeadWindow(CkWindow *winPtr);
+void	CkEventDeadWindow(CkWindow *winPtr);
 #if defined(USE_NCURSES) || defined(_WIN32)
-EXTERN void	CkFocusRestore(ClientData clientData);
+void	CkFocusRestore(ClientData clientData);
 #endif
-EXTERN void	CkFreeBindingTags(CkWindow *winPtr);
-EXTERN char *	CkGetBarcodeData(CkMainInfo *mainPtr);
-EXTERN void	CkHandleInput(ClientData clientData, int mask);
-EXTERN int	CkInitFrame(Tcl_Interp *interp, CkWindow *winPtr,
+void	CkFreeBindingTags(CkWindow *winPtr);
+char *	CkGetBarcodeData(CkMainInfo *mainPtr);
+void	CkHandleInput(ClientData clientData, int mask);
+int	CkInitFrame(Tcl_Interp *interp, CkWindow *winPtr,
 		    int argc, const char **argv);
-EXTERN char *	CkKeysymToString(KeySym keySym, int printControl);
-EXTERN int	CkMeasureChars(CkMainInfo *mainPtr,
+char *	CkKeysymToString(KeySym keySym, int printControl);
+int	CkMeasureChars(CkMainInfo *mainPtr,
 		    char *source, int maxChars,
 		    int startX, int maxX, int tabOrigin, int flags,
 		    int *nextPtr, int *nextCPtr);
-EXTERN void     CkOptionClassChanged(CkWindow *winPtr);
-EXTERN void     CkOptionDeadWindow(CkWindow *winPtr);
-EXTERN KeySym	CkStringToKeysym(const char *name);
-EXTERN int	CkTermHasKey(Tcl_Interp *interp, const char *name);
-EXTERN void	CkUnderlineChars(CkMainInfo *mainPtr,
+void	CkOptionClassChanged(CkWindow *winPtr);
+void	CkOptionDeadWindow(CkWindow *winPtr);
+KeySym	CkStringToKeysym(const char *name);
+int	CkTermHasKey(Tcl_Interp *interp, const char *name);
+void	CkUnderlineChars(CkMainInfo *mainPtr,
 		    WINDOW *window, char *string,
 		    int numChars, int x, int y, int tabOrigin, int flags,
 		    int first, int last);
@@ -596,175 +579,158 @@ EXTERN void	CkUnderlineChars(CkMainInfo *mainPtr,
  * Exported procedures.
  */
 
-EXTERN void     Ck_AddOption(CkWindow *winPtr, const char *name,
+void	Ck_AddOption(CkWindow *winPtr, const char *name,
 		    const char *value, int priority);
-EXTERN void	Ck_BindEvent(Ck_BindingTable bindingTable,
+void	Ck_BindEvent(Ck_BindingTable bindingTable,
 		    CkEvent *eventPtr, CkWindow *winPtr, int numObjects,
 		    ClientData *objectPtr);
-EXTERN void     Ck_ClearToBot(CkWindow *winPtr, int x, int y);
-EXTERN void	Ck_ClearToEol(CkWindow *winPtr, int x, int y);
-EXTERN int      Ck_ConfigureInfo(Tcl_Interp *interp,
+void	Ck_ClearToBot(CkWindow *winPtr, int x, int y);
+void	Ck_ClearToEol(CkWindow *winPtr, int x, int y);
+int	Ck_ConfigureInfo(Tcl_Interp *interp,
 		    CkWindow *winPtr, Ck_ConfigSpec *specs, char *widgRec,
 		    const char *argvName, int flags);
-EXTERN int      Ck_ConfigureValue(Tcl_Interp *interp,
+int	Ck_ConfigureValue(Tcl_Interp *interp,
 		    CkWindow *winPtr, Ck_ConfigSpec *specs, char *widgRec,
 		    const char *argvName, int flags);
-EXTERN int      Ck_ConfigureWidget(Tcl_Interp *interp,
+int	Ck_ConfigureWidget(Tcl_Interp *interp,
 		    CkWindow *winPtr, Ck_ConfigSpec *specs,
 		    int argc, const char **argv, char *widgRec, int flags);
-EXTERN int	Ck_CreateBinding(Tcl_Interp *interp,
+int	Ck_CreateBinding(Tcl_Interp *interp,
 		    Ck_BindingTable bindingTable, ClientData object,
 		    const char *eventString, const char *command, int append);
-EXTERN Ck_BindingTable Ck_CreateBindingTable(Tcl_Interp *interp);
-EXTERN void	Ck_CreateEventHandler(CkWindow *winPtr, long mask,
+Ck_BindingTable Ck_CreateBindingTable(Tcl_Interp *interp);
+void	Ck_CreateEventHandler(CkWindow *winPtr, long mask,
 		    Ck_EventProc *proc, ClientData clientData);
-EXTERN void	Ck_CreateGenericHandler(Ck_GenericProc *proc,
+void	Ck_CreateGenericHandler(Ck_GenericProc *proc,
 		    ClientData clientData);
-EXTERN CkWindow *Ck_CreateMainWindow(Tcl_Interp *interp, char *className);
-EXTERN CkWindow	*Ck_CreateWindow(Tcl_Interp *interp,
+CkWindow	*Ck_CreateMainWindow(Tcl_Interp *interp, char *className);
+CkWindow	*Ck_CreateWindow(Tcl_Interp *interp,
 		    CkWindow *parentPtr, char *name, int toplevel);
-EXTERN CkWindow	*Ck_CreateWindowFromPath(Tcl_Interp *interp,
+CkWindow	*Ck_CreateWindowFromPath(Tcl_Interp *interp,
 		    CkWindow *anywin, const char *pathName, int toplevel);
-EXTERN void	Ck_DeleteAllBindings(Ck_BindingTable bindingTable,
+void	Ck_DeleteAllBindings(Ck_BindingTable bindingTable,
 		    ClientData object);
-EXTERN int	Ck_DeleteBinding(Tcl_Interp *interp,
+int	Ck_DeleteBinding(Tcl_Interp *interp,
 		    Ck_BindingTable bindingTable, ClientData object,
 		    const char *eventString);
-EXTERN void	Ck_DeleteBindingTable(Ck_BindingTable bindingTable);
-EXTERN void	Ck_DeleteEventHandler(CkWindow *winPtr, long mask,
+void	Ck_DeleteBindingTable(Ck_BindingTable bindingTable);
+void	Ck_DeleteEventHandler(CkWindow *winPtr, long mask,
 		    Ck_EventProc *proc, ClientData clientData);
-EXTERN void	Ck_DeleteGenericHandler(Ck_GenericProc *proc,
+void	Ck_DeleteGenericHandler(Ck_GenericProc *proc,
 		    ClientData clientData);
-EXTERN void	Ck_DestroyWindow(CkWindow *winPtr);
-EXTERN void	Ck_DrawBorder(CkWindow *winPtr,
+void	Ck_DestroyWindow(CkWindow *winPtr);
+void	Ck_DrawBorder(CkWindow *winPtr,
 		    CkBorder *borderPtr, int x, int y, int width, int height);
-EXTERN void	Ck_EventuallyRefresh(CkWindow *winPtr);
-EXTERN void	Ck_FreeBorder(CkBorder *borderPtr);
-EXTERN void     Ck_FreeOptions(Ck_ConfigSpec *specs,
+void	Ck_EventuallyRefresh(CkWindow *winPtr);
+void	Ck_FreeBorder(CkBorder *borderPtr);
+void	Ck_FreeOptions(Ck_ConfigSpec *specs,
 		    char *widgrec, int needFlags);
-EXTERN void	Ck_GeometryRequest(CkWindow *winPtr,
+void	Ck_GeometryRequest(CkWindow *winPtr,
 		    int reqWidth, int reqHeight);
-EXTERN void	Ck_GetAllBindings(Tcl_Interp *interp,
+void	Ck_GetAllBindings(Tcl_Interp *interp,
 		    Ck_BindingTable bindingTable, ClientData object);
-EXTERN int	Ck_GetAnchor(Tcl_Interp *interp, const char *string,
+int	Ck_GetAnchor(Tcl_Interp *interp, const char *string,
 		    Ck_Anchor *anchorPtr);
-EXTERN int	Ck_GetAttr(Tcl_Interp *interp, const char *name, int *attrPtr);
-EXTERN char *	Ck_GetBinding(Tcl_Interp *inter,
+int	Ck_GetAttr(Tcl_Interp *interp, const char *name, int *attrPtr);
+char *	Ck_GetBinding(Tcl_Interp *inter,
 		    Ck_BindingTable bindingTable, ClientData object,
 		    const char *eventString);
-EXTERN CkBorder *Ck_GetBorder(Tcl_Interp *interp, const char *string);
-EXTERN int	Ck_GetColor(Tcl_Interp *interp, char *name, int *colorPtr);
-EXTERN int	Ck_GetCoord(Tcl_Interp *interp, CkWindow *winPtr,
+CkBorder *Ck_GetBorder(Tcl_Interp *interp, const char *string);
+int	Ck_GetColor(Tcl_Interp *interp, char *name, int *colorPtr);
+int	Ck_GetCoord(Tcl_Interp *interp, CkWindow *winPtr,
 		    const char *string, int *intPtr);
-EXTERN int	Ck_GetEncoding(Tcl_Interp *interp);
-EXTERN int	Ck_GetGChar(Tcl_Interp *interp, const char *name, long *gchar);
-EXTERN int	Ck_GetJustify(Tcl_Interp *interp, const char *string,
+int	Ck_GetEncoding(Tcl_Interp *interp);
+int	Ck_GetGChar(Tcl_Interp *interp, const char *name, long *gchar);
+int	Ck_GetJustify(Tcl_Interp *interp, const char *string,
 		    Ck_Justify *justifyPtr);
-EXTERN Ck_Uid   Ck_GetOption(CkWindow *winPtr, const char *name, const char *class);
-EXTERN int	Ck_GetPair(CkWindow *winPtr, int fg, int bg);
-EXTERN void	Ck_GetRootGeometry(CkWindow *winPtr, int *xPtr,
+Ck_Uid	Ck_GetOption(CkWindow *winPtr, const char *name, const char *class);
+int	Ck_GetPair(CkWindow *winPtr, int fg, int bg);
+void	Ck_GetRootGeometry(CkWindow *winPtr, int *xPtr,
 		    int *yPtr, int *widthPtr, int *heightPtr);
-EXTERN int      Ck_GetScrollInfo(Tcl_Interp *interp,
+int	Ck_GetScrollInfo(Tcl_Interp *interp,
 		    int argc, const char **argv, double *dblPtr, int *intPtr);
-EXTERN Ck_Uid	Ck_GetUid(const char *string);
-EXTERN CkWindow *Ck_GetWindowXY(CkMainInfo *mainPtr, int *xPtr,
+Ck_Uid	Ck_GetUid(const char *string);
+CkWindow *Ck_GetWindowXY(CkMainInfo *mainPtr, int *xPtr,
 		    int *yPtr, int mode);
-EXTERN void	Ck_HandleEvent(CkMainInfo *mainPtr, CkEvent *eventPtr);
-EXTERN int	Ck_Init(Tcl_Interp *interp);
-EXTERN void	Ck_Main(int argc, const char **argv,
+void	Ck_HandleEvent(CkMainInfo *mainPtr, CkEvent *eventPtr);
+int	Ck_Init(Tcl_Interp *interp);
+void	Ck_Main(int argc, const char **argv,
 		    int (*appInitProc)(Tcl_Interp *), Tcl_Interp *interp);
-EXTERN void	Ck_MainLoop(void);
-EXTERN CkWindow	*Ck_MainWindow(Tcl_Interp *interp);
-EXTERN void	Ck_MaintainGeometry(CkWindow *slave, CkWindow *master,
+void	Ck_MainLoop(void);
+CkWindow	*Ck_MainWindow(Tcl_Interp *interp);
+void	Ck_MaintainGeometry(CkWindow *slave, CkWindow *master,
 		    int x, int y, int width, int height);
-EXTERN void	Ck_MakeWindowExist(CkWindow *winPtr);
-EXTERN void	Ck_ManageGeometry(CkWindow *winPtr,
+void	Ck_MakeWindowExist(CkWindow *winPtr);
+void	Ck_ManageGeometry(CkWindow *winPtr,
 			    Ck_GeomMgr *mgrPtr, ClientData clientData);
-EXTERN void	Ck_MapWindow(CkWindow *winPtr);
-EXTERN void	Ck_MoveWindow(CkWindow *winPtr, int x, int y);
-EXTERN char *	Ck_NameOfAnchor(Ck_Anchor anchor);
-EXTERN char *	Ck_NameOfAttr(int attr);
-EXTERN char *	Ck_NameOfBorder(CkBorder *borderPtr);
-EXTERN char *	Ck_NameOfColor(int color);
-EXTERN char *	Ck_NameOfJustify(Ck_Justify justify);
-EXTERN CkWindow *Ck_NameToWindow(Tcl_Interp *interp,
+void	Ck_MapWindow(CkWindow *winPtr);
+void	Ck_MoveWindow(CkWindow *winPtr, int x, int y);
+char *	Ck_NameOfAnchor(Ck_Anchor anchor);
+char *	Ck_NameOfAttr(int attr);
+char *	Ck_NameOfBorder(CkBorder *borderPtr);
+char *	Ck_NameOfColor(int color);
+char *	Ck_NameOfJustify(Ck_Justify justify);
+CkWindow *Ck_NameToWindow(Tcl_Interp *interp,
 		    const char *pathName, CkWindow *winPtr);
-EXTERN void	Ck_ResizeWindow(CkWindow *winPtr, int width, int height);
-EXTERN int	Ck_RestackWindow(CkWindow *winPtr, int aboveBelow,
+void	Ck_ResizeWindow(CkWindow *winPtr, int width, int height);
+int	Ck_RestackWindow(CkWindow *winPtr, int aboveBelow,
 		    CkWindow *otherPtr);
-EXTERN void	Ck_SetClass(CkWindow *winPtr, const char *className);
-EXTERN int	Ck_SetEncoding(Tcl_Interp *interp, const char *name);
-EXTERN void	Ck_SetFocus(CkWindow *winPtr);
-EXTERN int	Ck_SetGChar(Tcl_Interp *interp, const char *name, long gchar);
-EXTERN void	Ck_SetHWCursor(CkWindow *winPtr, int newState);
-EXTERN void	Ck_SetInternalBorder(CkWindow *winPtr, int onoff);
-EXTERN void	Ck_SetWindowAttr(CkWindow *winPtr, int fg, int bg, int attr);
-EXTERN void	Ck_UnmaintainGeometry(CkWindow *slave, CkWindow *master);
-EXTERN void	Ck_UnmapWindow(CkWindow *winPtr);
+void	Ck_SetClass(CkWindow *winPtr, const char *className);
+int	Ck_SetEncoding(Tcl_Interp *interp, const char *name);
+void	Ck_SetFocus(CkWindow *winPtr);
+int	Ck_SetGChar(Tcl_Interp *interp, const char *name, long gchar);
+void	Ck_SetHWCursor(CkWindow *winPtr, int newState);
+void	Ck_SetInternalBorder(CkWindow *winPtr, int onoff);
+void	Ck_SetWindowAttr(CkWindow *winPtr, int fg, int bg, int attr);
+void	Ck_UnmaintainGeometry(CkWindow *slave, CkWindow *master);
+void	Ck_UnmapWindow(CkWindow *winPtr);
 
 /*
  * Command procedures.
  */
 
-EXTERN int	Ck_BellCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_BindCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_BindtagsCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_CursesCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_DestroyCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_ExitCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_FocusCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_GridCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_LowerCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_OptionCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_PackCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_PlaceCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_RaiseCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_RecorderCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_TkwaitCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_UpdateCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_WinfoCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
+typedef int (CkCmdProc)(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv);
+
+Tcl_ObjCmdProc BuildInfoObjCmd;
+
+CkCmdProc Ck_BellCmd;
+CkCmdProc Ck_BindCmd;
+CkCmdProc Ck_BindtagsCmd;
+CkCmdProc Ck_CursesCmd;
+CkCmdProc Ck_DestroyCmd;
+CkCmdProc Ck_ExitCmd;
+CkCmdProc Ck_FocusCmd;
+CkCmdProc Ck_GridCmd;
+CkCmdProc Ck_LowerCmd;
+CkCmdProc Ck_OptionCmd;
+CkCmdProc Ck_PackCmd;
+CkCmdProc Ck_PlaceCmd;
+CkCmdProc Ck_RaiseCmd;
+CkCmdProc Ck_RecorderCmd;
+CkCmdProc Ck_TkwaitCmd;
+CkCmdProc Ck_UpdateCmd;
+CkCmdProc Ck_WinfoCmd;
 
 /*
  * Widget creation procedures.
  */
 
-EXTERN int	Ck_ButtonCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_EntryCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_FrameCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_ListboxCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_MenuCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_MenubuttonCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_MessageCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_ScrollbarCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_TextCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
-EXTERN int	Ck_TreeCmd(ClientData clientData,
-		    Tcl_Interp *interp, int argc, const char **argv);
+CkCmdProc Ck_ButtonCmd;
+CkCmdProc Ck_EntryCmd;
+CkCmdProc Ck_FrameCmd;
+CkCmdProc Ck_ListboxCmd;
+CkCmdProc Ck_MenuCmd;
+CkCmdProc Ck_MenubuttonCmd;
+CkCmdProc Ck_MessageCmd;
+CkCmdProc Ck_ScrollbarCmd;
+CkCmdProc Ck_TextCmd;
+CkCmdProc Ck_TreeCmd;
+
+DLLEXPORT int Ck_Init(Tcl_Interp* interp);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* RESOURCE_INCLUDED */
 #endif  /* _CK_H */

@@ -112,7 +112,7 @@ CK_VERSION=$VERSION
 CK_MAJOR_VERSION=$TCL_MAJOR_VERSION
 CK_MINOR_VERSION=$TCL_MINOR_VERSION
 # Special for >=8.4 to avoid lots of warnings
-CK_CFLAGS="-DUSE_NON_CONST"
+#CK_CFLAGS="-DUSE_NON_CONST"
 AC_MSG_RESULT(${CK_VERSION})
 
 #--------------------------------------------------------------------

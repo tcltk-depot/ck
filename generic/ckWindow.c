@@ -17,6 +17,16 @@
 #endif
 
 /*
+ * Metainfo for a pkgconfig command for the extension via Tcl_RegisterConfig
+ * Must only have const static UTF-8 encoded char pointers.
+ */
+Tcl_Config ckConfig[] = {
+    {"version", PACKAGE_VERSION},
+    /* Add additional configuration or feature information if relevant */
+    {NULL, NULL}
+};
+
+/*
  * Main information.
  */
 
@@ -67,9 +77,6 @@ Ck_Uid ckNormalUid = NULL;
  * The following structure defines all of the commands supported by
  * the toolkit, and the C procedures that execute them.
  */
-
-typedef int (CkCmdProc)(ClientData clientData, Tcl_Interp *interp,
-			int argc, const char **argv);
 
 typedef struct {
     char *name;				/* Name of command. */
@@ -719,7 +726,7 @@ Ck_CreateMainWindow(
      * Set variables for the intepreter.
      */
 
-    Tcl_SetVar(interp, "ck_version", CK_VERSION, TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "ck_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
 
     /*
      * Make main window into a frame widget.
@@ -751,21 +758,17 @@ Ck_CreateMainWindow(
  *----------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 {
     CkWindow *mainWindow;
     const char *p, *name;
-    char *class;
-    int code;
-    static char initCmd[] =
-"proc init {} {\n\
-    global ck_library ck_version\n\
-    rename init {}\n\
-    tcl_findLibrary ck $ck_version 0 ck.tcl CK_LIBRARY ck_library\n\
-}\n\
-init";
+    char *className;
 
+    /*
+     * Support any Tcl version compatible with the version against which the
+     * extension is being built.
+     */
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
 	return TCL_ERROR;
 
@@ -782,6 +785,12 @@ init";
 	return TCL_ERROR;
     }
 
+    /*
+     * Register the commands added by the package.
+     * Ck_CreateMainWindow calls Tcl_CreateCommand on the elements of `commands[]`
+     */
+    Tcl_CreateObjCommand(interp, PACKAGE_NAME "::" "build-info", BuildInfoObjCmd, NULL, NULL);
+
     p = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
     if (p == NULL || *p == '\0')
 	p = "Ck";
@@ -790,16 +799,23 @@ init";
 	name++;
     else
 	name = p;
-    class = (char *) ckalloc((unsigned) (strlen(name) + 1));
-    strcpy(class, name);
-    class[0] = toupper((unsigned char) class[0]);
-    mainWindow = Ck_CreateMainWindow(interp, class);
-    ckfree(class);
+    className = (char *) ckalloc((unsigned) (strlen(name) + 1));
+    strcpy(className, name);
+    className[0] = toupper((unsigned char) className[0]);
+    mainWindow = Ck_CreateMainWindow(interp, className);
+    ckfree(className);
 
-    code = Tcl_PkgProvide(interp, "Ck", CK_VERSION);
-    if (code != TCL_OK)
+    /* Register feature configuration  */
+    Tcl_RegisterConfig(interp, PACKAGE_NAME, ckConfig, "utf-8");
+
+    /*
+     * Inform Tcl the package is available. PACKAGE_NAME and PACKAGE_VERSION
+     * are set by the build system (autoconf or nmake)
+     */
+    if (Tcl_PkgProvideEx(interp, PACKAGE_NAME, PACKAGE_VERSION, NULL) != TCL_OK)
 	return TCL_ERROR;
-    return Tcl_Eval(interp, initCmd);
+
+    return TCL_OK;
 }
 
 /*

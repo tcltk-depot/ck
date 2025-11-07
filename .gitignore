@@ -1,5 +1,6 @@
 *.o
 *.swp
+*~
 /pkgIndex.tcl
 /Makefile
 /ckConfig.sh
@@ -11,3 +12,4 @@ config.log
 config.status
 autom4te.cache
 .vimrc
+/generic/config.h
