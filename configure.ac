@@ -213,7 +213,7 @@ AC_EGREP_HEADER([strtol],[stdlib.h],[tk_ok=yes],[tk_ok=no])
 AC_EGREP_HEADER([strtoul],[stdlib.h],[],[tk_ok=no])
 AC_EGREP_HEADER([strtod],[stdlib.h],[],[tk_ok=no])
 if test $tk_ok = no; then
-    AC_DEFINE(NO_STDLIB_H)
+    AC_DEFINE(NO_STDLIB_H, 1, [Define if stdlib.h is missing or doesn't define strtol/strtoul/strtod])
 fi
 AC_MSG_RESULT($tk_ok)
 
@@ -248,12 +248,12 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>]], [[fd_set readMask
 if test $tk_ok = no; then
     AC_EGREP_HEADER([fd_mask],[sys/select.h],[tk_ok=yes])
     if test $tk_ok = yes; then
-	AC_DEFINE(HAVE_SYS_SELECT_H)
+	AC_DEFINE(HAVE_SYS_SELECT_H, 1, [Define to 1 if you have sys/select.h])
     fi
 fi
 AC_MSG_RESULT($tk_ok)
 if test $tk_ok = no; then
-    AC_DEFINE(NO_FD_SET)
+    AC_DEFINE(NO_FD_SET, 1, [Define if fd_set is not defined])
 fi
 
 #--------------------------------------------------------------------
@@ -310,7 +310,7 @@ AC_CHECK_LIB(ieee, main, [MATH_LIBS="-lieee $MATH_LIBS"])
 # instead.
 #--------------------------------------------------------------------
 
-AC_CHECK_FUNC(memmove, , [AC_DEFINE(memmove, memcpy)])
+AC_CHECK_FUNC(memmove, , [AC_DEFINE(memmove, memcpy, [Define to memcpy if memmove is not available])])
 
 #--------------------------------------------------------------------
 # SGI systems don't use the BSD form of the gettimeofday function,
@@ -320,11 +320,11 @@ AC_CHECK_FUNC(memmove, , [AC_DEFINE(memmove, memcpy)])
 # to tkPort.h can declare it if it isn't already declared.
 #--------------------------------------------------------------------
 
-AC_CHECK_FUNC(BSDgettimeofday, AC_DEFINE(HAVE_BSDGETTIMEOFDAY))
+AC_CHECK_FUNC(BSDgettimeofday, [AC_DEFINE(HAVE_BSDGETTIMEOFDAY, 1, [Define to 1 if you have the BSDgettimeofday function])])
 AC_MSG_CHECKING([for gettimeofday declaration])
 AC_EGREP_HEADER(gettimeofday, sys/time.h, AC_MSG_RESULT(present), [
     AC_MSG_RESULT(missing)
-    AC_DEFINE(GETTOD_NOT_DECLARED)
+    AC_DEFINE(GETTOD_NOT_DECLARED, 1, [Define if gettimeofday is not declared])
 ])
 
 #--------------------------------------------------------------------
@@ -353,7 +353,7 @@ if test "$tk_strtod" = 1; then
         AC_MSG_RESULT(ok)
     else
         AC_MSG_RESULT(buggy)
-        AC_DEFINE(strtod, fixstrtod)
+        AC_DEFINE(strtod, fixstrtod, [Define to fixstrtod if strtod is buggy])
     fi
 fi
 
@@ -533,10 +533,10 @@ else
     LIBS="$CURSESLIBSW"
     if test $USE_NCURSES = 1 ; then
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <ncurses.h>]], [[int c; initscr(); scr_dump("xx");]])],[AC_MSG_RESULT(yes)
-           AC_DEFINE(HAVE_SCR_DUMP)],[AC_MSG_RESULT(no)])
+           AC_DEFINE(HAVE_SCR_DUMP, 1, [Define to 1 if you have the scr_dump function])],[AC_MSG_RESULT(no)])
     else
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[int c; initscr(); scr_dump("xx");]])],[AC_MSG_RESULT(yes)
-           AC_DEFINE(HAVE_SCR_DUMP)],[AC_MSG_RESULT(no)])
+           AC_DEFINE(HAVE_SCR_DUMP, 1, [Define to 1 if you have the scr_dump function])],[AC_MSG_RESULT(no)])
     fi
     CFLAGS=$tk_oldCFlags
     LIBS=$tk_oldLibs
@@ -558,7 +558,7 @@ if test $NOGPM -eq 0 ; then
     tk_oldLibs=$LIBS
     LIBS="-lgpm"
     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <gpm.h>]], [[Gpm_Connect conn; Gpm_Open(&conn, 0);]])],[AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_GPM)
+        AC_DEFINE(HAVE_GPM, 1, [Define to 1 if you have the GPM library])
         CURSESLIBSW="$CURSESLIBSW -lgpm"],[AC_MSG_RESULT(no)])
     LIBS=$tk_oldLibs
 fi
