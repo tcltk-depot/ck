@@ -29,7 +29,7 @@ package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ \
         foreach path $searchPaths {
             set lib [file join $path $fileName]
             if {[file exists $lib]} {
-                if {[file exists [file join $path @NCCOMPAT_LIB_FILE@]]} {
+                if {0 && [file exists [file join $path @NCCOMPAT_LIB_FILE@]]} {
                     # Load sidecar package to support binary compatibility for
                     # different versions of ncurses.  Doesn't define any new
                     # Tcl commands, just exports the found ncurses symbols to
@@ -41,6 +41,7 @@ package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ \
                 # Load was successful
                 set ${package_ns}::dll_path $lib
                 set ${package_ns}::package_dir $dir
+		uplevel #0 [list source [file join $::ck_library ck.tcl]]
                 return
             }
         }

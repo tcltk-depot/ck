@@ -3,10 +3,12 @@
 
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
-    namespace import ::tcltest::*
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
 }
 
-loadTestedCommands
+::tcltest::loadTestedCommands
 
 package require ck
 
@@ -21,3 +23,5 @@ namespace eval ck::test {
 ::tcltest::cleanupTests
 namespace delete ck::test
 return
+
+# vim: ft=tcl

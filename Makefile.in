@@ -196,6 +196,9 @@ VALGRIND	= valgrind
 VALGRINDARGS	= --tool=memcheck --num-callers=8 --leak-resolution=high \
 		  --leak-check=yes --show-reachable=yes -v
 
+PACKAGE_LOAD = "apply {dir {source [file join \$$dir pkgIndex.tcl]}} `@CYGPATH@ $(srcdir)`" 
+PACKAGE_LOAD_EMBED = apply\ {dir\ {source\ [file\ join\ \$$dir\ pkgIndex.tcl]}}\ `@CYGPATH@ $(srcdir)` 
+
 .SUFFIXES: .c .$(OBJEXT)
 
 #========================================================================
@@ -322,9 +325,7 @@ install-demos:
 
 test: binaries libraries
 	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS) \
-	    -load "package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) \
-		[list load `@CYGPATH@ $(PKG_LIB_FILE)` [string totitle $(PACKAGE_NAME)]]"
-
+	    -load $(PACKAGE_LOAD)
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
 
@@ -335,8 +336,7 @@ gdb-test: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(GDB) \
 	    --args $(TCLSH_PROG) `@CYGPATH@ $(srcdir)/tests/all.tcl` \
 	    $(TESTFLAGS) -singleproc 1 \
-	    -load "package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) \
-		[list load `@CYGPATH@ $(PKG_LIB_FILE)` [string totitle $(PACKAGE_NAME)]]"
+	    -load $(PACKAGE_LOAD)
 
 valgrind: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) \
@@ -344,6 +344,15 @@ valgrind: binaries libraries
 
 valgrindshell: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) $(SCRIPT)
+
+vim-gdb: binaries libraries
+	$(TCLSH_ENV) $(PKG_ENV) vim \
+	    -c "set number" \
+	    -c "set mouse=a" \
+	    -c "set foldlevel=100" \
+	    -c "Termdebug -ex set\ print\ pretty\ on --args $(TCLSH_PROG) tests/all.tcl -singleproc 1 -load $(PACKAGE_LOAD_EMBED) $(TESTFLAGS)" \
+	    -c "2windo set nonumber" \
+	    -c "1windo set nonumber"
 
 depend:
 
@@ -562,6 +571,7 @@ uninstall-binaries:
 
 .PHONY: all binaries clean depend distclean doc install libraries test
 .PHONY: gdb gdb-test valgrind valgrindshell
+.PHONY: vim-gdb
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

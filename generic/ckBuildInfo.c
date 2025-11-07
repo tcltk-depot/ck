@@ -8,7 +8,7 @@
  *
  */
 
-#include "ck.h"
+#include "ckInt.h"
 #include "ckUuid.h"
 #include <string.h>
 

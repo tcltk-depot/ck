@@ -10,23 +10,6 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
-# Insist on running with compatible versions of Tcl and Ck.
-
-apply {{tv cv} {
-    scan $tv "%d.%d" a b
-    scan $cv "%d.%d" c d
-    if {$a == 8} {
-	if {$c != 8} {
-	    error "wrong version of Ck loaded ($c.$d): need 8.X"
-	}
-	if {$d != $b} {
-	    error "wrong version of Ck loaded ($c.$d): need 8.$b"
-	}
-    } else {
-	error "wrong version of Tcl loaded ($a.b): need 8.x"
-    }
-}} [info tclversion] $ck_version
-
 if {$tcl_platform(platform) eq "windows"} {
     curses encoding IBM437
     set env(TERM) win32

@@ -1,0 +1,19 @@
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+::tcltest::loadTestedCommands
+
+package require ck
+
+test dialog-1.1 {dialog command} -body {
+    ck_dialog .foo "hello, world" "This is the body text" Ok Cancel
+} -result Ok
+
+::tcltest::cleanupTests
+return
+
+# vim: ft=tcl

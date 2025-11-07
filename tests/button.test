@@ -1,0 +1,26 @@
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+::tcltest::loadTestedCommands
+
+package require ck
+
+test button-1.1 {button widget} -body {
+    button .b -text "hello, world" -command {puts bye; set ::done 1}
+    pack .b
+    vwait ::done
+    return -level 0 Ok
+} -cleanup {
+    unset -nocomplain ::done
+    catch {destroy .b}
+} -result Ok
+
+::tcltest::cleanupTests
+return
+
+# vim: ft=tcl
