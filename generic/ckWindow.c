@@ -140,20 +140,14 @@ static void	RefreshToplevels(CkWindow *winPtr);
 static void	RefreshThem(CkWindow *winPtr);
 static void     UpdateHWCursor(CkMainInfo *mainPtr);
 static CkWindow *GetWindowXY(CkWindow *winPtr, int *xPtr, int *yPtr);
-static int	DeadAppCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      ExecCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      PutsCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      CloseCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      FlushCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      ReadCmd (ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
-static int      GetsCmd(ClientData clientData,
-			Tcl_Interp *interp, int argc, const char **argv);
+
+static CkCmdProc	DeadAppCmd;
+static CkCmdProc	ExecCmd;
+static CkCmdProc	PutsCmd;
+static CkCmdProc	CloseCmd;
+static CkCmdProc	FlushCmd;
+static CkCmdProc	ReadCmd;
+static CkCmdProc	GetsCmd;
 
 /*
  * Some plain Tcl commands are handled specially.
@@ -773,14 +767,14 @@ Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 
     /* Interlock: only one interp allowed. */
     if (ckMainInfo != NULL && ckMainInfo->interp != interp) {
-	Tcl_SetResult(interp, "can't load Ck", TCL_STATIC);
+	Tcl_SetResult(interp, "can't load " PACKAGE_NAME, TCL_STATIC);
 	return TCL_ERROR;
     }
 
     /* Interlock: when Tk is loaded, refuse to continue. */
     if ((Tcl_FindCommand(interp, "::tk", NULL, 0) != NULL) &&
 	(Tcl_FindCommand(interp, "::bind", NULL, 0) != NULL)) {
-	Tcl_SetResult(interp, "can't load Ck", TCL_STATIC);
+	Tcl_SetResult(interp, "can't load " PACKAGE_NAME, TCL_STATIC);
 	return TCL_ERROR;
     }
 
@@ -792,7 +786,7 @@ Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 
     p = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
     if (p == NULL || *p == '\0')
-	p = "Ck";
+	p = PACKAGE_NAME;
     name = strrchr(p, '/');
     if (name != NULL)
 	name++;

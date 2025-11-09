@@ -8,8 +8,6 @@ if {[llength [info commands test]] == 0} {
 
 ::tcltest::loadTestedCommands
 
-package require ck
-
 test button-1.1 {button widget} -body {
     button .b -text "hello, world" -command {puts bye; set ::done 1}
     pack .b

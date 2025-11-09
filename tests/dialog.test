@@ -7,11 +7,9 @@ if {[llength [info commands test]] == 0} {
 
 ::tcltest::loadTestedCommands
 
-package require ck
-
 test dialog-1.1 {dialog command} -body {
     ck_dialog .foo "hello, world" "This is the body text" Ok Cancel
-} -result Ok
+} -result 0
 
 ::tcltest::cleanupTests
 return

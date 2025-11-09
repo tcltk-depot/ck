@@ -1,8 +1,15 @@
 package require tcltest
 
+namespace import tcltest::test
+
+tcltest::outputChannel stderr
+
+tcltest::loadTestedCommands
+
 # Test configuration options that may be set are:
 # (currently none)
 
+tcltest::configure -singleproc true
 tcltest::configure -testdir [file dirname [file normalize [info script]]]
 # Avoid running temp Emacs and others
 tcltest::configure -notfile "*#*"

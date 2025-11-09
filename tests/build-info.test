@@ -10,8 +10,6 @@ if {[llength [info commands test]] == 0} {
 
 ::tcltest::loadTestedCommands
 
-package require ck
-
 namespace eval ck::test {
     # Only a sample test! Does not test all build-info commands.
     test build-info-1.1 {build-info command} -body {
