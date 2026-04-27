@@ -112,9 +112,15 @@ Ck_ExitCmd(
 	} else {
 	    ckMainInfo->flags &= ~CK_NOCLR_ON_EXIT;
 	}
+	/*
+	 * Ck_DestroyWindow handles endwin/delscreen/CkStdioSwap_Restore
+	 * for the main window; don't duplicate any of that here.
+	 */
 	Ck_DestroyWindow((CkWindow *) clientData);
+#if CK_NC_LEAK_DEBUG
+	_nc_freeall();
+#endif
     }
-    endwin();	/* just in case */
     Tcl_Exit(value);
     /* NOTREACHED */
     return TCL_OK;
@@ -455,9 +461,9 @@ Ck_CursesCmd(
 	    return TCL_ERROR;
         }
     } else if ((c == 's') && (strncmp(argv[1], "screendump", length) == 0)) {
-	Tcl_DString buffer;
-	char *fileName;
 #ifdef HAVE_SCR_DUMP
+	Tcl_DString buffer;
+	const char *fileName;
 	int ret;
 #endif
 
@@ -466,12 +472,24 @@ Ck_CursesCmd(
 		" ", argv[1], " filename\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	fileName = Tcl_TildeSubst(interp, argv[2], &buffer);
-	if (fileName == NULL) {
-	    Tcl_DStringFree(&buffer);
-	    return TCL_ERROR;
-	}
 #ifdef HAVE_SCR_DUMP
+	/*
+	 * Tcl 9 dropped automatic tilde substitution for paths.  Translate
+	 * via [file normalize] to keep behaviour consistent across versions.
+	 */
+	Tcl_DStringInit(&buffer);
+	{
+	    Tcl_Obj *pathObj = Tcl_NewStringObj(argv[2], -1);
+	    Tcl_IncrRefCount(pathObj);
+	    Tcl_Obj *normObj = Tcl_FSGetNormalizedPath(interp, pathObj);
+	    if (normObj == NULL) {
+		Tcl_DecrRefCount(pathObj);
+		return TCL_ERROR;
+	    }
+	    Tcl_DStringAppend(&buffer, Tcl_GetString(normObj), -1);
+	    Tcl_DecrRefCount(pathObj);
+	}
+	fileName = Tcl_DStringValue(&buffer);
 	ret = scr_dump(fileName);
 	Tcl_DStringFree(&buffer);
 	if (ret != OK) {
@@ -882,7 +900,8 @@ Ck_BindtagsCmd(
 {
     CkWindow *mainWin = (CkWindow *) clientData;
     CkWindow *winPtr, *winPtr2;
-    int i, tagArgc;
+    int i;
+    Tcl_Size tagArgc;
     const char *p, **tagArgv;
 
     if ((argc < 2) || (argc > 3)) {

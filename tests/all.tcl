@@ -4,15 +4,26 @@ namespace import tcltest::test
 
 tcltest::outputChannel stderr
 
+# Tests run in the test harness's process, which is itself attached to a
+# real (or pty-wrapped) controlling terminal.  The legacy [package
+# require ck] auto-creates the main window on that terminal, which (a)
+# corrupts the test harness's stdout, and (b) makes it impossible for
+# tests to drive ck against a private pty.  Suppress the auto-open
+# globally; tests that exercise widget behaviour are responsible for
+# opening their own pty session via [ck::pty open] + [ck::open -pty].
+set ::ck_no_auto_open 1
+
 tcltest::loadTestedCommands
+
+# Filter out emacs/etc. transient files; everything else uses the
+# pty-driven model now.
+tcltest::configure -notfile {*#*}
 
 # Test configuration options that may be set are:
 # (currently none)
 
 tcltest::configure -singleproc true
 tcltest::configure -testdir [file dirname [file normalize [info script]]]
-# Avoid running temp Emacs and others
-tcltest::configure -notfile "*#*"
 
 if {[info exists env(TEMP)]} {
     tcltest::configure -tmpdir $::env(TEMP)/cffi-test/[clock seconds]
@@ -24,7 +35,7 @@ if {[info exists env(TEMP)]} {
     }
 }
 
-eval tcltest::configure $argv
+tcltest::configure {*}$argv
 
 # ERROR_ON_FAILURES for github actions
 set ErrorOnFailures [info exists env(ERROR_ON_FAILURES)]
@@ -39,3 +50,4 @@ if { [info exists ::argv0] && [file tail $::argv0] eq [file tail [info script]]
     proc exit args {}
 }
 
+exit

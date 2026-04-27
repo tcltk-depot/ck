@@ -1,0 +1,100 @@
+'\"
+'\" Copyright (c) 2026 Cyan Ogilvie
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\"
+.so man.macros
+.TH ck::pty n 1.0 Ck "Ck Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+ck::pty \- Allocate a pty pair for testing or external Ck sessions
+.SH SYNOPSIS
+\fBck::pty open\fR ?\fB-rows\fR \fIN\fR? ?\fB-cols\fR \fIN\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+\fBck::pty\fR exposes ncurses-friendly pty primitives at the Tcl level.
+It is intended primarily for test harnesses that want to drive a Ck
+session against a controlled pty so they can inject synthetic
+keystrokes, snapshot the rendered output, and assert against widget
+behaviour without taking over the test process's own controlling
+terminal.
+
+.SS \fBck::pty open\fR ?\fB-rows\fR \fIN\fR? ?\fB-cols\fR \fIN\fR?
+.PP
+Allocates a pseudoterminal pair via \fBopenpty\fR(3) and returns a
+two-element list \fB{\fImasterChan\fB \fIslaveChan\fB}\fR.  Both ends
+are wrapped in Tcl channels and registered with the calling
+interpreter, so they can be passed directly to \fBchan read\fR,
+\fBchan puts\fR, and friends, and they participate in normal channel
+cleanup on \fBchan close\fR.
+.PP
+Channel options applied at creation time:
+.RS
+.IP \(bu 4
+\fIMaster:\fR \fB-translation\ binary\fR, \fB-buffering\ none\fR,
+\fB-blocking\ 0\fR.  Non-blocking and unbuffered makes it cheap for
+tests to do "drain whatever's available" reads without hanging when
+the slave hasn't written yet.
+.IP \(bu 4
+\fISlave:\fR \fB-translation\ binary\fR, \fB-buffering\ none\fR.
+Blocking remains on by default so that injected keystrokes don't
+silently get short-written.
+.RE
+.PP
+The slave channel can be passed straight to \fBck::open\ -pty\fR; the
+underlying fd is extracted via \fBTcl_GetChannelHandle\fR.
+\fIfd\fR-form integers are also accepted for the same option, so a
+test that already has a raw fd in hand doesn't need to wrap it.
+.PP
+The optional \fB-rows\fR and \fB-cols\fR pair, when both supplied with
+positive values, sets the pty's window size (\fBTIOCSWINSZ\fR) before
+\fBck::pty open\fR returns.  Either both must be set or neither;
+supplying just one is a Tcl error.
+
+.SH EXAMPLES
+.PP
+A test that creates a button, sends Return to it, and checks that the
+\fB-command\fR fired:
+.CS
+set ::ck_no_auto_open 1
+package require ck
+
+lassign [\fBck::pty open\fR \-rows 24 \-cols 80] master slave
+\fBck::open\fR \-pty $slave .
+
+button .b \-text Hello \-command {set ::pressed 1}
+pack .b
+focus .b
+update                         ;\fI# initial paint\fR
+
+puts \-nonewline $master "\\r"   ;\fI# inject Return\fR
+flush $master
+update                         ;\fI# dispatch\fR
+
+if {$::pressed} {
+    puts "ok"
+}
+
+destroy .
+chan close $master
+chan close $slave
+.CE
+
+.SH NOTES
+.PP
+The slave end is intentionally returned as a Tcl channel rather than
+a raw fd so the test process can clean up uniformly with
+\fBchan close\fR.  When the slave channel is passed to
+\fBck::open\ -pty\fR, ncurses dups its fd internally for use by
+\fBnewterm\fR(3); the original Tcl channel remains valid until the
+test closes it.
+
+.SH SEE ALSO
+ck::open(n), destroy(n)
+
+.SH KEYWORDS
+pty, openpty, test, channel

@@ -1,0 +1,6 @@
+option('testmode', type: 'boolean', value: false,
+  description: 'Build with whitebox testing hooks exposed')
+
+option('nc_leak_debug', type: 'boolean', value: false,
+  description: 'Call ncurses _nc_freeall() on exit to flush static state. ' +
+               'Only safe when ncurses was built with --disable-leaks.')

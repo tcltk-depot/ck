@@ -1,0 +1,30 @@
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+::tcltest::loadTestedCommands
+
+namespace eval ck::test {
+
+    test nop-1.1 {ck commands install via ck::open} -setup {
+        lassign [ck::pty open -rows 24 -cols 80] master slave
+    } -body {
+        ck::open -pty $slave .
+        # ck::open should have registered the curses widget commands;
+        # `label` is a representative one.
+        expr {"::label" in [info commands ::*]}
+    } -cleanup {
+        catch {destroy .}
+        catch {chan close $master}
+        catch {chan close $slave}
+    } -result 1
+}
+
+::tcltest::cleanupTests
+namespace delete ck::test
+return
+
+# vim: ft=tcl

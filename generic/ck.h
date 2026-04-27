@@ -27,6 +27,9 @@
 # define Tcl_NewSizeIntObj Tcl_NewIntObj
 # define TCL_SIZE_MAX      INT_MAX
 # define TCL_SIZE_MODIFIER ""
+# ifndef TCL_INDEX_NONE
+#  define TCL_INDEX_NONE  ((Tcl_Size)-1)
+# endif
 #endif
 
 #if (TCL_MAJOR_VERSION < 8)
@@ -58,11 +61,10 @@
 #endif
 
 
-#ifdef TCL_UTF_MAX
-#if TCL_UTF_MAX == 4
-#error TCL_UTF_MAX=4 is unsupported
-#endif
-#endif
+/*
+ * TCL_UTF_MAX may be 3 (legacy Tcl 8.6 default) or 4 (Tcl 9, full Unicode).
+ * Both are supported.
+ */
 
 #ifndef RESOURCE_INCLUDED
 
@@ -193,6 +195,7 @@ typedef struct CkEventHandler {
  */
 
 typedef struct CkMainInfo {
+    SCREEN *screen;		/* Curses screen structure for application. */
     struct CkWindow *winPtr;	/* Pointer to main window. */
     Tcl_Interp *interp;		/* Interpreter associated with application. */
     Tcl_HashTable nameTable;	/* Hash table mapping path names to CkWindow
@@ -224,6 +227,21 @@ typedef struct CkMainInfo {
     int winchFd[2];		/* Pipe for SIGWINCH handling. */
 #endif
     Tcl_Encoding isoEncoding;
+    /*
+     * fd-swap state: while a Ck session is active the process's stdout
+     * and stderr (fds 1 and 2) are redirected to a capture file so that
+     * stray puts/printf calls don't smash the curses display.  ncurses
+     * itself runs against FILE*s built on the saved fds (uiOutFp/uiInFp)
+     * pointing at the real terminal.  saved_*_fd == -1 means no swap is
+     * currently active (e.g. because no real tty was available, or
+     * because the swap has already been undone at teardown).
+     */
+    int saved_stdin_fd;		/* dup of original fd 0; -1 if no swap. */
+    int saved_stdout_fd;	/* dup of original fd 1. */
+    int saved_stderr_fd;	/* dup of original fd 2. */
+    int capture_fd;		/* memfd/tmpfile holding captured 1+2; -1 if none. */
+    FILE *uiOutFp;		/* FILE* on saved_stdout_fd, owned by ncurses. */
+    FILE *uiInFp;		/* FILE* on saved_stdin_fd, owned by ncurses. */
 } CkMainInfo;
 
 #define CK_HAS_COLOR        1

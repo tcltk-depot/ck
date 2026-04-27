@@ -5,13 +5,100 @@ if {[llength [info commands test]] == 0} {
     namespace import ::tcltest::test
 }
 
+set ::ck_no_auto_open 1
 ::tcltest::loadTestedCommands
+source [file join [file dirname [info script]] helpers.tcl]
 
-test dialog-1.1 {dialog command} -body {
-    ck_dialog .foo "hello, world" "This is the body text" Ok Cancel
-} -result 0
+namespace eval ck::test {
+
+    # ck_dialog blocks in [tkwait window] until a button fires.  To
+    # drive it we schedule the keystroke injection via [after] so it
+    # runs *inside* tkwait's event loop, presses the focused button,
+    # and unblocks ck_dialog with $ckPriv(button) set.
+
+    test dialog-1.1 {ck_dialog returns 0 when Return invokes the default-focused button} -setup {
+        open_pty
+    } -body {
+        after 50 [list ::ck::test::send_keys "\r"]
+        ck_dialog .foo "Title" "Body" Ok Cancel
+    } -cleanup {
+        catch {destroy .foo}
+        close_pty
+    } -result 0
+
+    test dialog-1.2 {ck_dialog returns 1 after Tab + Return moves focus to the second button} -setup {
+        open_pty
+    } -body {
+        # Two send_keys calls: one moves focus, the other invokes.  A
+        # single send_keys "\t\r" race-conditions with focus dispatch
+        # — the Return can hit before the focus traversal completes.
+        after 50 {
+            ::ck::test::send_keys "\t"
+            after 50 [list ::ck::test::send_keys "\r"]
+        }
+        ck_dialog .foo "Title" "Body" Ok Cancel
+    } -cleanup {
+        catch {destroy .foo}
+        close_pty
+    } -result 1
+
+    test dialog-1.3 {ck_dialog with no buttons returns -1} -setup {
+        open_pty
+    } -body {
+        ck_dialog .foo "Title" "Body"
+    } -cleanup {
+        catch {destroy .foo}
+        close_pty
+    } -result -1
+
+    test dialog-1.4 {ck_dialog renders title and body text to the parsed grid} -setup {
+        open_pty
+        # Snapshot the screen *while the dialog is still up*, then
+        # dismiss it.  If we waited until ck_dialog returned to look
+        # at the screen, ck's destroy-dialog redraw would have already
+        # overwritten the title/body cells with spaces.
+        after 100 {
+            set ::ck::test::dialog_screen [::ck::test::vt_dump]
+            ::ck::test::send_keys "\r"
+        }
+    } -body {
+        ck_dialog .foo "Title" "Body" Ok
+        set found_title 0
+        set found_body  0
+        foreach row $::ck::test::dialog_screen {
+            if {[regexp {│Title} $row]} { set found_title 1 }
+            if {[regexp {│ Body} $row]} { set found_body  1 }
+        }
+        list $found_title $found_body
+    } -cleanup {
+        close_pty
+        unset -nocomplain ::ck::test::dialog_screen
+    } -result {1 1}
+
+    test dialog-1.5 {ck_dialog draws a box-drawing border} -setup {
+        open_pty
+        after 100 {
+            set ::ck::test::dialog_screen [::ck::test::vt_dump]
+            ::ck::test::send_keys "\r"
+        }
+    } -body {
+        ck_dialog .foo "T" "B" Ok
+        set found_top    0
+        set found_bottom 0
+        foreach row $::ck::test::dialog_screen {
+            # Top: ┌─...─┐  Bottom: └─...─┘
+            if {[regexp {┌─+┐} $row]} { set found_top    1 }
+            if {[regexp {└─+┘} $row]} { set found_bottom 1 }
+        }
+        list $found_top $found_bottom
+    } -cleanup {
+        close_pty
+        unset -nocomplain ::ck::test::dialog_screen
+    } -result {1 1}
+}
 
 ::tcltest::cleanupTests
+namespace delete ck::test
 return
 
 # vim: ft=tcl

@@ -26,7 +26,16 @@ if {[info exists auto_path]} {
 }
 
 # ----------------------------------------------------------------------
-# Read in files that define all of the class bindings.
+# Read in files that define class bindings AND files that contribute
+# default option-database entries (option add ...) for built-in
+# dialogs.  Sourcing these explicitly here matters: under repeated
+# ck::open / destroy . cycles in the same interp (notably under
+# tcltest -singleproc), Ck_DestroyWindow tears the option database
+# down with the main window, but auto_path-driven autoload only fires
+# *once* per interp because [info procs ck_dialog] is still defined.
+# Without re-sourcing, the second session's [toplevel -class Dialog]
+# can't find *Dialog.border, [$w cget -border] returns "", and the
+# dialog renders without its border / separator frames.
 # ----------------------------------------------------------------------
 
 source [file join $ck_library button.tcl]
@@ -35,6 +44,11 @@ source [file join $ck_library listbox.tcl]
 source [file join $ck_library scrollbar.tcl]
 source [file join $ck_library text.tcl]
 source [file join $ck_library menu.tcl]
+source [file join $ck_library dialog.tcl]
+source [file join $ck_library bgerror.tcl]
+source [file join $ck_library msgbox.tcl]
+source [file join $ck_library clrpick.tcl]
+source [file join $ck_library ckfbox.tcl]
 
 # ----------------------------------------------------------------------
 # Default bindings for keyboard traversal.

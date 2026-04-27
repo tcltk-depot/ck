@@ -906,10 +906,9 @@ replaceChar:
 		if (curX >= 0)
 		    waddnwstr(window, w, 1);
 #else
-		for (i = 0; i < nc; i++) {
+		for (i = 0; i < nc; i++)
 		    if (curX + i >= 0)
-			waddch(window, p[i])
-		}
+			waddch(window, p[i]);
 #endif
 	    }
 	    curX += len;

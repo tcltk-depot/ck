@@ -142,38 +142,6 @@ static void     UpdateHWCursor(CkMainInfo *mainPtr);
 static CkWindow *GetWindowXY(CkWindow *winPtr, int *xPtr, int *yPtr);
 
 static CkCmdProc	DeadAppCmd;
-static CkCmdProc	ExecCmd;
-static CkCmdProc	PutsCmd;
-static CkCmdProc	CloseCmd;
-static CkCmdProc	FlushCmd;
-static CkCmdProc	ReadCmd;
-static CkCmdProc	GetsCmd;
-
-/*
- * Some plain Tcl commands are handled specially.
- */
-
-CkCmd redirCommands[] = {
-#ifndef _WIN32
-    {"exec",    ExecCmd},
-#endif
-    {"puts",    PutsCmd},
-    {"close",   CloseCmd},
-    {"flush",   FlushCmd},
-    {"read",    ReadCmd},
-    {"gets",    GetsCmd},
-    {(char *) NULL, (CkCmdProc *) NULL}
-};
-
-/*
- * The following structure is used as ClientData for redirected
- * plain Tcl commands.
- */
-
-typedef struct {
-    CkMainInfo *mainPtr;
-    Tcl_CmdInfo cmdInfo;
-} RedirInfo;
 
 /*
  *--------------------------------------------------------------
@@ -399,16 +367,20 @@ HandleWinch(int sig)
  *----------------------------------------------------------------------
  */
 
-static void
-CleanupRedirInfo(ClientData clientData)
-{
-    ckfree((char *) clientData);
-}
-
+/* Public, default-options entry point.  ck::open uses CkCreateMainWindowEx. */
 CkWindow *
 Ck_CreateMainWindow(
     Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
     char *className)		/* Class name of the new main window. */
+{
+    return CkCreateMainWindowEx(interp, className, NULL);
+}
+
+CkWindow *
+CkCreateMainWindowEx(
+    Tcl_Interp *interp,		/* Interpreter to use for error reporting. */
+    char *className,		/* Class name of the new main window. */
+    const CkOpenOptions *openOpts) /* NULL = legacy controlling-tty path. */
 {
     int dummy;
     Tcl_HashEntry *hPtr;
@@ -459,6 +431,12 @@ Ck_CreateMainWindow(
     mainPtr->lastRefresh = 0;
     mainPtr->refreshTimer = NULL;
     mainPtr->flags = 0;
+    mainPtr->saved_stdin_fd  = -1;
+    mainPtr->saved_stdout_fd = -1;
+    mainPtr->saved_stderr_fd = -1;
+    mainPtr->capture_fd      = -1;
+    mainPtr->uiOutFp         = NULL;
+    mainPtr->uiInFp          = NULL;
     ckMainInfo = mainPtr;
     winPtr->mainPtr = mainPtr;
     winPtr->nameUid = Ck_GetUid(".");
@@ -558,10 +536,30 @@ Ck_CreateMainWindow(
 #endif
 #endif
 
-    if (initscr() == (WINDOW *) ERR) {
+    /*
+     * Capture stdout/stderr to a memory buffer for the duration of the Ck
+     * session so that puts/printf from the host application or its loaded
+     * extensions doesn't corrupt the curses display.  CkStdioSwap_Restore()
+     * (called from Ck_DestroyWindow) puts the fds back and dumps whatever
+     * was captured to the user's restored stderr.  If the swap fails (no
+     * tty, dup exhausted, etc.) we fall back to using stdout/stdin
+     * directly so behaviour is unchanged from the pre-swap world.
+     */
+    if (CkStdioSwap_Init(mainPtr, openOpts) == TCL_OK) {
+	const char *termName = (openOpts != NULL) ? openOpts->term : NULL;
+	mainPtr->screen = newterm((char *) termName,
+				   mainPtr->uiOutFp, mainPtr->uiInFp);
+    } else {
+	mainPtr->screen = newterm(NULL, stdout, stdin);
+    }
+    if (!mainPtr->screen) {
+	CkStdioSwap_Restore(mainPtr);
 	ckfree((char *) winPtr);
 	return NULL;
     }
+    set_term(mainPtr->screen);
+
+
 #ifdef SIGTSTP
     /* This is essential for ncurses-1.9.4 */
 #ifdef HAVE_SIGACTION
@@ -581,6 +579,7 @@ Ck_CreateMainWindow(
 #ifdef USE_NCURSES
     ESCDELAY = 300;
 #endif
+
     mainPtr->maxWidth = COLS;
     mainPtr->maxHeight = LINES;
     winPtr->width = mainPtr->maxWidth;
@@ -665,8 +664,21 @@ Ck_CreateMainWindow(
     typeahead(-1);
     InputSetup(&inputInfo);
 #else
-    Tcl_CreateFileHandler(0,
-	TCL_READABLE, CkHandleInput, (ClientData) mainPtr);
+    /*
+     * Watch for input on the actual fd ncurses is reading from — this is
+     * saved_stdin_fd, which CkStdioSwap_Init set to dup(STDIN_FILENO) in
+     * the default path or dup(pty_fd) in the explicit-pty path.  In both
+     * cases the saved fd shares its kernel open-file-description with the
+     * caller-visible fd, so a select on either sees the same readable
+     * events and reads via ncurses' FILE* drain the same buffer.  If the
+     * swap never set the field (e.g. legacy fall-through), use fd 0.
+     */
+    {
+	int inputFd = (mainPtr->saved_stdin_fd >= 0)
+		? mainPtr->saved_stdin_fd : STDIN_FILENO;
+	Tcl_CreateFileHandler(inputFd,
+		TCL_READABLE, CkHandleInput, (ClientData) mainPtr);
+    }
 #endif
 
     Tcl_CreateEventSource(CkEvtSetup, CkEvtCheck, (ClientData) mainPtr);
@@ -693,27 +705,6 @@ Ck_CreateMainWindow(
     for (cmdPtr = commands; cmdPtr->name != NULL; cmdPtr++) {
 	Tcl_CreateCommand(interp, cmdPtr->name, cmdPtr->cmdProc,
 		(ClientData) winPtr, (Tcl_CmdDeleteProc *) NULL);
-    }
-
-    /*
-     * Redirect some critical Tcl commands to our own procedures
-     */
-    for (cmdPtr = redirCommands; cmdPtr->name != NULL; cmdPtr++) {
-	RedirInfo *redirInfo;
-	Tcl_DString cmd;
-
-	redirInfo = (RedirInfo *) ckalloc(sizeof (RedirInfo));
-	redirInfo->mainPtr = mainPtr;
-	Tcl_GetCommandInfo(interp, cmdPtr->name, &redirInfo->cmdInfo);
-	Tcl_DStringInit(&cmd);
-	Tcl_DStringAppend(&cmd, "::rename ", -1);
-	Tcl_DStringAppend(&cmd, cmdPtr->name, -1);
-	Tcl_DStringAppend(&cmd, " ::tcl::", -1);
-	Tcl_DStringAppend(&cmd, cmdPtr->name, -1);
-	Tcl_GlobalEval(interp, Tcl_DStringValue(&cmd));
-	Tcl_DStringFree(&cmd);
-	Tcl_CreateCommand(interp, cmdPtr->name, cmdPtr->cmdProc,
-	    (ClientData) redirInfo, CleanupRedirInfo);
     }
 
     /*
@@ -755,9 +746,6 @@ Ck_CreateMainWindow(
 DLLEXPORT int
 Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
 {
-    const char *p, *name;
-    char *className;
-
     /*
      * Support any Tcl version compatible with the version against which the
      * extension is being built.
@@ -779,24 +767,22 @@ Ck_Init(Tcl_Interp *interp)		/* Interpreter to initialize. */
     }
 
     /*
-     * Register the commands added by the package.
-     * Ck_CreateMainWindow calls Tcl_CreateCommand on the elements of `commands[]`
+     * Register the package-level meta commands.  Curses-touching commands
+     * (bell, bind, button, ...) are not registered here — they get
+     * installed by ck::open as part of creating a main window, since they
+     * have no meaningful semantics until ncurses is initialised.
+     *
+     * The legacy contract was that [package require ck] auto-creates the
+     * main window on the controlling tty.  library/ck.tcl preserves that
+     * by calling [ck::open .] unless ::ck::no_auto_open is set ahead of
+     * time (the escape hatch tests use to drive ck::open -pty themselves).
      */
-    Tcl_CreateObjCommand(interp, PACKAGE_NAME "::" "build-info", BuildInfoObjCmd, NULL, NULL);
-
-    p = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
-    if (p == NULL || *p == '\0')
-	p = PACKAGE_NAME;
-    name = strrchr(p, '/');
-    if (name != NULL)
-	name++;
-    else
-	name = p;
-    className = (char *) ckalloc((unsigned) (strlen(name) + 1));
-    strcpy(className, name);
-    className[0] = toupper((unsigned char) className[0]);
-    Ck_CreateMainWindow(interp, className);
-    ckfree(className);
+    Tcl_CreateObjCommand(interp, PACKAGE_NAME "::" "build-info",
+	    BuildInfoObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand(interp, PACKAGE_NAME "::" "open",
+	    CkOpenObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand(interp, PACKAGE_NAME "::" "pty",
+	    CkPtyObjCmd, NULL, NULL);
 
     /* Register feature configuration  */
     Tcl_RegisterConfig(interp, PACKAGE_NAME, ckConfig, "utf-8");
@@ -1094,7 +1080,59 @@ Ck_DestroyWindow(CkWindow *winPtr)	/* Window to destroy. */
 		wclear(stdscr);
 		wrefresh(stdscr);
 	    }
+	    /*
+	     * Tear down the long-lived registrations Ck_CreateMainWindow set
+	     * up against this mainPtr.  Doing this before delscreen() means
+	     * the file handler can't fire mid-teardown with a freed
+	     * clientData, and the matching exit handler won't run again
+	     * later (e.g., on a subsequent ck::open / destroy . cycle in the
+	     * same interp, which is exactly what tcltest -singleproc does).
+	     */
+#ifndef _WIN32
+	    {
+		int inputFd = (mainPtr->saved_stdin_fd >= 0)
+			? mainPtr->saved_stdin_fd : STDIN_FILENO;
+		Tcl_DeleteFileHandler(inputFd);
+	    }
+#  ifdef USE_NCURSES
+	    if (mainPtr->winchFd[0] >= 0) {
+		Tcl_DeleteFileHandler(mainPtr->winchFd[0]);
+		close(mainPtr->winchFd[0]);
+		close(mainPtr->winchFd[1]);
+		mainPtr->winchFd[0] = mainPtr->winchFd[1] = -1;
+	    }
+#  endif
+#endif
+	    Tcl_DeleteEventSource(CkEvtSetup, CkEvtCheck,
+		    (ClientData) mainPtr);
+	    Tcl_DeleteExitHandler(CkEvtExit, (ClientData) mainPtr);
+
+	    /*
+	     * Drop any pending refresh — a queued DoRefresh idle handler
+	     * would otherwise fire on the about-to-be-freed mainPtr the
+	     * next time the event loop runs (e.g., the next ck::open's
+	     * `update`).
+	     */
+	    Tcl_CancelIdleCall(DoRefresh, (ClientData) mainPtr);
+	    if (mainPtr->refreshTimer != NULL) {
+		Tcl_DeleteTimerHandler(mainPtr->refreshTimer);
+		mainPtr->refreshTimer = NULL;
+	    }
+
 	    endwin();
+	    /*
+	     * Order matters: restore stdout/stderr fds (re-aliasing them
+	     * over the capture fd) BEFORE delscreen() runs, because
+	     * delscreen() fcloses the FILE*s wrapping the saved stdout/stdin
+	     * fds and we need the open file description on the original tty
+	     * to be referenced by fd 1 at that point.  Then delscreen() to
+	     * free the SCREEN.
+	     */
+	    CkStdioSwap_Restore(mainPtr);
+	    if (mainPtr->screen != NULL) {
+		delscreen(mainPtr->screen);
+		mainPtr->screen = NULL;
+	    }
 	    if (mainPtr->isoEncoding != NULL) {
 		Tcl_FreeEncoding(mainPtr->isoEncoding);
 	    }
@@ -2343,275 +2381,6 @@ DeadAppCmd(
     return TCL_ERROR;
 }
 
-/*
- *----------------------------------------------------------------------
- *
- * ExecCmd --
- *
- *	Own version of "exec" Tcl command which supports the -endwin
- *      option.
- *
- * Results:
- *	See documentation for "exec".
- *
- *----------------------------------------------------------------------
- */
-
-static int
-ExecCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-    int result, endWin = 0, length;
-    const char *savedargv1 = NULL;
-    char *clrCmd = NULL;
-#ifdef SIGINT
-#ifdef HAVE_SIGACTION
-    struct sigaction oldsig, newsig;
-#else
-    Ck_SignalProc sigproc;
-#endif
-#endif
-
-    length = strlen(argv[1]);
-    if (argc > 1 && length >= 7 && strncmp(argv[1], "-endwin", 7) == 0) {
-	endWin = 1;
-	if (length >= 8 && strncmp(argv[1], "-endwinc", 8) == 0) {
-	    clrCmd = tigetstr("clear");
-	}
-	savedargv1 = argv[1];
-	argv[1] = argv[0];
-	curs_set(1);
-	nodelay(stdscr, FALSE);
-	endwin();
-#ifdef SIGINT
-#ifdef HAVE_SIGACTION
-	newsig.sa_handler = SIG_IGN;
-	sigfillset(&newsig.sa_mask);
-	newsig.sa_flags = 0;
-	sigaction(SIGINT, &newsig, &oldsig);
-#else
-	sigproc = signal(SIGINT, SIG_IGN);
-#endif
-#endif
-#ifndef _WIN32
-	if (clrCmd != NULL && clrCmd != (char *) -1) {
-	    size_t remain = strlen(clrCmd);
-	    while (remain > 0) {
-		int wrote = write(1, clrCmd, remain);
-		if (wrote == -1) perror("write");
-		remain -= wrote;
-	    }
-
-	}
-#endif
-    }
-    result = (*cmdInfo->proc)(cmdInfo->clientData, interp,
-		argc - endWin, argv + endWin);
-    if (endWin) {
-#ifdef SIGINT
-#ifdef HAVE_SIGACTION
-	sigaction(SIGINT, &oldsig, NULL);
-#else
-	signal(SIGINT, sigproc);
-#endif
-#endif
-	argv[0] = argv[1];
-	argv[1] = savedargv1;
-	nodelay(stdscr, TRUE);
-	Ck_EventuallyRefresh(redirInfo->mainPtr->winPtr);
-    }
-    return result;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * PutsCmd --
- *
- *	Redirect "puts" Tcl command from "stdout" to "stderr" in the
- *      hope that it will not destroy our screen.
- *
- * Results:
- *	See documentation of "puts" command.
- *
- *----------------------------------------------------------------------
- */
-
-static int
-PutsCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-    int index = 0;
-    const char *newArgv[5];
-
-    newArgv[0] = argv[0];
-    if (argc > 1 && strcmp(argv[1], "-nonewline") == 0) {
-	newArgv[1] = argv[1];
-	index++;
-    }
-    if (argc == index + 2) {
-	newArgv[index + 2] = argv[index + 1];
-toStderr:
-	newArgv[index + 1] = "stderr";
-	return (*cmdInfo->proc)(cmdInfo->clientData, interp,
-	    index + 3, newArgv);
-    } else if (argc == index + 3 &&
-       (strcmp(argv[index + 1], "stdout") == 0 ||
-	strcmp(argv[index + 1], "file1") == 0)) {
-	newArgv[index + 2] = argv[index + 2];
-	goto toStderr;
-    }
-    return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * CloseCmd --
- *
- *	Report error when attempt is made to close stdin or stdout.
- *
- * Results:
- *	See documentation of "close" command.
- *
- *----------------------------------------------------------------------
- */
-
-static int
-CloseCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-
-    if (argc == 2 &&
-       (strcmp(argv[1], "stdin") == 0 ||
-	strcmp(argv[1], "file0") == 0 ||
-	strcmp(argv[1], "stdout") == 0 ||
-	strcmp(argv[1], "file1") == 0)) {
-	Tcl_AppendResult(interp, "may not close fileId \"",
-	     argv[1], "\" while in toolkit", (char *) NULL);
-	return TCL_ERROR;
-    }
-    return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * FlushCmd --
- *
- *	Report error when attempt is made to flush stdin or stdout.
- *
- * Results:
- *	See documentation of "flush" command.
- *
- *----------------------------------------------------------------------
- */
-
-static int
-FlushCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-
-    if (argc == 2 &&
-       (strcmp(argv[1], "stdin") == 0 ||
-	strcmp(argv[1], "file0") == 0 ||
-	strcmp(argv[1], "stdout") == 0 ||
-	strcmp(argv[1], "file1") == 0)) {
-	Tcl_AppendResult(interp, "may not flush fileId \"",
-	     argv[1], "\" while in toolkit", (char *) NULL);
-	return TCL_ERROR;
-    }
-    return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * ReadCmd --
- *
- *	Report error when attempt is made to read from stdin.
- *
- * Results:
- *	See documentation of "read" command.
- *
- *----------------------------------------------------------------------
- */
-
-static int
-ReadCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-
-    if ((argc > 1 &&
-	(strcmp(argv[1], "stdin") == 0 ||
-	 strcmp(argv[1], "file0") == 0)) ||
-	(argc > 2 &&
-	 (strcmp(argv[2], "stdin") == 0 ||
-	  strcmp(argv[2], "file0") == 0))) {
-	Tcl_AppendResult(interp, "may not read from fileId \"",
-	     argv[1], "\" while in toolkit", (char *) NULL);
-	return TCL_ERROR;
-    }
-    return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * GetsCmd --
- *
- *	Report error when attempt is made to read from stdin.
- *
- * Results:
- *	See documentation of "gets" command.
- *
- *----------------------------------------------------------------------
- */
-
-static int
-GetsCmd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int argc,
-    const char **argv)
-{
-    RedirInfo *redirInfo = (RedirInfo *) clientData;
-    Tcl_CmdInfo *cmdInfo = &redirInfo->cmdInfo;
-
-    if (argc >= 2 &&
-       (strcmp(argv[1], "stdin") == 0 ||
-	strcmp(argv[1], "file0") == 0)) {
-	Tcl_AppendResult(interp, "may not gets from fileId \"",
-	     argv[1], "\" while in toolkit", (char *) NULL);
-	return TCL_ERROR;
-    }
-    return (*cmdInfo->proc)(cmdInfo->clientData, interp, argc, argv);
-}
 
 #ifdef _WIN32
 

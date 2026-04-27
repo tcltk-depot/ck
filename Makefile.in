@@ -337,12 +337,11 @@ gdb:
 gdb-test: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(GDB) \
 	    --args $(TCLSH_PROG) `@CYGPATH@ $(srcdir)/tests/all.tcl` \
-	    $(TESTFLAGS) \
-	    -load $(PACKAGE_LOAD)
+	    $(TESTFLAGS) -singleproc 1 -load $(PACKAGE_LOAD)
 
 valgrind: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) \
-	    `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS) -load $(PACKAGE_LOAD)
+	    `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS) -singleproc 1 -load $(PACKAGE_LOAD)
 
 valgrindshell: binaries libraries
 	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) $(SCRIPT)
@@ -352,7 +351,7 @@ vim-gdb: binaries libraries
 	    -c "set number" \
 	    -c "set mouse=a" \
 	    -c "set foldlevel=100" \
-	    -c "Termdebug -ex set\ print\ pretty\ on --args $(TCLSH_PROG) tests/all.tcl -load $(PACKAGE_LOAD_EMBED) $(TESTFLAGS)" \
+	    -c "Termdebug -ex set\ print\ pretty\ on --args $(TCLSH_PROG) tests/all.tcl -singleproc 1 -load $(PACKAGE_LOAD_EMBED) $(TESTFLAGS)" \
 	    -c "2windo set nonumber" \
 	    -c "1windo set nonumber"
 

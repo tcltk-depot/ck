@@ -29,19 +29,22 @@ package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ \
         foreach path $searchPaths {
             set lib [file join $path $fileName]
             if {[file exists $lib]} {
-                if {0 && [file exists [file join $path @NCCOMPAT_LIB_FILE@]]} {
-                    # Load sidecar package to support binary compatibility for
-                    # different versions of ncurses.  Doesn't define any new
-                    # Tcl commands, just exports the found ncurses symbols to
-                    # the process image
-                    #load -global [file join $path @NCCOMPAT_LIB_FILE@] Nccompat
-                    load [file join $path @NCCOMPAT_LIB_FILE@] Nccompat
-                }
                 uplevel #0 [list load $lib $initName]
                 # Load was successful
                 set ${package_ns}::dll_path $lib
                 set ${package_ns}::package_dir $dir
-		uplevel #0 [list source [file join $::ck_library ck.tcl]]
+                # Legacy contract: package require @PACKAGE_NAME@ creates
+                # the main window (.) on the controlling tty and wires
+                # up class bindings.  ck::open sources library/ck.tcl on
+                # success, so a single call covers both pieces.  Tests
+                # that need to drive Ck against a controlled pty set
+                # ::ck_no_auto_open=1 before requiring the package and
+                # call [ck::open -pty $fd] themselves.  A plain global
+                # is used (rather than a namespace var) so the test
+                # harness can set it without first creating ::ck.
+                if {![info exists ::ck_no_auto_open] || !$::ck_no_auto_open} {
+                    uplevel #0 [list ::@PACKAGE_NAME@::open .]
+                }
                 return
             }
         }

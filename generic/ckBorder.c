@@ -112,9 +112,14 @@ Ck_GetGChar(
 
 	if (acsc != NULL && acsc != (char *) -1) {
 	    for (i = 0; acsc[i] != 0; i += 2) {
-		if (acsc[i] < 0 || acsc[i] >= 128)
-		    continue;
-		local_map[(int)acsc[i]] = (acsc[i+1] & 0xFF) | A_ALTCHARSET;
+		/* acsc is signed char; treat byte values as unsigned so the
+		 * 128-255 range is correctly excluded from local_map's 128-
+		 * entry index space.  Pre-fix this was `acsc[i] < 0 ||
+		 * acsc[i] >= 128`, where the second clause was dead code
+		 * (signed char can never be >= 128) — clang flagged it. */
+		unsigned ch = (unsigned char) acsc[i];
+		if (ch >= 128) continue;
+		local_map[ch] = (acsc[i+1] & 0xFF) | A_ALTCHARSET;
 	    }
 	}
 
@@ -281,7 +286,7 @@ Ck_GetBorder(
     Tcl_Interp *interp,
     const char *string)
 {
-    int i, largc;
+    Tcl_Size i, largc;
     long bchar[8];
     const char **largv;
     CkBorder *borderPtr;
@@ -294,7 +299,7 @@ Ck_GetBorder(
 	    (char *) NULL);
 	return NULL;
     }
-    for (i = 0; i < sizeof (bchar) / sizeof (bchar[0]); i++)
+    for (i = 0; i < (Tcl_Size)(sizeof (bchar) / sizeof (bchar[0])); i++)
 	bchar[i] = ' ';
     for (i = 0; i < largc; i++) {
 	if (strlen(largv[i]) == 1)
@@ -305,7 +310,7 @@ Ck_GetBorder(
 	}
     }
     if (largc == 1) {
-    	for (i = 1; i < sizeof (bchar) / sizeof (bchar[0]); i++)
+	for (i = 1; i < (Tcl_Size)(sizeof (bchar) / sizeof (bchar[0])); i++)
 	    bchar[i] = bchar[0];
     } else if (largc == 3) {
 	bchar[3] = bchar[7] = bchar[2];

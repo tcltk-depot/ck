@@ -1,0 +1,94 @@
+# pty.test — exercise the ck::pty / ck::open -pty path itself, plus the
+# basic key-injection sanity check that all higher-level tests build on.
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+set ::ck_no_auto_open 1
+::tcltest::loadTestedCommands
+source [file join [file dirname [info script]] helpers.tcl]
+
+namespace eval ck::test {
+
+    test pty-1.1 {ck::pty open returns a 2-list of channel names} -body {
+        lassign [ck::pty open -rows 24 -cols 80] master slave
+        set ok [expr {
+            $master ne {} && $slave ne {}
+            && $master in [chan names]
+            && $slave in [chan names]
+        }]
+        chan close $master
+        chan close $slave
+        return $ok
+    } -result 1
+
+    test pty-1.2 {ck::open -pty drives ncurses against the slave end} -setup {
+        lassign [ck::pty open -rows 24 -cols 80] master slave
+    } -body {
+        ck::open -pty $slave .
+        # An ncurses session writes a non-trivial amount of setup
+        # (cursor positioning, attribute resets, the initial paint of
+        # the empty main window).  Anything > 0 bytes confirms newterm
+        # was wired to our pty rather than the host's controlling tty.
+        update
+        set drawn [read $master]
+        expr {[string length $drawn] > 0}
+    } -cleanup {
+        catch {destroy .}
+        catch {chan close $master}
+        catch {chan close $slave}
+    } -result 1
+
+    test pty-1.3 {-rows / -cols are honoured by ck via TIOCSWINSZ} -setup {
+        open_pty -rows 10 -cols 40
+    } -body {
+        list [winfo screenwidth .] [winfo screenheight .]
+    } -cleanup {
+        close_pty
+    } -result {40 10}
+
+    test pty-2.1 {keystrokes injected on master fire bindings on .} -setup {
+        open_pty
+        bind . <Return> {set ::ck::test::pty_pressed Return}
+        focus .
+        set ::ck::test::pty_pressed ""
+    } -body {
+        send_keys "\r"
+        wait_for ::ck::test::pty_pressed Return 500
+    } -cleanup {
+        close_pty
+        unset -nocomplain ::ck::test::pty_pressed
+    } -result Return
+
+    test pty-2.2 {a sequence of keys dispatches in order} -setup {
+        open_pty
+        set ::ck::test::pty_keys {}
+        # Bind <Return> last so it tracks both the event and the
+        # expected end-of-sequence sentinel for wait_for below.
+        bind . <Tab>    {lappend ::ck::test::pty_keys Tab}
+        bind . <Key>    {lappend ::ck::test::pty_keys "Key:%K"}
+        bind . <Return> {
+            lappend ::ck::test::pty_keys Return
+            set ::ck::test::pty_done 1
+        }
+        focus .
+        set ::ck::test::pty_done 0
+    } -body {
+        send_keys "\tx\r"
+        wait_for ::ck::test::pty_done 1 500
+        set ::ck::test::pty_keys
+    } -cleanup {
+        close_pty
+        unset -nocomplain ::ck::test::pty_keys ::ck::test::pty_done
+    } -result {Tab Key:x Return}
+}
+
+::tcltest::cleanupTests
+namespace delete ck::test
+return
+
+# vim: ft=tcl

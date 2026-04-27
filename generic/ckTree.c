@@ -1529,7 +1529,8 @@ TreeTagsParseProc(
     int offset)				/* Offset into item (ignored). */
 {
     Node *nodePtr = (Node *) widgRec, *activeNode = NULL;
-    int argc, i, hideChildren = 0, redraw = 0, recompute = 0;
+    int hideChildren = 0, redraw = 0, recompute = 0;
+    Tcl_Size argc, i;
     const char **argv;
     Ck_Uid *newPtr;
 

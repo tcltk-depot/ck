@@ -265,7 +265,7 @@ RecorderReplay(ClientData clientData)
 	if (*p == '<') {
 	    CkEvent event;
 	    int cmdError = TCL_OK, deliver = 0;
-	    int argc;
+	    Tcl_Size argc;
 	    const char **argv;
 
 	    if (Tcl_SplitList(recPtr->interp, p, &argc, &argv) != TCL_OK) {

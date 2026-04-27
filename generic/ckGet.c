@@ -182,7 +182,7 @@ Ck_GetAttr(
     const char *name,
     int *attrPtr)
 {
-    int i, k, len, largc;
+    Tcl_Size i, k, len, largc;
     const char **largv;
 
     if (Tcl_SplitList(interp, name, &largc, &largv) != TCL_OK)
@@ -193,13 +193,13 @@ Ck_GetAttr(
 	for (i = 0; i < largc; i++) {
 	    len = strlen(largv[i]);
 	    if (len > 0) {
-		for (k = 0; k < sizeof (atab) / sizeof (atab[0]); k++)
+		for (k = 0; k < (Tcl_Size)(sizeof (atab) / sizeof (atab[0])); k++)
 		    if (strncmp(largv[i], atab[k].name, len) == 0) {
 			if (attrPtr != NULL)
 		            *attrPtr |= atab[k].value;
 			break;
 		    }
-		if (k >= sizeof (atab) / sizeof (atab[0])) {
+		if (k >= (Tcl_Size)(sizeof (atab) / sizeof (atab[0]))) {
 		    Tcl_AppendResult(interp, "bad attribute \"",
 			name, "\"", (char *) NULL);
 		    ckfree((char *) largv);

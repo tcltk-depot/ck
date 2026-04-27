@@ -1,0 +1,249 @@
+# vt.test — self-tests for the pure-Tcl VT100 parser.
+#
+# These tests exercise tests/vt.tcl in isolation, feeding canned escape
+# sequences in and checking grid state out.  They don't need the ck
+# binary, so a regression in the parser surfaces here, decoupled from
+# any concurrent ck change.
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+# vt.tcl is parser-only — no ck dependency, so we don't loadTestedCommands.
+set ::ck_no_auto_open 1
+source [file join [file dirname [info script]] vt.tcl]
+
+namespace eval vt::test {
+    variable S
+
+    proc setup_vt {{rows 5} {cols 20}} {
+        variable S
+        set S [::vt::new -rows $rows -cols $cols]
+    }
+    proc teardown_vt {} {
+        variable S
+        ::vt::destroy $S
+        unset -nocomplain S
+    }
+    proc feed {bytes} {
+        variable S
+        ::vt::feed $S $bytes
+    }
+    proc row {r}        { variable S; ::vt::row $S $r }
+    proc cell {r c}     { variable S; ::vt::cell $S $r $c }
+    proc cursor {}      { variable S; ::vt::cursor $S }
+    proc unhandled {}   { variable S; ::vt::unhandled $S }
+
+    # --- ground-state writes ---
+
+    test vt-1.1 {plain ASCII writes left-to-right} -setup {
+        setup_vt 3 10
+    } -body {
+        feed "hello"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "hello     "
+
+    test vt-1.2 {LF moves to next row, CR returns to col 0} -setup {
+        setup_vt 3 10
+    } -body {
+        feed "abc\r\nxyz"
+        list [row 0] [row 1] [cursor]
+    } -cleanup {
+        teardown_vt
+    } -result {{abc       } {xyz       } {1 3}}
+
+    test vt-1.3 {BS moves cursor back, overwrite works} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "abc\b\bX"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "aXc       "
+
+    # --- CSI cursor positioning ---
+
+    test vt-2.1 {CUP positions cursor (1-based)} -setup {
+        setup_vt 5 10
+    } -body {
+        feed "\x1b\[3;5HX"
+        list [row 0] [row 1] [row 2] [cursor]
+    } -cleanup {
+        teardown_vt
+    } -result {{          } {          } {    X     } {2 5}}
+
+    test vt-2.2 {CUP without params goes to (1,1)} -setup {
+        setup_vt 5 10
+    } -body {
+        feed "abc\x1b\[HX"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "Xbc       "
+
+    test vt-2.3 {CUF / CUB move cursor by Ps columns} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "\x1b\[3CX\x1b\[2DY"
+        # CUF 3 from col 0 → col 3, write X (cursor → col 4),
+        # CUB 2 from col 4 → col 2, write Y (cursor → col 3).
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "  YX      "
+
+    test vt-2.4 {CUU / CUD clamp at the edges} -setup {
+        setup_vt 5 10
+    } -body {
+        # On row 0 already, CUU 3 should stay at row 0
+        feed "\x1b\[3Aa"
+        # Now jump to bottom and try to overshoot
+        feed "\x1b\[5;1H\x1b\[10Bz"
+        list [row 0] [row 4]
+    } -cleanup {
+        teardown_vt
+    } -result {{a         } {z         }}
+
+    # --- erase ---
+
+    test vt-3.1 {EL 0 clears cursor → end of line} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "abcdefghij\x1b\[5G\x1b\[K"
+        # cursor at col 4 (5th column, 0-based 4), erase from there
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "abcd      "
+
+    test vt-3.2 {EL 1 clears start → cursor (inclusive)} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "abcdefghij\x1b\[5G\x1b\[1K"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "     fghij"
+
+    test vt-3.3 {EL 2 clears the whole line} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "abcdefghij\x1b\[2K"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "          "
+
+    test vt-3.4 {ED 2 clears the whole screen} -setup {
+        setup_vt 3 5
+    } -body {
+        feed "AAA\r\nBBB\r\nCCC\x1b\[2J"
+        list [row 0] [row 1] [row 2]
+    } -cleanup {
+        teardown_vt
+    } -result {{     } {     } {     }}
+
+    test vt-3.5 {ED 0 clears cursor → bottom of screen} -setup {
+        setup_vt 3 5
+    } -body {
+        feed "AAA\r\nBBB\r\nCCC\x1b\[2;3H\x1b\[J"
+        # cursor at row 1, col 2, erase from there to end
+        list [row 0] [row 1] [row 2]
+    } -cleanup {
+        teardown_vt
+    } -result {{AAA  } {BB   } {     }}
+
+    # --- save/restore ---
+
+    test vt-4.1 {ESC 7 / ESC 8 round-trip cursor position} -setup {
+        setup_vt 5 10
+    } -body {
+        # Tcl's \7 is octal-7 (BEL), not the digit '7' after ESC, so
+        # build the byte sequence as concatenation rather than relying
+        # on a single backslash-escape string.
+        feed [format "\x1b\[2;5H\x1b%s\x1b\[5;1H\x1b%sX" "7" "8"]
+        list [cursor] [row 1]
+    } -cleanup {
+        teardown_vt
+    } -result {{1 5} {    X     }}
+
+    test vt-4.2 {CSI s / CSI u round-trip cursor position} -setup {
+        setup_vt 5 10
+    } -body {
+        feed "\x1b\[3;3H\x1b\[s\x1b\[1;1H\x1b\[uY"
+        row 2
+    } -cleanup {
+        teardown_vt
+    } -result "  Y       "
+
+    # --- charsets / line drawing ---
+
+    test vt-5.1 {ESC ( 0 enables line drawing, q → ─} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "\x1b(0qqq\x1b(B---"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "───---    "
+
+    test vt-5.2 {SO/SI toggle line drawing} -setup {
+        setup_vt 1 10
+    } -body {
+        feed "a\x0eq\x0fa"
+        row 0
+    } -cleanup {
+        teardown_vt
+    } -result "a─a       "
+
+    # --- newline / scroll region ---
+
+    test vt-6.1 {LF at bottom of screen scrolls up} -setup {
+        setup_vt 3 5
+    } -body {
+        feed "AAA\r\nBBB\r\nCCC\r\nDDD"
+        list [row 0] [row 1] [row 2]
+    } -cleanup {
+        teardown_vt
+    } -result {{BBB  } {CCC  } {DDD  }}
+
+    test vt-6.2 {DECSTBM constrains scroll to a sub-region} -setup {
+        setup_vt 5 5
+    } -body {
+        feed "\x1b\[2;4r"
+        # scroll region is rows 1..3 (0-based); cursor reset to (0,0)
+        feed "AA\r\n"
+        feed "BB\r\n"
+        feed "CC\r\n"
+        feed "DD\r\n"
+        feed "EE\r\n"
+        feed "FF"
+        # rows 0 and 4 are outside the scroll region and shouldn't move.
+        list [row 0] [row 4]
+    } -cleanup {
+        teardown_vt
+    } -result {{AA   } {     }}
+
+    # --- unknown sequences logged ---
+
+    test vt-7.1 {unknown CSI finalizer is recorded for diagnosis} -setup {
+        setup_vt 1 5
+    } -body {
+        # CSI 1;2~ (function-key style, not in our coverage)
+        feed "\x1b\[1;2~"
+        unhandled
+    } -cleanup {
+        teardown_vt
+    } -result {{CSI 1;2~}}
+}
+
+::tcltest::cleanupTests
+namespace delete vt::test
+return
+
+# vim: ft=tcl

@@ -1,24 +1,86 @@
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
 }
-
 if {[llength [info commands test]] == 0} {
     namespace import ::tcltest::test
 }
 
+set ::ck_no_auto_open 1
 ::tcltest::loadTestedCommands
+source [file join [file dirname [info script]] helpers.tcl]
 
-test button-1.1 {button widget} -body {
-    button .b -text "hello, world" -command {puts bye; set ::done 1}
-    pack .b
-    vwait ::done
-    return -level 0 Ok
-} -cleanup {
-    unset -nocomplain ::done
-    catch {destroy .b}
-} -result Ok
+namespace eval ck::test {
+
+    test button-1.1 {button -command fires on Return when focused} -setup {
+        open_pty
+        button .b -text "hello, world" -command {set ::ck::test::button_pressed 1}
+        pack .b
+        focus .b
+        update
+        # Drop initial paint bytes so a later read $master only sees
+        # what the button activation triggered.
+        read_master
+        set ::ck::test::button_pressed 0
+    } -body {
+        send_keys "\r"
+        wait_for ::ck::test::button_pressed 1 500
+    } -cleanup {
+        catch {destroy .b}
+        close_pty
+        unset -nocomplain ::ck::test::button_pressed
+    } -result 1
+
+    test button-1.2 {button -command fires on space when focused} -setup {
+        open_pty
+        button .b -text x -command {set ::ck::test::button_pressed 1}
+        pack .b
+        focus .b
+        update
+        read_master
+        set ::ck::test::button_pressed 0
+    } -body {
+        send_keys " "
+        wait_for ::ck::test::button_pressed 1 500
+    } -cleanup {
+        catch {destroy .b}
+        close_pty
+        unset -nocomplain ::ck::test::button_pressed
+    } -result 1
+
+    test button-1.3 {button -text is rendered to the parsed grid} -setup {
+        open_pty
+    } -body {
+        button .b -text "MarkerTextHere"
+        pack .b
+        update
+        # vt_find_row pumps the pty into the vt screen and locates the
+        # row containing the literal text — assertions like these are
+        # immune to the cursor-positioning / attribute escapes that
+        # surround the actual characters.
+        vt_find_row "MarkerTextHere"
+    } -cleanup {
+        catch {destroy .b}
+        close_pty
+    } -match glob -result {[0-9]*}
+
+    test button-1.4 {button text appears at row 0 with default packing} -setup {
+        open_pty
+    } -body {
+        button .b -text Greetings
+        pack .b
+        update
+        # With a single packed widget on an 80x24 screen, ck centres
+        # the button on row 0.  We don't assert exact column placement
+        # since that depends on text length, but the row should be 0.
+        vt_find_row Greetings
+    } -cleanup {
+        catch {destroy .b}
+        close_pty
+    } -result 0
+}
 
 ::tcltest::cleanupTests
+namespace delete ck::test
 return
 
 # vim: ft=tcl

@@ -482,6 +482,7 @@ TextWidgetCmd(
     } else if ((c == 'i') && (strncmp(argv[1], "insert", length) == 0)
 	    && (length >= 3)) {
 	int i, j, numTags;
+	Tcl_Size numTagNames;
 	const char **tagNames;
 	CkTextTag **oldTagArrayPtr;
 
@@ -510,12 +511,12 @@ TextWidgetCmd(
 			}
 			ckfree((char *) oldTagArrayPtr);
 		    }
-		    if (Tcl_SplitList(interp, argv[j+1], &numTags, &tagNames)
+		    if (Tcl_SplitList(interp, argv[j+1], &numTagNames, &tagNames)
 			    != TCL_OK) {
 			result = TCL_ERROR;
 			goto done;
 		    }
-		    for (i = 0; i < numTags; i++) {
+		    for (i = 0; i < (int)numTagNames; i++) {
 			CkBTreeTag(&index1, &index2,
 				CkTextCreateTag(textPtr, tagNames[i]), 1);
 		    }
@@ -1427,7 +1428,8 @@ CkTextGetTabs(
     const char *string)			/* Description of the tab stops.  See
 					 * text manual entry for details. */
 {
-    int argc, i, count, c = 0;
+    Tcl_Size argc, i;
+    int count, c = 0;
     const char **argv;
     CkTextTabArray *tabArrayPtr;
     CkTextTab *tabPtr;

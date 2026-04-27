@@ -17,3 +17,11 @@ autom4te.cache
 /nccompat.so
 /ckUuid.h
 /manifest.uuid
+/build9
+/build9g
+/build86
+/build-fallback
+/buildwin
+/subprojects/*-*
+/subprojects/packagecache
+/subprojects/.wraplock

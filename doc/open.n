@@ -1,0 +1,137 @@
+'\"
+'\" Copyright (c) 2026 Cyan Ogilvie
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\"
+.so man.macros
+.TH ck::open n 1.0 Ck "Ck Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+ck::open \- Create the Ck main window and start a curses session
+.SH SYNOPSIS
+\fBck::open \fR?\fIoption value ...\fR? ?\fIpath\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+\fBck::open\fR creates the Ck main window (\fI.\fR) and starts a curses
+session against it.  Successive calls to \fBck::open\fR within the same
+interpreter are not permitted while a session is active; the existing
+session must be torn down with \fBdestroy .\fR first.
+.PP
+On a successful return the path of the created window (currently
+always ``\fB.\fR'') is left as the interpreter's result and the runtime
+Tcl-side bindings are loaded as a side effect (the same set of files
+\fB$ck_library/ck.tcl\fR sources for class bindings, dialog defaults,
+and so on).
+.PP
+\fBck::open\fR has two operating modes:
+.TP
+\fBControlling-tty mode\fR (default — no \fB-pty\fR option supplied)
+The session takes over the process's controlling terminal.  fds 0/1/2
+are dup-saved to high-numbered slots, the saved out/in fds are wrapped
+in \fBFILE\ *\fRs and handed to ncurses' \fBnewterm\fR(3) for display
+output and keyboard input, and a private capture buffer (\fBmemfd_create\fR(2)
+on Linux, \fBtmpfile\fR(3) elsewhere) is dup'd over fds 1/2 so that
+any \fBputs\fR, \fBprintf\fR, or extension-emitted output during the
+session is collected rather than corrupting the curses display.  At
+session teardown (\fBdestroy .\fR or process exit), the saved fds are
+restored over 1/2, the capture is drained to the now-restored stderr,
+and the curses screen is freed.  This is the behaviour applications
+that previously relied on the implicit \fBpackage require ck\fR
+auto-open get for free.
+.TP
+\fBExplicit-pty mode\fR (\fB-pty\fR \fIfd\fR)
+The caller supplies an open file descriptor (or Tcl channel name)
+referring to one end of a pty pair; ncurses runs against \fIfd\fR
+and the host process's fds 0/1/2 are left untouched.  This is the
+mode test harnesses use after allocating a pair via \fBck::pty open\fR
+\(em the harness reads from the master end to inspect what the curses
+session drew, and writes to it to inject keystrokes.
+
+.SH OPTIONS
+.PP
+.TP
+\fB-pty\fR \fIfdOrChannel\fR
+Drive the curses session on the given file descriptor instead of the
+process's controlling terminal.  \fIfdOrChannel\fR may be either a
+small non-negative integer (a raw fd, e.g. the slave end of a pty pair)
+or the name of an existing Tcl channel (e.g. the slave channel returned
+by \fBck::pty\ open\fR), in which case the underlying fd is extracted
+via \fBTcl_GetChannelHandle\fR.
+.TP
+\fB-rows\fR \fIN\fR
+Force the new session's row count to \fIN\fR by issuing
+\fBTIOCSWINSZ\fR on the underlying pty before \fBnewterm\fR(3) reads
+the terminal size.  Must be a positive integer; takes effect only
+together with \fB-cols\fR.  In controlling-tty mode the value is
+informational only \(em the kernel-reported tty size wins.
+.TP
+\fB-cols\fR \fIN\fR
+Like \fB-rows\fR but for column count.  Both must be set together for
+the resize to apply.
+.TP
+\fB-class\fR \fIclassName\fR
+Override the option-database class for the new main window.  When
+omitted the class is derived from the basename of \fB$argv0\fR
+(capitalised), defaulting to \fBCk\fR if \fB$argv0\fR is unset.
+.TP
+\fB-term\fR \fItermName\fR
+Override the terminal type passed to \fBnewterm\fR(3).  Defaults to
+the value of \fB$env(TERM)\fR.
+.TP
+\fIpath\fR
+Currently must be ``\fB.\fR'' if supplied (Ck only supports a single
+main window per interpreter); the option is reserved for future
+multi-root support.
+
+.SH AUTOMATIC OPEN AND THE \fB::ck_no_auto_open\fR GLOBAL
+.PP
+Historical Ck applications relied on \fBpackage require ck\fR creating
+the main window as a side effect.  That contract is preserved: the
+package's \fBpkgIndex.tcl\fR calls \fBck::open .\fR after loading the
+shared library unless the global variable \fB::ck_no_auto_open\fR is
+set to a true value beforehand.  Setting it suppresses the implicit
+open and leaves the caller responsible for invoking \fBck::open\fR
+explicitly (typically with \fB-pty\fR).
+.PP
+A plain top-level global is used (rather than a \fB::ck::no_auto_open\fR
+namespace var) so the suppression can be set without first creating
+the \fB::ck\fR namespace, which doesn't exist until the package has
+been loaded:
+.CS
+set ::ck_no_auto_open 1
+package require ck
+lassign [\fBck::pty open\fR \-rows 24 \-cols 80] master slave
+\fBck::open\fR \-pty $slave .
+.CE
+The variable is consulted only at \fBpackage require\fR time; setting
+it after the package has loaded has no effect on subsequent
+\fBck::open\fR calls.
+
+.SH STDOUT / STDERR CAPTURE
+.PP
+In controlling-tty mode, while the session is active the process's
+\fBstdout\fR and \fBstderr\fR are diverted to a capture buffer.  Any
+output written through them \(em including \fBputs\fR from Tcl,
+\fBprintf\fR from C extensions, the default \fBbgerror\fR fallback,
+and so on \(em is collected in memory rather than written to the
+display.  At teardown the original fds are reattached and the
+captured bytes are dumped to the now-restored \fBstderr\fR, so a
+diagnostic that would have been silently lost becomes visible the
+moment the curses screen tears down.
+.PP
+This supersedes Ck's previous strategy of intercepting the Tcl
+\fBputs\fR/\fBclose\fR/\fBflush\fR/\fBread\fR/\fBgets\fR/\fBexec\fR
+commands at the script level.  The fd-level capture covers C
+extensions and subprocess output that the Tcl-level intercepts
+couldn't reach, and it doesn't rely on any objCmd-versus-stringCmd
+trampolining in Tcl 9.
+
+.SH SEE ALSO
+ck::pty(n), destroy(n), exit(n)
+
+.SH KEYWORDS
+curses, main window, pty, capture, stdout, stderr
