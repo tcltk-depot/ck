@@ -39,6 +39,14 @@ of three decimal numbers.
 \fBcurses baudrate\fR
 Returns the baud rate of the terminal as decimal string.
 .TP
+\fBcurses colors\fR
+Returns the color mode in use: \fBdirect\fR (24 bit RGB colors),
+\fB256\fR, \fB16\fR, \fB8\fR or \fBnone\fR.  This is the number of
+colors the terminal description supports, limited by the \fB-colors\fR
+option of \fBck::open\fR or the \fBCK_COLORS\fR environment variable.
+Colors that can't be shown exactly are shown as the nearest available
+color.
+.TP
 \fBcurses encoding \fR\fI?ISO8859|IBM437?\fR
 Sets or returns the character encoding being or to be used for
 displaying text. This affects for example the output of

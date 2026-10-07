@@ -382,7 +382,7 @@ CkCreateMainWindowEx(
     char *className,		/* Class name of the new main window. */
     const CkOpenOptions *openOpts) /* NULL = legacy controlling-tty path. */
 {
-    int dummy;
+    int dummy, colorMode;
     Tcl_HashEntry *hPtr;
     CkMainInfo *mainPtr;
     CkWindow *winPtr;
@@ -545,12 +545,23 @@ CkCreateMainWindowEx(
      * tty, dup exhausted, etc.) we fall back to using stdout/stdin
      * directly so behaviour is unchanged from the pre-swap world.
      */
+    colorMode = (openOpts != NULL) ? openOpts->colors : CK_COLORS_AUTO;
+    if (colorMode == CK_COLORS_AUTO && getenv("CK_COLORS") != NULL &&
+	    CkGetColorMode(NULL, getenv("CK_COLORS"), &colorMode) != TCL_OK) {
+	colorMode = CK_COLORS_AUTO;
+    }
     if (CkStdioSwap_Init(mainPtr, openOpts) == TCL_OK) {
 	const char *termName = (openOpts != NULL) ? openOpts->term : NULL;
+
+	if (termName == NULL) {
+	    termName = CkDirectColorTerm(colorMode,
+		    fileno(mainPtr->uiOutFp));
+	}
 	mainPtr->screen = newterm((char *) termName,
 				   mainPtr->uiOutFp, mainPtr->uiInFp);
     } else {
-	mainPtr->screen = newterm(NULL, stdout, stdin);
+	mainPtr->screen = newterm((char *) CkDirectColorTerm(colorMode, 1),
+		stdout, stdin);
     }
     if (!mainPtr->screen) {
 	CkStdioSwap_Restore(mainPtr);
@@ -587,8 +598,8 @@ CkCreateMainWindowEx(
     winPtr->window = newwin(winPtr->height, winPtr->width, 0, 0);
     if (has_colors()) {
 	start_color();
-	mainPtr->flags |= CK_HAS_COLOR;
     }
+    CkInitColors(mainPtr, colorMode);
 #ifdef NCURSES_MOUSE_VERSION
     mouseinterval(1);
     mMask = mousemask(BUTTON1_PRESSED | BUTTON1_RELEASED |
@@ -1573,7 +1584,20 @@ Ck_SetWindowAttr(
 		fg = tmp;
 	    }
 	}
-	wattrset(winPtr->window, attr | Ck_GetPair(winPtr, fg, bg));
+#ifdef CK_EXT_COLORS
+	{
+	    int pair = CkAllocPair(winPtr->mainPtr, fg, bg);
+
+	    /*
+	     * Passing the pair via opts lifts COLOR_PAIR()'s limit of 256
+	     * pairs.
+	     */
+	    wattr_set(winPtr->window, (attr_t) attr, 0, &pair);
+	}
+#else
+	wattrset(winPtr->window,
+		attr | COLOR_PAIR(CkAllocPair(winPtr->mainPtr, fg, bg)));
+#endif
     }
 }
 

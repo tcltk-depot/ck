@@ -32,6 +32,16 @@ static inline void replace_tclobj(Tcl_Obj** target, Tcl_Obj* replacement)
     }
 }
 
+/*
+ * ncurses 6.1 added extended color pairs (more than 256 pairs, and colors
+ * that don't fit in a short, needed for direct color), and alloc_pair().
+ */
+#if defined(NCURSES_VERSION_MAJOR) && defined(NCURSES_EXT_COLORS) && \
+	(NCURSES_VERSION_MAJOR > 6 || \
+	 (NCURSES_VERSION_MAJOR == 6 && NCURSES_VERSION_MINOR >= 1))
+#   define CK_EXT_COLORS 1
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,13 +61,16 @@ int	CkAllKeyNames(Tcl_Interp *interp);
  * directly off this fd (typically the slave end of a pty pair the
  * caller created via ck::pty open)".  rows/cols, when both > 0, force
  * a TIOCSWINSZ on the pty before newterm() picks up the size.  term
- * overrides the TERM environment variable for newterm().
+ * overrides the TERM environment variable for newterm().  colors is the
+ * requested color mode (CK_COLORS_*), CK_COLORS_AUTO meaning $CK_COLORS
+ * if set, otherwise whatever the terminal supports.
  */
 typedef struct CkOpenOptions {
     int		pty_fd;
     int		rows;
     int		cols;
     const char *term;
+    int		colors;		/* Requested CK_COLORS_* mode. */
 } CkOpenOptions;
 
 #define CK_OPEN_OPTIONS_INIT_DEFAULTS(opts) do { \
@@ -65,6 +78,7 @@ typedef struct CkOpenOptions {
     (opts).rows   = 0;  \
     (opts).cols   = 0;  \
     (opts).term   = NULL; \
+    (opts).colors = CK_COLORS_AUTO; \
 } while (0)
 
 /*
@@ -78,6 +92,14 @@ CkWindow *CkCreateMainWindowEx(Tcl_Interp *interp, char *className,
 /* ckStdioSwap.c */
 int	CkStdioSwap_Init(CkMainInfo *mainPtr, const CkOpenOptions *opts);
 void	CkStdioSwap_Restore(CkMainInfo *mainPtr);
+
+/* ckColor.c */
+int	CkAllocPair(CkMainInfo *mainPtr, int fg, int bg);
+int	CkCursesColor(CkMainInfo *mainPtr, int color);
+const char *CkDirectColorTerm(int mode, int fd);
+int	CkGetColorMode(Tcl_Interp *interp, const char *name, int *modePtr);
+void	CkInitColors(CkMainInfo *mainPtr, int mode);
+const char *CkNameOfColorMode(int mode);
 
 /* ckOpen.c */
 Tcl_ObjCmdProc CkOpenObjCmd;

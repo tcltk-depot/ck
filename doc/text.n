@@ -289,7 +289,8 @@ associated with the tag.
 \fB\-foreground \fIcolor\fR
 \fIColor\fR specifies the color to use when drawing text and other
 foreground information such as underlines.
-It may have any of the forms accepted by \fBTk_GetColor\fR.
+It may have any of the forms described for the \fBbackground\fR
+option in the \fBoptions\fR manual entry.
 .TP
 \fB\-justify \fIjustify\fR
 If the first character of a display line has a tag for which this

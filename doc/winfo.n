@@ -44,7 +44,8 @@ chosen.
 \fBwinfo depth \fIwindow\fR
 Returns a decimal string giving the depth of \fIwindow\fR. 1 means the
 terminal's screen is monochrome. Any number higher than 1 means that
-the terminal supports colors.
+the terminal supports colors: 3 for 8 colors, 4 for 16, 8 for 256 and
+24 for direct (24 bit) color.  See \fBcurses colors\fR.
 .TP
 \fBwinfo exists \fIwindow\fR
 Returns 1 if there exists a window named \fIwindow\fR, 0 if no such

@@ -753,7 +753,13 @@ FormatConfigValue(
 	    break;
 	}
 	case CK_CONFIG_COLOR: {
-	    result = Ck_NameOfColor(*((int *) ptr));
+	    /* Ck_NameOfColor may use a static buffer */
+	    const char *name = Ck_NameOfColor(*((int *) ptr));
+
+	    if (name != NULL) {
+		strcpy(buffer, name);
+		result = buffer;
+	    }
 	    break;
 	}
 	case CK_CONFIG_BORDER: {

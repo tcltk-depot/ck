@@ -128,7 +128,8 @@ GetFdFromObj(Tcl_Interp *interp, Tcl_Obj *obj, int *fdPtr)
  *
  * CkOpenObjCmd --
  *
- *	ck::open ?-pty fd? ?-rows N? ?-cols M? ?-class CLASS? ?-term TERM? ?path?
+ *	ck::open ?-pty fd? ?-rows N? ?-cols M? ?-class CLASS? ?-term TERM?
+ *		?-colors MODE? ?path?
  *
  *	Returns the path of the created main window (currently always ".",
  *	since the underlying CkMainInfo is still single-rooted) on success.
@@ -143,9 +144,9 @@ CkOpenObjCmd(
     Tcl_Obj *const objv[])
 {
     static const char *const optStrings[] = {
-	"-pty", "-rows", "-cols", "-class", "-term", NULL
+	"-pty", "-rows", "-cols", "-class", "-term", "-colors", NULL
     };
-    enum { OPT_PTY, OPT_ROWS, OPT_COLS, OPT_CLASS, OPT_TERM };
+    enum { OPT_PTY, OPT_ROWS, OPT_COLS, OPT_CLASS, OPT_TERM, OPT_COLORS };
     CkOpenOptions opts;
     const char *classOverride = NULL;
     const char *path = ".";
@@ -207,6 +208,12 @@ CkOpenObjCmd(
 	    break;
 	case OPT_TERM:
 	    opts.term = Tcl_GetString(objv[i]);
+	    break;
+	case OPT_COLORS:
+	    if (CkGetColorMode(interp, Tcl_GetString(objv[i]),
+		    &opts.colors) != TCL_OK) {
+		return TCL_ERROR;
+	    }
 	    break;
 	}
     }

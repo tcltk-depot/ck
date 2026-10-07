@@ -242,6 +242,11 @@ typedef struct CkMainInfo {
     int capture_fd;		/* memfd/tmpfile holding captured 1+2; -1 if none. */
     FILE *uiOutFp;		/* FILE* on saved_stdout_fd, owned by ncurses. */
     FILE *uiInFp;		/* FILE* on saved_stdin_fd, owned by ncurses. */
+    int termColors;		/* Number of colors the terminal supports
+				 * (curses COLORS). */
+    int colorMode;		/* Color mode in use, CK_COLORS_*: the
+				 * lesser of termColors and the requested
+				 * mode.  See ckColor.c. */
 } CkMainInfo;
 
 #define CK_HAS_COLOR        1
@@ -251,6 +256,27 @@ typedef struct CkMainInfo {
 #define CK_REFRESH_TIMER   16
 #define CK_HAS_BARCODE     32
 #define CK_NOCLR_ON_EXIT   64
+
+/*
+ * Color values: -1 (unset), 0 - 255 (palette index) or
+ * CK_COLOR_RGB_FLAG | 0xrrggbb.  See ckColor.c.
+ */
+
+#define CK_COLOR_RGB_FLAG	0x1000000
+#define CK_COLOR_IS_RGB(c)	((c) >= 0 && ((c) & CK_COLOR_RGB_FLAG))
+#define CK_COLOR_RGB(c)		((c) & 0xffffff)
+
+/*
+ * Color modes (CkMainInfo.colorMode).  The values are ordered by the
+ * number of colors available.
+ */
+
+#define CK_COLORS_AUTO		-1
+#define CK_COLORS_NONE		0
+#define CK_COLORS_8		8
+#define CK_COLORS_16		16
+#define CK_COLORS_256		256
+#define CK_COLORS_DIRECT	0x1000000
 
 /*
  * Ck keeps one of the following structures for each window.

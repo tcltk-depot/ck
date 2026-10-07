@@ -1,0 +1,339 @@
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+}
+if {[llength [info commands test]] == 0} {
+    namespace import ::tcltest::test
+}
+
+set ::ck_no_auto_open 1
+::tcltest::loadTestedCommands
+source [file join [file dirname [info script]] helpers.tcl]
+
+namespace eval ck::test {
+
+    # Run script with the given environment variables set (or unset, for
+    # an empty value), restoring the environment afterwards.
+    proc with_env {vars script} {
+        set saved {}
+        foreach {k v} $vars {
+            if {[info exists ::env($k)]} {
+                dict set saved $k $::env($k)
+            }
+            if {$v eq ""} {
+                unset -nocomplain ::env($k)
+            } else {
+                set ::env($k) $v
+            }
+        }
+        try {
+            uplevel 1 $script
+        } finally {
+            foreach {k v} $vars {
+                if {[dict exists $saved $k]} {
+                    set ::env($k) [dict get $saved $k]
+                } else {
+                    unset -nocomplain ::env($k)
+                }
+            }
+        }
+    }
+
+    # Is seq in bytes?
+    proc has {bytes seq} {
+        expr {[string first $seq $bytes] >= 0}
+    }
+
+    # Bytes ncurses writes to draw a label with the given colors
+    proc label_bytes {args} {
+        label .l -text "ColorMarker" {*}$args
+        pack .l
+        update
+        read_master
+    }
+
+    # Color specifications <<<
+    test color-1.1 {#rrggbb round trips through cget} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        label .l -foreground #ff8000 -background #00007F
+        list [.l cget -foreground] [.l cget -background]
+    } -cleanup {
+        close_pty
+    } -result [list #ff8000 #00007f]
+
+    test color-1.2 {#rgb is short for #rrggbb} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        label .l -foreground #f80
+        .l cget -foreground
+    } -cleanup {
+        close_pty
+    } -result {#ff8800}
+
+    test color-1.3 {palette indices and bright names} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        label .l
+        lmap c {color0 color9 color200 color255 brightred brightwhite} {
+            .l configure -foreground $c
+            .l cget -foreground
+        }
+    } -cleanup {
+        close_pty
+    } -result {black brightred color200 color255 brightred brightwhite}
+
+    test color-1.4 {classic names still match by prefix} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        label .l
+        lmap c {b blu c r yellow} {
+            .l configure -foreground $c
+            .l cget -foreground
+        }
+    } -cleanup {
+        close_pty
+    } -result {black blue cyan red yellow}
+
+    test color-1.5 {bad color specifications} -setup {
+        open_pty -term xterm-direct
+        label .l
+    } -body {
+        lmap c {#12 #12345 #1234567 #gggggg color256 color colorx purple {}} {
+            list [catch {.l configure -foreground $c} msg] $msg
+        }
+    } -cleanup {
+        close_pty
+    } -result [lmap c {#12 #12345 #1234567 #gggggg color256 color colorx purple {}} {
+        list 1 "bad color \"$c\""
+    }]
+
+    test color-1.6 {text tag colors round trip} -setup {
+        open_pty -term xterm-256color
+    } -body {
+        text .t
+        .t tag configure x -foreground #123456 -background color42
+        list [.t tag cget x -foreground] [.t tag cget x -background]
+    } -cleanup {
+        close_pty
+    } -result [list #123456 color42]
+
+    #>>>
+    # Color modes <<<
+    test color-2.1 {color mode follows the terminal description} -body {
+        with_env {COLORTERM {} CK_COLORS {}} {
+            lmap term {xterm-direct xterm-256color xterm-16color xterm vt100} {
+                open_pty -term $term
+                set res [list [curses colors] [winfo depth .]]
+                close_pty
+                set res
+            }
+        }
+    } -result {{direct 24} {256 8} {16 4} {8 3} {none 1}}
+
+    test color-2.2 {-colors limits the color mode} -body {
+        with_env {COLORTERM {} CK_COLORS {}} {
+            lmap colors {direct 256 16 8 none auto} {
+                open_pty -term xterm-direct -colors $colors
+                set res [curses colors]
+                close_pty
+                set res
+            }
+        }
+    } -result {direct 256 16 8 none direct}
+
+    test color-2.3 {-colors can't exceed what the terminal supports} -body {
+        with_env {COLORTERM {} CK_COLORS {}} {
+            open_pty -term xterm -colors direct
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result 8
+
+    test color-2.4 {bad -colors} -body {
+        ck::open -colors 24bit .
+    } -returnCodes error -result {bad color mode "24bit": must be auto, direct, 256, 16, 8 or none}
+
+    test color-2.5 {COLORTERM=truecolor selects the -direct terminfo variant} -body {
+        with_env {TERM xterm-256color COLORTERM truecolor CK_COLORS {}} {
+            open_pty
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result direct
+
+    test color-2.6 {no -direct variant without COLORTERM} -body {
+        with_env {TERM xterm-256color COLORTERM {} CK_COLORS {}} {
+            open_pty
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result 256
+
+    test color-2.7 {-colors direct selects the -direct terminfo variant} -body {
+        with_env {TERM xterm-256color COLORTERM {} CK_COLORS {}} {
+            open_pty -colors direct
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result direct
+
+    test color-2.8 {CK_COLORS sets the mode when -colors isn't given} -body {
+        with_env {TERM xterm-256color COLORTERM truecolor CK_COLORS 256} {
+            open_pty
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result 256
+
+    test color-2.9 {-colors overrides CK_COLORS} -body {
+        with_env {TERM xterm-256color COLORTERM {} CK_COLORS 8} {
+            open_pty -colors 256
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result 256
+
+    test color-2.10 {-term disables the -direct variant} -body {
+        with_env {COLORTERM truecolor CK_COLORS {}} {
+            open_pty -term xterm-256color
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result 256
+
+    test color-2.11 {no -direct variant for terminals without one} -body {
+        with_env {TERM vt100 COLORTERM truecolor CK_COLORS {}} {
+            open_pty
+            curses colors
+        }
+    } -cleanup {
+        close_pty
+    } -result none
+
+    #>>>
+    # Output <<<
+    test color-3.1 {direct color: rgb colors are sent as rgb} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        set bytes [label_bytes -foreground #ff8000 -background #000080]
+        list \
+            [has $bytes "\x1b\[38:2::255:128:0m"] \
+            [has $bytes "\x1b\[48:2::0:0:128m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.2 {direct color: named colors use the terminal's palette} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        set bytes [label_bytes -foreground red -background blue]
+        list [has $bytes "\x1b\[31m"] [has $bytes "\x1b\[44m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.3 {direct color: palette indices >= 8 are sent as rgb} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        set bytes [label_bytes -foreground color200]
+        has $bytes "\x1b\[38:2::255:0:215m"
+    } -cleanup {
+        close_pty
+    } -result 1
+
+    test color-3.4 {direct color: rgb values below 8 aren't sent as ANSI colors} -setup {
+        open_pty -term xterm-direct
+    } -body {
+        set bytes [label_bytes -foreground #000003 -background #000000]
+        list [has $bytes "\x1b\[38:2::0:0:8m"] [has $bytes "\x1b\[48:2::0:0:8m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.5 {256 colors: rgb maps to the nearest cube or grey entry} -setup {
+        open_pty -term xterm-256color
+    } -body {
+        set bytes [label_bytes -foreground #ff8000 -background #808080]
+        list \
+            [has $bytes "\x1b\[38;5;208m"] \
+            [has $bytes "\x1b\[48;5;244m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.6 {256 colors: palette indices are sent as is} -setup {
+        open_pty -term xterm-256color
+    } -body {
+        set bytes [label_bytes -foreground color123 -background brightred]
+        list \
+            [has $bytes "\x1b\[38;5;123m"] \
+            [has $bytes "\x1b\[101m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.7 {8 colors: rgb and palette colors map to the nearest ANSI color} -setup {
+        open_pty -term xterm
+    } -body {
+        set bytes [label_bytes -foreground #f01010 -background color21]
+        list [has $bytes "\x1b\[31m"] [has $bytes "\x1b\[44m"]
+    } -cleanup {
+        close_pty
+    } -result {1 1}
+
+    test color-3.8 {8 colors: bright colors map to the base colors} -setup {
+        open_pty -term xterm
+    } -body {
+        set bytes [label_bytes -foreground brightgreen]
+        has $bytes "\x1b\[32m"
+    } -cleanup {
+        close_pty
+    } -result 1
+
+    test color-3.9 {direct color from a 256 color terminal limited to 256 colors} -setup {
+        open_pty -term xterm-direct -colors 256
+    } -body {
+        # #ff8000 -> palette 208 (#ff8700), sent as rgb
+        set bytes [label_bytes -foreground #ff8000]
+        has $bytes "\x1b\[38:2::255:135:0m"
+    } -cleanup {
+        close_pty
+    } -result 1
+
+    test color-4.1 {more than 256 color pairs} -setup {
+        open_pty -term xterm-direct -rows 40 -cols 80
+        text .t -width 80 -height 40
+        pack .t
+        update
+        read_master
+    } -body {
+        # 300 characters on screen with different colors: pairs above 255
+        # must keep their colors (COLOR_PAIR() can only express 0-255)
+        for {set i 0} {$i < 300} {incr i} {
+            set rgb [format #%02x%02x%02x [expr {$i & 0xff}] [expr {$i >> 8}] 0x40]
+            .t tag configure t$i -foreground $rgb
+            .t insert end x t$i
+        }
+        update
+        set bytes [read_master]
+        lmap i {260 280 299} {
+            has $bytes "\x1b\[38:2::[expr {$i & 0xff}]:[expr {$i >> 8}]:64m"
+        }
+    } -cleanup {
+        close_pty
+    } -result {1 1 1}
+
+    #>>>
+}
+
+::tcltest::cleanupTests
+return
+
+# vim: ft=tcl foldmethod=marker foldmarker=<<<,>>> ts=8 shiftwidth=4 expandtab

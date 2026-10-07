@@ -8,8 +8,9 @@ source [file join [file dirname [info script]] vt.tcl]
 
 namespace eval ck::test {
 
-    # open_pty ?-rows R? ?-cols C? — returns the master channel for
-    # the caller to read/write.  Also stands up a vt screen of the same
+    # open_pty ?-rows R? ?-cols C? ?-term T? ?-colors M? — returns the
+    # master channel for the caller to read/write (-term and -colors are
+    # passed to ck::open).  Also stands up a vt screen of the same
     # size that test_state(vt) tracks alongside the byte stream, so
     # higher-level tests can assert on a parsed grid (vt_row, vt_cell)
     # instead of substring-matching raw escape sequences.
@@ -19,16 +20,18 @@ namespace eval ck::test {
         # default size: small enough that an off-by-one is loud
         set rows 24
         set cols 80
+        set extra {}
         foreach {opt val} $args {
             switch -- $opt {
                 -rows { set rows $val }
                 -cols { set cols $val }
+                -term - -colors { lappend extra $opt $val }
                 default { error "unknown option \"$opt\"" }
             }
         }
 
         lassign [ck::pty open -rows $rows -cols $cols] master slave
-        ck::open -pty $slave -rows $rows -cols $cols .
+        ck::open -pty $slave -rows $rows -cols $cols {*}$extra .
 
         set test_state(master) $master
         set test_state(slave)  $slave

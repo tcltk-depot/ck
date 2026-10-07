@@ -70,6 +70,7 @@ TEA_ADD_SOURCES([
     generic/ckBind.c
     generic/ckBorder.c
     generic/ckButton.c
+    generic/ckColor.c
     generic/ckCmds.c
     generic/ckConfig.c
     generic/ckEntry.c

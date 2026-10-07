@@ -80,7 +80,28 @@ omitted the class is derived from the basename of \fB$argv0\fR
 .TP
 \fB-term\fR \fItermName\fR
 Override the terminal type passed to \fBnewterm\fR(3).  Defaults to
-the value of \fB$env(TERM)\fR.
+the value of \fB$env(TERM)\fR, or its direct color variant (see
+\fB-colors\fR).
+.TP
+\fB-colors\fR \fImode\fR
+The color mode to use: \fBauto\fR (the default), \fBdirect\fR,
+\fB256\fR, \fB16\fR, \fB8\fR or \fBnone\fR.  A mode other than
+\fBauto\fR limits the colors used to that many, even if the terminal
+supports more.  If this option isn't given, the \fBCK_COLORS\fR
+environment variable is used if set.
+.RS
+.PP
+terminfo can only describe 24 bit color support in a separate terminal
+description, such as \fBxterm-direct\fR, so terminals that support it
+usually run with \fBTERM\fR set to a 256 color description and
+advertise 24 bit color by setting \fBCOLORTERM\fR to \fBtruecolor\fR
+or \fB24bit\fR.  Unless \fB-term\fR is given, when \fImode\fR is
+\fBdirect\fR, or \fBauto\fR and \fBCOLORTERM\fR is set like that,
+the \fB-direct\fR variant of the terminal description is used if it
+exists: \fBxterm-direct\fR for \fBxterm-256color\fR,
+\fBtmux-direct\fR for \fBtmux-256color\fR, and so on.  Set
+\fBCK_COLORS\fR to \fB256\fR to prevent this.
+.RE
 .TP
 \fIpath\fR
 Currently must be ``\fB.\fR'' if supplied (Ck only supports a single

@@ -376,6 +376,14 @@ Ck_CursesCmd(
 	sprintf(buf, "%d", baudrate());
 	Tcl_AppendResult(interp, buf, (char *) NULL);
 	return TCL_OK;
+    } else if ((c == 'c') && (strncmp(argv[1], "colors", length) == 0)) {
+	if (argc != 2) {
+	    Tcl_AppendResult(interp, "wrong # args: must be \"", argv[0],
+		" ", argv[1], "\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+	Tcl_SetResult(interp, (char *) CkNameOfColorMode(mainPtr->colorMode),
+		TCL_STATIC);
     } else if ((c == 'e') && (strncmp(argv[1], "encoding", length) == 0)) {
 	if (argc == 2)
 	    return Ck_GetEncoding(interp);
@@ -520,7 +528,7 @@ Ck_CursesCmd(
 #endif
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
-	    "\": must be barcode, baudrate, encoding, gchar, haskey, ",
+	    "\": must be barcode, baudrate, colors, encoding, gchar, haskey, ",
 	    "purgeinput, refreshdelay, reversekludge, screendump or suspend",
 	    (char *) NULL);
 	return TCL_ERROR;
@@ -601,8 +609,13 @@ Ck_WinfoCmd(
 	}
     } else if ((c == 'd') && (strncmp(argv[1], "depth", length) == 0)) {
 	SETUP("depth");
-	Tcl_SetResult(interp, (winPtr->mainPtr->flags & CK_HAS_COLOR) ?
-		      "3" : "1", TCL_STATIC);
+	switch (winPtr->mainPtr->colorMode) {
+	case CK_COLORS_DIRECT:	Tcl_SetResult(interp, "24", TCL_STATIC); break;
+	case CK_COLORS_256:	Tcl_SetResult(interp, "8", TCL_STATIC); break;
+	case CK_COLORS_16:	Tcl_SetResult(interp, "4", TCL_STATIC); break;
+	case CK_COLORS_8:	Tcl_SetResult(interp, "3", TCL_STATIC); break;
+	default:		Tcl_SetResult(interp, "1", TCL_STATIC); break;
+	}
     } else if ((c == 'e') && (strncmp(argv[1], "exists", length) == 0)) {
 	if (argc != 3) {
 	    argName = "exists";

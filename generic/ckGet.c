@@ -15,13 +15,6 @@
 #include "ckPort.h"
 #include "ck.h"
 
-typedef struct {
-    short fg, bg;
-} CPair;
-
-static CPair *cPairs = NULL;
-static int numPairs, newPair;
-
 /*
  * The hash table below is used to keep track of all the Ck_Uids created
  * so far.
@@ -29,20 +22,6 @@ static int numPairs, newPair;
 
 static Tcl_HashTable uidTable;
 static int initialized = 0;
-
-static struct {
-    char *name;
-    int value;
-} ctab[] = {
-    { "black", COLOR_BLACK },
-    { "blue", COLOR_BLUE },
-    { "cyan", COLOR_CYAN },
-    { "green", COLOR_GREEN },
-    { "magenta", COLOR_MAGENTA },
-    { "red", COLOR_RED },
-    { "white", COLOR_WHITE },
-    { "yellow", COLOR_YELLOW }
-};
 
 static struct {
     char *name;
@@ -91,71 +70,6 @@ Ck_GetUid(const char *string)		/* String to convert. */
     }
     return (Ck_Uid) Tcl_GetHashKey(&uidTable,
 	    Tcl_CreateHashEntry(&uidTable, string, &dummy));
-}
-
-/*
- *------------------------------------------------------------------------
- *
- * Ck_GetColor --
- *
- *	Given a color specification, return curses color value.
- *
- * Results:
- *	TCL_OK if color found, curses color in *colorPtr.
- *	TCL_ERROR if color not found; interp's result contains an
- *	error message.
- *
- * Side effects:
- *	None.
- *
- *------------------------------------------------------------------------
- */
-
-int
-Ck_GetColor(
-    Tcl_Interp *interp,
-    char *name,
-    int *colorPtr)
-{
-    int i, len;
-
-    len = strlen(name);
-    if (len > 0)
-	for (i = 0; i < sizeof (ctab) / sizeof (ctab[0]); i++)
-	    if (strncmp(name, ctab[i].name, len) == 0) {
-	    	if (colorPtr != NULL)
-		    *colorPtr = ctab[i].value;
-		return TCL_OK;
-	    }
-    Tcl_AppendResult(interp, "bad color \"", name, "\"", (char *) NULL);
-    return TCL_ERROR;
-}
-
-/*
- *------------------------------------------------------------------------
- *
- * Ck_NameOfColor --
- *
- *	Given a curses color, return its name.
- *
- * Results:
- *	String: name of color, or NULL if no valid color.
- *
- * Side effects:
- *	None.
- *
- *------------------------------------------------------------------------
- */
-
-char *
-Ck_NameOfColor(int color)	/* Curses color to get name for */
-{
-    int i;
-
-    for (i = 0; i < sizeof (ctab) / sizeof (ctab[0]); i++)
-	if (ctab[i].value == color)
-	    return ctab[i].name;
-    return NULL;
 }
 
 /*
@@ -248,51 +162,6 @@ Ck_NameOfAttr(int attr)
     Tcl_DStringFree(&list);
     return result;
 }
-/*
- *------------------------------------------------------------------------
- *
- * Ck_GetColorPair --
- *
- *	Given background/foreground curses colors, a color pair
- *	is allocated and returned.
- *
- * Results:
- *	TCL_OK if color found, curses color in *colorPtr.
- *	TCL_ERROR if color not found; interp's result contains an
- *	error message.
- *
- * Side effects:
- *	None.
- *
- *------------------------------------------------------------------------
- */
-
-int
-Ck_GetPair(CkWindow *winPtr, int fg, int bg)
-{
-    int i;
-
-    if (!(winPtr->mainPtr->flags & CK_HAS_COLOR))
-	return COLOR_PAIR(0);
-    if (cPairs == NULL) {
-	cPairs = (CPair *) ckalloc(sizeof (CPair) * (COLOR_PAIRS + 2));
-	numPairs = 0;
-	newPair = 1;
-    }
-    for (i = 1; i < numPairs; i++)
-	if (cPairs[i].fg == fg && cPairs[i].bg == bg)
-	    return COLOR_PAIR(i);
-    i = newPair;
-    cPairs[i].fg = fg;
-    cPairs[i].bg = bg;
-    init_pair((short) i, (short) fg, (short) bg);
-    if (++newPair >= COLOR_PAIRS)
-	newPair = 1;
-    else
-	numPairs = newPair;
-    return COLOR_PAIR(i);
-}
-
 /*
  *--------------------------------------------------------------
  *

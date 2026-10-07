@@ -66,16 +66,34 @@ Command-Line Switch:	\fB\-activebackground\fR
 .fi
 .IP
 Specifies background color to use when drawing active elements of
-widgets. Color specifications are always symbolic; valid color names are:
-.PP
-.ta 4c 8c
-.nf
-	\fBblack\fR	\fBmagenta\fR
-	\fBblue\fR	\fBred\fR
-	\fBcyan\fR	\fByellow\fR
-	\fBgreen\fR	\fBwhite\fR
-.fi
-.ta 4c
+widgets. A color may be given in any of these forms:
+.RS
+.TP
+\fBblack\fR, \fBblue\fR, \fBcyan\fR, \fBgreen\fR, \fBmagenta\fR, \fBred\fR, \fBwhite\fR, \fByellow\fR
+The eight basic terminal colors (palette entries 0 - 7).  These names
+may be abbreviated.
+.TP
+\fBbrightblack\fR, \fBbrightblue\fR, ... \fBbrightyellow\fR
+The bright variants of the basic colors (palette entries 8 - 15).
+.TP
+\fBcolor\fIN\fR
+Entry \fIN\fR (0 - 255) of the 256 color palette: 0 - 15 are the
+basic and bright colors, 16 - 231 a 6\(mu6\(mu6 color cube and
+232 - 255 a grey ramp.
+.TP
+\fB#\fIrrggbb\fR, \fB#\fIrgb\fR
+A 24 bit RGB color in hexadecimal (\fB#\fIrgb\fR is short for
+\fB#\fIrrggbb\fR, as in CSS: \fB#f80\fR is \fB#ff8800\fR).
+.RE
+.IP
+Colors are displayed as closely as the terminal allows (see
+\fBcurses colors\fR): on a direct color terminal RGB colors are shown
+exactly, on a 256 color terminal as the nearest entry of the color cube
+or grey ramp, and with 16 or 8 colors as the nearest basic (or bright)
+color.  The basic colors are shown in the terminal's own palette, which
+depends on its theme, as are the bright colors except in direct color
+mode (direct color terminal descriptions can't select them, so they are
+sent as their usual xterm RGB values).
 .PP
 .LP
 .nf

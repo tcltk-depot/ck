@@ -47,6 +47,7 @@ pkg_sources = files(
   'generic/ckBind.c',
   'generic/ckBorder.c',
   'generic/ckButton.c',
+  'generic/ckColor.c',
   'generic/ckCmds.c',
   'generic/ckConfig.c',
   'generic/ckEntry.c',
